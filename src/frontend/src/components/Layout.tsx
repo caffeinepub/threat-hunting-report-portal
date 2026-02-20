@@ -1,10 +1,13 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Shield, FileText, Plus } from 'lucide-react';
+import { Shield, FileText, Plus, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LoginButton from './LoginButton';
+import { useGetCallerUserProfile } from '../hooks/useGetCallerUserProfile';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const { data: userProfile } = useGetCallerUserProfile();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,12 +30,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   Reports
                 </Link>
               </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/attack-path">
+                  <Network className="h-4 w-4 mr-2" />
+                  Attack Path
+                </Link>
+              </Button>
               <Button size="sm" asChild>
                 <Link to="/create">
                   <Plus className="h-4 w-4 mr-2" />
                   New Report
                 </Link>
               </Button>
+              {userProfile && (
+                <div className="ml-2 px-3 py-1 bg-primary/10 rounded-full text-sm font-medium">
+                  {userProfile.name}
+                </div>
+              )}
+              <LoginButton />
             </nav>
           </div>
         </div>

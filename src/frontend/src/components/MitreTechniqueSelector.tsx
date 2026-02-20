@@ -3,18 +3,27 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, ChevronsUpDown, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Check, ChevronsUpDown, X, Plus } from 'lucide-react';
 import { mitreAttackData } from '@/data/mitreAttackData';
 import { cn } from '@/lib/utils';
 
 interface MitreTechniqueSelectorProps {
   selectedTechniques: string[];
   onTechniquesChange: (techniques: string[]) => void;
+  customTechniques: string[];
+  onCustomTechniquesChange: (techniques: string[]) => void;
 }
 
-export default function MitreTechniqueSelector({ selectedTechniques, onTechniquesChange }: MitreTechniqueSelectorProps) {
+export default function MitreTechniqueSelector({ 
+  selectedTechniques, 
+  onTechniquesChange,
+  customTechniques,
+  onCustomTechniquesChange 
+}: MitreTechniqueSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [customInput, setCustomInput] = useState('');
 
   const addTechnique = (techniqueId: string) => {
     if (!selectedTechniques.includes(techniqueId)) {
@@ -26,6 +35,18 @@ export default function MitreTechniqueSelector({ selectedTechniques, onTechnique
 
   const removeTechnique = (techniqueId: string) => {
     onTechniquesChange(selectedTechniques.filter((id) => id !== techniqueId));
+  };
+
+  const addCustomTechnique = () => {
+    const trimmed = customInput.trim();
+    if (trimmed && !customTechniques.includes(trimmed)) {
+      onCustomTechniquesChange([...customTechniques, trimmed]);
+      setCustomInput('');
+    }
+  };
+
+  const removeCustomTechnique = (technique: string) => {
+    onCustomTechniquesChange(customTechniques.filter((t) => t !== technique));
   };
 
   const filteredTechniques = mitreAttackData.filter(
@@ -70,20 +91,56 @@ export default function MitreTechniqueSelector({ selectedTechniques, onTechnique
         </PopoverContent>
       </Popover>
 
+      <div className="flex gap-2">
+        <Input 
+          placeholder="Add custom technique or note..." 
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addCustomTechnique();
+            }
+          }}
+        />
+        <Button type="button" variant="outline" size="icon" onClick={addCustomTechnique} disabled={!customInput.trim()}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+
       {selectedTechniques.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selectedTechniques.map((techniqueId) => {
-            const technique = mitreAttackData.find((t) => t.id === techniqueId);
-            return (
-              <Badge key={techniqueId} variant="secondary" className="gap-1 pr-1">
-                <span className="font-mono text-xs">{techniqueId}</span>
-                <span className="text-xs">- {technique?.name}</span>
-                <Button variant="ghost" size="icon" className="h-4 w-4 p-0 hover:bg-transparent" onClick={() => removeTechnique(techniqueId)}>
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Predefined Techniques:</p>
+          <div className="flex flex-wrap gap-2">
+            {selectedTechniques.map((techniqueId) => {
+              const technique = mitreAttackData.find((t) => t.id === techniqueId);
+              return (
+                <Badge key={techniqueId} variant="secondary" className="gap-1 pr-1">
+                  <span className="font-mono text-xs">{techniqueId}</span>
+                  <span className="text-xs">- {technique?.name}</span>
+                  <Button variant="ghost" size="icon" className="h-4 w-4 p-0 hover:bg-transparent" onClick={() => removeTechnique(techniqueId)}>
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {customTechniques.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Custom Techniques:</p>
+          <div className="flex flex-wrap gap-2">
+            {customTechniques.map((technique, index) => (
+              <Badge key={index} variant="outline" className="gap-1 pr-1 italic">
+                <span className="text-xs">{technique}</span>
+                <Button variant="ghost" size="icon" className="h-4 w-4 p-0 hover:bg-transparent" onClick={() => removeCustomTechnique(technique)}>
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
-            );
-          })}
+            ))}
+          </div>
         </div>
       )}
     </div>

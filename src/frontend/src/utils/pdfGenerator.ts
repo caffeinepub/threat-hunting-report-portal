@@ -1,7 +1,7 @@
-import type { Report } from '@/backend';
+import type { DetailedReport } from '@/hooks/useQueries';
 import { mitreAttackData } from '@/data/mitreAttackData';
 
-export async function generateReportPdf(report: Report): Promise<void> {
+export async function generateReportPdf(report: DetailedReport): Promise<void> {
   // Create a printable HTML document
   const printWindow = window.open('', '_blank');
   
@@ -87,6 +87,15 @@ export async function generateReportPdf(report: Report): Promise<void> {
           
           .section-content {
             padding-left: 10px;
+            white-space: pre-wrap;
+          }
+          
+          .subsection-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+            margin-top: 15px;
           }
           
           .threat-actor {
@@ -127,6 +136,15 @@ export async function generateReportPdf(report: Report): Promise<void> {
             color: #4a5568;
           }
           
+          .custom-technique {
+            background: #faf5ff;
+            border-left: 4px solid #805ad5;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-style: italic;
+            color: #553c9a;
+          }
+          
           .ioc {
             background: #fffaf0;
             border-left: 4px solid #dd6b20;
@@ -148,28 +166,6 @@ export async function generateReportPdf(report: Report): Promise<void> {
             font-weight: 700;
             color: #2d3748;
             margin-bottom: 8px;
-          }
-          
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-          }
-          
-          th, td {
-            border: 1px solid #cbd5e0;
-            padding: 10px;
-            text-align: left;
-          }
-          
-          th {
-            background: #2d3748;
-            color: white;
-            font-weight: 600;
-          }
-          
-          tr:nth-child(even) {
-            background: #f7fafc;
           }
           
           .footer {
@@ -224,6 +220,48 @@ export async function generateReportPdf(report: Report): Promise<void> {
           </div>
         </div>
         
+        <div class="section">
+          <h3 class="section-title">Timeline of Events</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.timeline)}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3 class="section-title">Attack Vector Analysis</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.attackVector)}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3 class="section-title">Evidence Collection Details</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.evidenceCollection)}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3 class="section-title">Affected Systems/Assets</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.affectedSystems)}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3 class="section-title">Remediation Actions Taken</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.remediationActions)}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3 class="section-title">Recommendations for Future Prevention</h3>
+          <div class="section-content">
+            <p>${escapeHtml(report.recommendations)}</p>
+          </div>
+        </div>
+        
         ${report.threatActors.length > 0 ? `
           <div class="section">
             <h3 class="section-title">Threat Actors</h3>
@@ -238,20 +276,29 @@ export async function generateReportPdf(report: Report): Promise<void> {
           </div>
         ` : ''}
         
-        ${report.mitreTechniques.length > 0 ? `
+        ${report.mitreTechniques.length > 0 || report.customMitreTechniques.length > 0 ? `
           <div class="section">
             <h3 class="section-title">MITRE ATT&CK Techniques</h3>
             <div class="section-content">
-              ${report.mitreTechniques.map(techniqueId => {
-                const technique = mitreAttackData.find(t => t.id === techniqueId);
-                return `
-                  <div class="technique">
-                    <div class="technique-id">${escapeHtml(techniqueId)}</div>
-                    <div class="technique-name">${escapeHtml(technique?.name || 'Unknown Technique')}</div>
-                    <div class="technique-desc">${escapeHtml(technique?.description || 'No description available')}</div>
-                  </div>
-                `;
-              }).join('')}
+              ${report.mitreTechniques.length > 0 ? `
+                <div class="subsection-title">Predefined Techniques:</div>
+                ${report.mitreTechniques.map(techniqueId => {
+                  const technique = mitreAttackData.find(t => t.id === techniqueId);
+                  return `
+                    <div class="technique">
+                      <div class="technique-id">${escapeHtml(techniqueId)}</div>
+                      <div class="technique-name">${escapeHtml(technique?.name || 'Unknown Technique')}</div>
+                      <div class="technique-desc">${escapeHtml(technique?.description || 'No description available')}</div>
+                    </div>
+                  `;
+                }).join('')}
+              ` : ''}
+              ${report.customMitreTechniques.length > 0 ? `
+                <div class="subsection-title">Custom Techniques:</div>
+                ${report.customMitreTechniques.map(technique => `
+                  <div class="custom-technique">${escapeHtml(technique)}</div>
+                `).join('')}
+              ` : ''}
             </div>
           </div>
         ` : ''}

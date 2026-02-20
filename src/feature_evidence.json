@@ -2,101 +2,153 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
-      "featureTitle": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+      "featureId": "feature-add-an-up-and-down-parallel-arrow-bidirectional-vertical-arrow-icon-to-the-attack-path-visualizer-toolbar-as-a-draggable-element-that-can-be-placed-on-the-canvas",
+      "featureTitle": "Add an up and down parallel arrow (bidirectional vertical arrow) icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
       "files": [
-        "frontend/src/components/ReportForm.tsx",
-        "frontend/src/pages/CreateReportPage.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-46"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-integrate-mitre-att-ck-framework-data-by-providing-a-searchable-dropdown-or-selection-interface-for-mitre-att-ck-techniques-with-their-ids-e-g-t1059-001-and-descriptions",
-      "featureTitle": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+      "featureId": "feature-enable-text-label-rotation-in-the-attack-path-visualizer-allowing-users-to-rotate-text-labels-to-any-angle",
+      "featureTitle": "Enable text label rotation in the attack path visualizer, allowing users to rotate text labels to any angle",
       "files": [
-        "frontend/src/components/MitreTechniqueSelector.tsx",
-        "frontend/src/components/ReportForm.tsx",
-        "frontend/src/data/mitreAttackData.ts"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/components/LoadDiagramDialog.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-47"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-pdf-generation-functionality-that-creates-a-professionally-formatted-threat-hunting-report-containing-all-report-sections-including-mitre-att-ck-techniques-iocs-and-findings",
-      "featureTitle": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+      "featureId": "feature-implement-a-free-transform-tool-in-the-attack-path-visualizer-that-allows-users-to-move-and-resize-both-icons-and-text-labels-with-visual-transformation-controls",
+      "featureTitle": "Implement a free transform tool in the attack path visualizer that allows users to move and resize both icons and text labels with visual transformation controls",
       "files": [
-        "frontend/src/components/PdfGeneratorButton.tsx",
-        "frontend/src/utils/pdfGenerator.ts"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx",
+        "frontend/src/components/LoadDiagramDialog.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-4"
+        "REQ-48"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-a-report-listing-page-that-displays-all-saved-threat-hunting-reports-with-basic-information-title-date-techniques-count-and-allows-users-to-view-full-details-or-generate-pdfs",
-      "featureTitle": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+      "featureId": "feature-change-the-exe-icon-in-the-attack-path-visualizer-from-a-graphical-icon-to-a-text-based-representation-displaying-exe",
+      "featureTitle": "Change the .exe icon in the attack path visualizer from a graphical icon to a text-based representation displaying '.exe'",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/ReportDetailPage.tsx",
-        "frontend/src/pages/ReportListPage.tsx"
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-5"
+        "REQ-49"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-design-a-professional-security-focused-visual-theme-with-a-cohesive-color-palette-avoiding-blue-and-purple-clear-typography-optimized-for-readability-of-technical-content-and-a-layout-that-emphasizes-structured-information-and-data-clarity-suitable-for-cybersecurity-professionals",
-      "featureTitle": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+      "featureId": "feature-change-the-excel-icon-in-the-attack-path-visualizer-to-display-as-text-reading-microsoft-excel-instead-of-a-graphical-icon",
+      "featureTitle": "Change the Excel icon in the attack path visualizer to display as text reading 'Microsoft Excel' instead of a graphical icon",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-6"
+        "REQ-50"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-change-the-word-icon-in-the-attack-path-visualizer-to-display-as-text-reading-microsoft-word-instead-of-a-graphical-icon",
+      "featureTitle": "Change the Word icon in the attack path visualizer to display as text reading 'Microsoft Word' instead of a graphical icon",
+      "files": [
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-51"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-the-ip-address-icon-from-the-attack-path-visualizer-toolbar-and-prevent-it-from-being-placed-on-the-canvas",
+      "featureTitle": "Remove the IP Address icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+      "files": [
+        "frontend/src/components/AttackPathToolbar.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-52"
       ],
       "confidence": "high"
     }

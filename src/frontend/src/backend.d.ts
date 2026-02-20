@@ -7,27 +7,66 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface ReportMetadata {
-    title: string;
-    date: Time;
-    author: string;
+export interface Line {
+    color: string;
+    endPosition: Position;
+    isArrow: boolean;
+    startPosition: Position;
+    strokeWidth: number;
 }
-export interface ThreatActor {
+export interface Icon {
+    id: string;
     name: string;
-    description: string;
+    iconType: string;
+    position: Position;
 }
-export type Time = bigint;
-export interface Report {
-    mitreTechniques: Array<string>;
-    metadata: ReportMetadata;
-    iocs: Array<string>;
-    executiveSummary: string;
-    findings: Array<string>;
-    threatActors: Array<ThreatActor>;
+export interface Position {
+    x: number;
+    y: number;
+}
+export interface DiagramState {
+    lines: Array<Line>;
+    lastModified: bigint;
+    connections: Array<Connection>;
+    textLabels: Array<TextLabel>;
+    icons: Array<Icon>;
+    freehandDrawings: Array<FreehandDrawing>;
+}
+export interface TextLabel {
+    content: string;
+    color: string;
+    fontWeight: string;
+    position: Position;
+    fontSize: number;
+}
+export interface FreehandDrawing {
+    color: string;
+    strokeWidth: number;
+    points: Array<Position>;
+}
+export interface Connection {
+    color: string;
+    sourceId: string;
+    connectionType: string;
+    targetId: string;
+}
+export interface UserProfile {
+    name: string;
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
 }
 export interface backendInterface {
-    deleteReport(id: bigint): Promise<void>;
-    getAllReports(): Promise<Array<Report>>;
-    getReport(id: bigint): Promise<Report>;
-    saveReport(title: string, author: string, executiveSummary: string, threatActorNames: Array<string>, threatActorDescriptions: Array<string>, mitreTechniques: Array<string>, iocs: Array<string>, findings: Array<string>): Promise<bigint>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    getAllConnections(): Promise<Array<Connection> | null>;
+    getAllIconPositions(): Promise<Array<Icon> | null>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    getDiagramState(): Promise<DiagramState | null>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isCallerAdmin(): Promise<boolean>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveDiagramState(state: DiagramState): Promise<void>;
 }

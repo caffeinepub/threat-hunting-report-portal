@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { generateReportPdf } from '@/utils/pdfGenerator';
-import type { Report } from '@/backend';
+import type { DetailedReport } from '@/hooks/useQueries';
 import { toast } from 'sonner';
 
 interface PdfGeneratorButtonProps {
-  report: Report;
+  report: DetailedReport;
   children?: React.ReactNode;
   variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';

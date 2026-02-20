@@ -1,143 +1,191 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Threat Hunt Portal - Frontend Implementation",
+  "title": "Add bidirectional arrow, text rotation, free transform tool, and update icon styles in attack path visualizer",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Create threat hunting report form interface with dynamic technique and IOC management",
+      "id": "REQ-46",
+      "summary": "Add bidirectional vertical arrow icon to attack path visualizer toolbar as draggable element",
       "acceptanceCriteria": [
-        "Form includes fields for report title, date, executive summary, threat actors, techniques, IOCs, and findings",
-        "Form validates required fields before submission",
-        "Users can add multiple techniques and IOCs dynamically"
+        "A bidirectional vertical arrow icon appears in the AttackPathToolbar",
+        "The arrow icon can be dragged from the toolbar and placed onto the canvas",
+        "The placed arrow icon can be repositioned like other icons",
+        "The arrow icon maintains consistent styling with other attack path elements"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/ReportForm.tsx",
-          "operation": "create",
-          "description": "Create comprehensive report form component with fields for title, date, author, executive summary, threat actors (name and description), MITRE ATT&CK techniques, IOCs, and findings. Implement dynamic arrays for threat actors, techniques, IOCs, and findings with add/remove functionality. Include form validation for required fields (title, date, author, executive summary). Use shadcn-ui form components (Input, Textarea, Button) for consistent UI."
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Add a new bidirectional vertical arrow icon to the toolbar's draggable icons array. Include the icon with type 'bidirectional-arrow' alongside existing icons like 'attacker', 'computer', etc. Ensure the icon is draggable using the same onDragStart mechanism as other toolbar icons."
         },
         {
-          "path": "frontend/src/pages/CreateReportPage.tsx",
-          "operation": "create",
-          "description": "Create page component that renders ReportForm and handles form submission by calling backend saveReport method. Handle success and error states, show loading indicators during submission, and navigate to report listing page on successful save."
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Add rendering logic for the 'bidirectional-arrow' icon type. Create an SVG-based bidirectional vertical arrow (up and down parallel arrows) that matches the styling of existing attack path elements. Ensure the icon maintains draggability and interaction consistency with other icon types."
         },
         {
-          "path": "frontend/src/hooks/useBackend.ts",
-          "operation": "create",
-          "description": "Create custom hook that provides typed access to backend methods (saveReport, getAllReports, getReport, deleteReport) with error handling and loading states."
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Ensure the canvas correctly handles drop and placement of the new 'bidirectional-arrow' icon type, treating it like other draggable icons with full repositioning support."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Integrate MITRE ATT&CK framework with searchable technique selection interface",
+      "id": "REQ-47",
+      "summary": "Enable text label rotation in attack path visualizer",
       "acceptanceCriteria": [
-        "Users can search and select MITRE ATT&CK techniques by ID or name",
-        "Selected techniques display their full ID and description",
-        "Multiple techniques can be added to a single report"
+        "Text labels can be rotated using a rotation control or handle",
+        "Rotation angle is persisted in the text label state",
+        "Rotated text labels maintain their rotation when saved and loaded",
+        "Rotation is smooth and intuitive to use"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/data/mitreAttackData.ts",
-          "operation": "create",
-          "description": "Create static MITRE ATT&CK technique data file containing an array of techniques with id (e.g., T1059.001), name, and description. Include commonly used techniques across tactics like Initial Access, Execution, Persistence, Privilege Escalation, Defense Evasion, Credential Access, Discovery, Lateral Movement, Collection, and Exfiltration."
-        },
-        {
-          "path": "frontend/src/components/MitreTechniqueSelector.tsx",
-          "operation": "create",
-          "description": "Create searchable technique selector component using shadcn-ui Combobox or Command component. Implement fuzzy search across technique IDs, names, and descriptions. Display selected techniques as removable tags with full ID and description. Allow multiple technique selection. Integrate with ReportForm for technique management."
-        },
-        {
-          "path": "frontend/src/components/ReportForm.tsx",
+          "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Integrate MitreTechniqueSelector component into the report form. Manage selected techniques state and ensure technique IDs are included in form submission to backend."
+          "description": "Add a 'rotation' property (number, default 0) to the TextLabel type in the state management hook. Update state setters to handle rotation changes for individual text labels."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Add rotation control UI for selected text labels. Implement a rotation handle (e.g., circular handle above the text label) that allows users to rotate text by dragging. Apply CSS transform rotation to text labels based on their rotation state. Ensure rotation persists when text is moved or edited."
+        },
+        {
+          "path": "frontend/src/hooks/useSaveDiagramState.ts",
+          "operation": "modify",
+          "description": "Update the diagram state serialization to include the rotation property when converting text labels to backend DiagramState format. Ensure rotation values are preserved during save operations."
+        },
+        {
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "operation": "modify",
+          "description": "Update the diagram state deserialization logic to extract and apply the rotation property when loading text labels from the backend DiagramState format into frontend state."
         }
       ]
     },
     {
-      "id": "REQ-4",
-      "summary": "Implement client-side PDF generation for threat hunting reports",
+      "id": "REQ-48",
+      "summary": "Implement free transform tool for moving and resizing icons and text labels",
       "acceptanceCriteria": [
-        "Users can generate and download PDF reports from saved threat hunting data",
-        "PDF includes all report sections in a readable format",
-        "PDF displays MITRE ATT&CK techniques with their IDs and descriptions",
-        "Generated PDF is properly formatted and downloadable"
+        "A free transform tool is available in the toolbar",
+        "When active, selected icons display resize handles at corners/edges",
+        "When active, selected text labels display resize handles",
+        "Icons and text labels can be resized by dragging handles",
+        "Icons and text labels can be moved while in transform mode",
+        "Resized dimensions are persisted in element state",
+        "Transform handles are visible and easy to interact with"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/pdfGenerator.ts",
-          "operation": "create",
-          "description": "Create PDF generation utility using jsPDF library. Implement formatReportAsPDF function that takes Report data and generates professionally formatted PDF with sections: title page with report metadata, executive summary, threat actors with descriptions, MITRE ATT&CK techniques table with IDs and descriptions, IOCs list, and detailed findings. Apply professional formatting with headers, spacing, tables, and page breaks. Return PDF blob for download."
-        },
-        {
-          "path": "frontend/src/components/PdfGeneratorButton.tsx",
-          "operation": "create",
-          "description": "Create button component that accepts report data, triggers PDF generation using pdfGenerator utility, and initiates browser download with filename format 'ThreatHuntReport_<title>_<date>.pdf'. Show loading state during PDF generation. Use shadcn-ui Button component."
-        },
-        {
-          "path": "frontend/package.json",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Add jsPDF library as dependency for client-side PDF generation functionality."
+          "description": "Add a 'Free Transform' tool button to the toolbar alongside existing drawing tools (freehand, line, arrow, text). The button should toggle the transform mode and provide visual feedback when active."
+        },
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Add 'width' and 'height' properties to Icon and TextLabel types. Add a new state property 'activeTransformTool' (boolean) to track when free transform mode is active. Add a 'selectedElementId' state to track which element is currently selected for transformation."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Implement free transform functionality: When free transform mode is active, display resize handles (corner and edge handles) around the selected icon or text label. Implement drag handlers for resize handles that update element width/height. Allow moving elements while in transform mode. Ensure all transform changes persist in state."
+        },
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Update icon rendering to support custom width and height properties from state. Apply dimensions using CSS or SVG attributes while maintaining aspect ratio or allowing free resize as needed."
+        },
+        {
+          "path": "frontend/src/hooks/useSaveDiagramState.ts",
+          "operation": "modify",
+          "description": "Update diagram state serialization to include width and height properties for icons and text labels when saving to backend."
+        },
+        {
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "operation": "modify",
+          "description": "Update diagram state deserialization to extract and apply width and height properties when loading icons and text labels from backend."
         }
       ]
     },
     {
-      "id": "REQ-5",
-      "summary": "Create report listing page with view and PDF generation capabilities",
+      "id": "REQ-49",
+      "summary": "Change .exe icon to text-based representation displaying '.exe'",
       "acceptanceCriteria": [
-        "Page displays all saved reports in a list or table format",
-        "Each report shows title, date, and number of techniques",
-        "Users can click to view full report details",
-        "Users can generate PDF from the listing page"
+        "The .exe icon in the toolbar displays as text reading '.exe'",
+        "When placed on the canvas, the .exe element renders as text '.exe'",
+        "The text-based .exe element maintains consistent styling with other elements",
+        "The .exe element remains draggable and functional"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ReportListPage.tsx",
-          "operation": "create",
-          "description": "Create report listing page that fetches all reports using useBackend hook and displays them in a table using shadcn-ui Table component. Show columns for report title, date, number of MITRE techniques, and actions (View Details, Generate PDF, Delete). Implement navigation to detail view page. Integrate PdfGeneratorButton for each report row. Handle loading and error states. Include button to navigate to CreateReportPage."
-        },
-        {
-          "path": "frontend/src/pages/ReportDetailPage.tsx",
-          "operation": "create",
-          "description": "Create report detail page that fetches and displays complete report data for a specific report ID. Show all sections: metadata, executive summary, threat actors with descriptions, MITRE ATT&CK techniques with full details from mitreAttackData, IOCs list, and findings. Include PdfGeneratorButton for downloading PDF of current report. Use shadcn-ui Card components for section organization. Handle loading and error states."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Wire React Router routes for CreateReportPage (/create), ReportListPage (/ as default), and ReportDetailPage (/report/:id). Add navigation structure with links to main pages. Set ReportListPage as the default landing page."
+          "description": "Update the rendering logic for the 'exe' icon type to display as text '.exe' instead of using the image asset frontend/public/assets/generated/exe-icon.dim_64x64.png. Apply consistent text styling (font, color, background) that matches other text-based elements in the attack path visualizer."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Update the toolbar representation of the .exe icon to display as text '.exe' instead of the image icon. Ensure the text representation is clearly visible and maintains the draggable behavior."
         }
       ]
     },
     {
-      "id": "REQ-6",
-      "summary": "Design professional security-focused theme with clear information hierarchy",
+      "id": "REQ-50",
+      "summary": "Change Excel icon to display 'Microsoft Excel' text instead of graphical icon",
       "acceptanceCriteria": [
-        "Visual design uses a consistent, professional color scheme appropriate for security applications",
-        "Typography is clear and readable for technical content",
-        "Layout emphasizes information hierarchy and data organization",
-        "Design conveys authority and technical professionalism"
+        "The Excel icon in the toolbar displays as text reading 'Microsoft Excel'",
+        "When placed on the canvas, the Excel element renders as text 'Microsoft Excel'",
+        "The text-based Excel element maintains consistent styling",
+        "The Excel element remains draggable and functional"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Define security-focused color palette using CSS variables avoiding blue and purple. Use dark greens, grays, reds, and oranges for professional security aesthetic. Set typography with clear, monospace-friendly fonts for technical content. Define spacing and layout utilities that emphasize information hierarchy. Ensure high contrast for readability of threat data and IOCs."
+          "description": "Update the rendering logic for the Excel icon type to display as text 'Microsoft Excel' instead of using the image asset frontend/public/assets/generated/excel-icon.dim_64x64.png. Apply consistent text styling that matches other text-based elements."
         },
         {
-          "path": "frontend/tailwind.config.js",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Extend Tailwind theme with security-themed color palette (dark greens, charcoal, slate, amber, red tones). Configure typography plugin for technical content readability. Set custom spacing and border radius for professional appearance. Ensure configuration supports the security-focused design system."
+          "description": "Update the toolbar representation of the Excel icon to display as text 'Microsoft Excel' instead of the image icon. Ensure the text is readable and maintains draggable behavior."
+        }
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "summary": "Change Word icon to display 'Microsoft Word' text instead of graphical icon",
+      "acceptanceCriteria": [
+        "The Word icon in the toolbar displays as text reading 'Microsoft Word'",
+        "When placed on the canvas, the Word element renders as text 'Microsoft Word'",
+        "The text-based Word element maintains consistent styling",
+        "The Word element remains draggable and functional"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Update the rendering logic for the Word icon type to display as text 'Microsoft Word' instead of using the image asset frontend/public/assets/generated/word-icon.dim_64x64.png. Apply consistent text styling that matches other text-based elements."
         },
         {
-          "path": "frontend/src/components/Layout.tsx",
-          "operation": "create",
-          "description": "Create main layout component with professional header featuring app title 'Threat Hunt Portal' and navigation links. Include the generated security-themed hero banner image (frontend/public/assets/generated/hero-banner.dim_1200x400.png) on the homepage/landing view. Use security-focused styling with dark theme elements. Provide consistent page structure wrapper for all views."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Wrap all routes with Layout component to ensure consistent header, navigation, and styling across all pages. Verify Layout correctly displays the hero banner on the ReportListPage."
+          "description": "Update the toolbar representation of the Word icon to display as text 'Microsoft Word' instead of the image icon. Ensure the text is readable and maintains draggable behavior."
+        }
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "summary": "Remove IP Address icon from attack path visualizer toolbar",
+      "acceptanceCriteria": [
+        "The IP Address icon is not visible in the AttackPathToolbar",
+        "Existing diagrams with IP Address icons remain unaffected",
+        "The IP Address icon type is removed from the available icon types for new placements"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Remove the IP Address icon from the toolbar's draggable icons array. Ensure that any references to 'ip' or 'ip-address' icon type are removed from the toolbar UI, preventing users from adding new IP Address icons to the canvas."
         }
       ]
     }

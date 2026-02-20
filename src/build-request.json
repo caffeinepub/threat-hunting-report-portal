@@ -1,119 +1,158 @@
 {
   "kind": "build_request",
-  "title": "Create threat hunting report portal with MITRE ATT&CK and PDF generation",
-  "projectName": "Threat Hunt Portal",
+  "title": "Add bidirectional arrow, text rotation, free transform tool, and update icon styles in attack path visualizer",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+      "id": "REQ-46",
+      "text": "Add an up and down parallel arrow (bidirectional vertical arrow) icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-latest"
+        ],
+        "quotes": [
+          "In attack path visualizer, put an up and down parallel arrow"
         ]
       },
       "acceptanceCriteria": [
-        "Form includes fields for report title, date, executive summary, threat actors, techniques, IOCs, and findings",
-        "Form validates required fields before submission",
-        "Users can add multiple techniques and IOCs dynamically"
+        "A bidirectional vertical arrow icon appears in the AttackPathToolbar",
+        "The arrow icon can be dragged from the toolbar and placed onto the canvas",
+        "The placed arrow icon can be repositioned like other icons",
+        "The arrow icon maintains consistent styling with other attack path elements"
       ]
     },
     {
-      "id": "REQ-2",
-      "text": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+      "id": "REQ-47",
+      "text": "Enable text label rotation in the attack path visualizer, allowing users to rotate text labels to any angle",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-latest"
+        ],
+        "quotes": [
+          "I should be able to rotate the text label"
         ]
       },
       "acceptanceCriteria": [
-        "Users can search and select MITRE ATT&CK techniques by ID or name",
-        "Selected techniques display their full ID and description",
-        "Multiple techniques can be added to a single report"
+        "Text labels can be rotated using a rotation control or handle",
+        "Rotation angle is persisted in the text label state",
+        "Rotated text labels maintain their rotation when saved and loaded",
+        "Rotation is smooth and intuitive to use"
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Store threat hunting reports in the backend with fields for report metadata (title, date, author), executive summary, threat actors, selected MITRE ATT&CK techniques, IOCs, and detailed findings",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend stores complete report data including all sections",
-        "Reports are persisted across canister upgrades",
-        "Each report has a unique identifier"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+      "id": "REQ-48",
+      "text": "Implement a free transform tool in the attack path visualizer that allows users to move and resize both icons and text labels with visual transformation controls",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-latest"
+        ],
+        "quotes": [
+          "Put a free transform tool, to move and resize the icons and text label"
         ]
       },
       "acceptanceCriteria": [
-        "Users can generate and download PDF reports from saved threat hunting data",
-        "PDF includes all report sections in a readable format",
-        "PDF displays MITRE ATT&CK techniques with their IDs and descriptions",
-        "Generated PDF is properly formatted and downloadable"
+        "A free transform tool is available in the toolbar",
+        "When active, selected icons display resize handles at corners/edges",
+        "When active, selected text labels display resize handles",
+        "Icons and text labels can be resized by dragging handles",
+        "Icons and text labels can be moved while in transform mode",
+        "Resized dimensions are persisted in element state",
+        "Transform handles are visible and easy to interact with"
       ]
     },
     {
-      "id": "REQ-5",
-      "text": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+      "id": "REQ-49",
+      "text": "Change the .exe icon in the attack path visualizer from a graphical icon to a text-based representation displaying '.exe'",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-latest"
+        ],
+        "quotes": [
+          "Change the .exe icon into a .exe word icon"
         ]
       },
       "acceptanceCriteria": [
-        "Page displays all saved reports in a list or table format",
-        "Each report shows title, date, and number of techniques",
-        "Users can click to view full report details",
-        "Users can generate PDF from the listing page"
+        "The .exe icon in the toolbar displays as text reading '.exe'",
+        "When placed on the canvas, the .exe element renders as text '.exe'",
+        "The text-based .exe element maintains consistent styling with other elements",
+        "The .exe element remains draggable and functional"
       ]
     },
     {
-      "id": "REQ-6",
-      "text": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+      "id": "REQ-50",
+      "text": "Change the Excel icon in the attack path visualizer to display as text reading 'Microsoft Excel' instead of a graphical icon",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-latest"
+        ],
+        "quotes": [
+          "Change the excel icon into microsoft excel icon"
         ]
       },
       "acceptanceCriteria": [
-        "Visual design uses a consistent, professional color scheme appropriate for security applications",
-        "Typography is clear and readable for technical content",
-        "Layout emphasizes information hierarchy and data organization",
-        "Design conveys authority and technical professionalism"
+        "The Excel icon in the toolbar displays as text reading 'Microsoft Excel'",
+        "When placed on the canvas, the Excel element renders as text 'Microsoft Excel'",
+        "The text-based Excel element maintains consistent styling",
+        "The Excel element remains draggable and functional"
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "text": "Change the Word icon in the attack path visualizer to display as text reading 'Microsoft Word' instead of a graphical icon",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Change the word icon into microsoft word icon"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Word icon in the toolbar displays as text reading 'Microsoft Word'",
+        "When placed on the canvas, the Word element renders as text 'Microsoft Word'",
+        "The text-based Word element maintains consistent styling",
+        "The Word element remains draggable and functional"
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "text": "Remove the IP Address icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Remove the IP address Icon"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The IP Address icon is not visible in the AttackPathToolbar",
+        "Existing diagrams with IP Address icons remain unaffected",
+        "The IP Address icon type is removed from the available icon types for new placements"
       ]
     }
   ],
   "constraints": [
-    "PDF generation must be handled client-side in the frontend",
-    "MITRE ATT&CK technique data should be embedded or statically available in the frontend",
-    "All report data must persist across canister upgrades"
+    "Preserve existing attack path state management structure in useAttackPathState hook",
+    "Maintain compatibility with saved diagram state in the backend",
+    "Do not modify backend main.mo file for this request",
+    "Keep existing icon functionality (drag, drop, connect, erase) intact"
   ],
   "nonGoals": [
-    "Real-time threat intelligence feeds or external API integration",
-    "Automated threat detection or scanning capabilities",
-    "User authentication beyond Internet Identity",
-    "Email notification or sharing features",
-    "Export formats other than PDF"
+    "Modifying other icon types not mentioned in the request",
+    "Changing the toolbar layout or organization",
+    "Adding new drawing tools beyond the free transform capability",
+    "Modifying the save/load diagram functionality"
   ],
   "imageRequirements": {
-    "required": [
-      "Security-themed hero banner showing abstract network or threat visualization in dark tones (hero-banner.dim_1200x400.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

@@ -1,118 +1,141 @@
-import Text "mo:core/Text";
-import Array "mo:core/Array";
-import Int "mo:core/Int";
-import Time "mo:core/Time";
 import Map "mo:core/Map";
-import Order "mo:core/Order";
+import Nat "mo:core/Nat";
+import Principal "mo:core/Principal";
+import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 
+import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "authorization/access-control";
+import MixinStorage "blob-storage/Mixin";
+
+
 actor {
-  type ThreatActor = {
+  include MixinStorage();
+
+  // Position Types
+  public type Position = {
+    x : Float;
+    y : Float;
+  };
+
+  // Icon Types
+  public type Icon = {
+    id : Text;
+    iconType : Text; // e.g. "server", "database"
+    position : Position;
     name : Text;
-    description : Text;
   };
 
-  type ReportMetadata = {
-    title : Text;
-    author : Text;
-    date : Time.Time;
+  // Connection Types
+  public type Connection = {
+    sourceId : Text;
+    targetId : Text;
+    connectionType : Text; // e.g. "solid", "dashed"
+    color : Text;
   };
 
-  public type Report = {
-    metadata : ReportMetadata;
-    executiveSummary : Text;
-    threatActors : [ThreatActor];
-    mitreTechniques : [Text];
-    iocs : [Text];
-    findings : [Text];
+  // Freehand Drawing Types
+  public type FreehandDrawing = {
+    points : [Position];
+    color : Text;
+    strokeWidth : Float;
   };
 
-  module Report {
-    public func compare(report1 : Report, report2 : Report) : Order.Order {
-      switch (Text.compare(report1.metadata.title, report2.metadata.title)) {
-        case (#equal) { Int.compare(report1.metadata.date, report2.metadata.date) };
-        case (other) { other };
-      };
+  // Line and Arrow Types
+  public type Line = {
+    startPosition : Position;
+    endPosition : Position;
+    color : Text;
+    strokeWidth : Float;
+    isArrow : Bool;
+  };
+
+  // Text Label Types
+  public type TextLabel = {
+    content : Text;
+    position : Position;
+    fontSize : Float;
+    color : Text;
+    fontWeight : Text; // e.g. "bold", "normal"
+  };
+
+  // Complete Diagram State
+  public type DiagramState = {
+    icons : [Icon];
+    connections : [Connection];
+    freehandDrawings : [FreehandDrawing];
+    lines : [Line];
+    textLabels : [TextLabel];
+    lastModified : Int;
+  };
+
+  // User Profile Type
+  public type UserProfile = {
+    name : Text;
+  };
+
+  let diagramStore = Map.empty<Principal, DiagramState>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
+  // User Profile Functions
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access profiles");
+    };
+    userProfiles.get(caller);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
+
+  // Save or update a diagram state
+  public shared ({ caller }) func saveDiagramState(state : DiagramState) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save diagram state");
+    };
+    diagramStore.add(caller, state);
+  };
+
+  // Retrieve a diagram state
+  public query ({ caller }) func getDiagramState() : async ?DiagramState {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access diagram state");
+    };
+    diagramStore.get(caller);
+  };
+
+  // Get all icon positions for a user
+  public query ({ caller }) func getAllIconPositions() : async ?[Icon] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access icon positions");
+    };
+    switch (diagramStore.get(caller)) {
+      case (?state) { ?state.icons };
+      case (null) { null };
     };
   };
 
-  type InternalReport = {
-    report : Report;
-    id : Nat;
-  };
-
-  module InternalReport {
-    public func compareByReportTitle(r1 : InternalReport, r2 : InternalReport) : Order.Order {
-      Text.compare(r1.report.metadata.title, r2.report.metadata.title);
+  // Get all connections for a user
+  public query ({ caller }) func getAllConnections() : async ?[Connection] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access connections");
     };
-  };
-
-  let reports = Map.empty<Nat, InternalReport>();
-
-  var reportId = 0;
-
-  public shared ({ caller }) func saveReport(
-    title : Text,
-    author : Text,
-    executiveSummary : Text,
-    threatActorNames : [Text],
-    threatActorDescriptions : [Text],
-    mitreTechniques : [Text],
-    iocs : [Text],
-    findings : [Text],
-  ) : async Nat {
-    if (threatActorNames.size() != threatActorDescriptions.size()) {
-      Runtime.trap("Mismatch in threat actor names and descriptions");
+    switch (diagramStore.get(caller)) {
+      case (?state) { ?state.connections };
+      case (null) { null };
     };
-
-    let threatActors = Array.tabulate(
-      threatActorNames.size(),
-      func(i) {
-        {
-          name = threatActorNames[i];
-          description = threatActorDescriptions[i];
-        };
-      },
-    );
-
-    let report : Report = {
-      metadata = {
-        title;
-        author;
-        date = Time.now();
-      };
-      executiveSummary;
-      threatActors;
-      mitreTechniques;
-      iocs;
-      findings;
-    };
-
-    let internalReport : InternalReport = {
-      report;
-      id = reportId;
-    };
-
-    reports.add(reportId, internalReport);
-    reportId += 1;
-    internalReport.id;
-  };
-
-  public query ({ caller }) func getReport(id : Nat) : async Report {
-    switch (reports.get(id)) {
-      case (null) { Runtime.trap("Report not found") };
-      case (?internalReport) { internalReport.report };
-    };
-  };
-
-  public query ({ caller }) func getAllReports() : async [Report] {
-    reports.values().toArray().sort(InternalReport.compareByReportTitle).map(func(ir) { ir.report });
-  };
-
-  public shared ({ caller }) func deleteReport(id : Nat) : async () {
-    if (not reports.containsKey(id)) {
-      Runtime.trap("Report not found");
-    };
-    reports.remove(id);
   };
 };

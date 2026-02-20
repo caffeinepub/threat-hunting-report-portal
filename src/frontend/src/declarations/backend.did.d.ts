@@ -10,38 +10,88 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Report {
-  'mitreTechniques' : Array<string>,
-  'metadata' : ReportMetadata,
-  'iocs' : Array<string>,
-  'executiveSummary' : string,
-  'findings' : Array<string>,
-  'threatActors' : Array<ThreatActor>,
+export interface Connection {
+  'color' : string,
+  'sourceId' : string,
+  'connectionType' : string,
+  'targetId' : string,
 }
-export interface ReportMetadata {
-  'title' : string,
-  'date' : Time,
-  'author' : string,
+export interface DiagramState {
+  'lines' : Array<Line>,
+  'lastModified' : bigint,
+  'connections' : Array<Connection>,
+  'textLabels' : Array<TextLabel>,
+  'icons' : Array<Icon>,
+  'freehandDrawings' : Array<FreehandDrawing>,
 }
-export interface ThreatActor { 'name' : string, 'description' : string }
-export type Time = bigint;
+export interface FreehandDrawing {
+  'color' : string,
+  'strokeWidth' : number,
+  'points' : Array<Position>,
+}
+export interface Icon {
+  'id' : string,
+  'name' : string,
+  'iconType' : string,
+  'position' : Position,
+}
+export interface Line {
+  'color' : string,
+  'endPosition' : Position,
+  'isArrow' : boolean,
+  'startPosition' : Position,
+  'strokeWidth' : number,
+}
+export interface Position { 'x' : number, 'y' : number }
+export interface TextLabel {
+  'content' : string,
+  'color' : string,
+  'fontWeight' : string,
+  'position' : Position,
+  'fontSize' : number,
+}
+export interface UserProfile { 'name' : string }
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
-  'deleteReport' : ActorMethod<[bigint], undefined>,
-  'getAllReports' : ActorMethod<[], Array<Report>>,
-  'getReport' : ActorMethod<[bigint], Report>,
-  'saveReport' : ActorMethod<
-    [
-      string,
-      string,
-      string,
-      Array<string>,
-      Array<string>,
-      Array<string>,
-      Array<string>,
-      Array<string>,
-    ],
-    bigint
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
   >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'getAllConnections' : ActorMethod<[], [] | [Array<Connection>]>,
+  'getAllIconPositions' : ActorMethod<[], [] | [Array<Icon>]>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getDiagramState' : ActorMethod<[], [] | [DiagramState]>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveDiagramState' : ActorMethod<[DiagramState], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

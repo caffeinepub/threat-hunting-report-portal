@@ -1,204 +1,129 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T10:17:30.601Z",
+  "generatedAt": "2026-02-20T18:13:49.249Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 5,
+    "total": 7,
+    "implemented": 7,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+        "id": "REQ-46",
+        "summary": "Add an up and down parallel arrow (bidirectional vertical arrow) icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ReportForm.tsx",
-          "frontend/src/pages/CreateReportPage.tsx",
-          "frontend/src/hooks/useBackend.ts"
+          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/ReportForm.tsx",
-          "frontend/src/pages/CreateReportPage.tsx"
+          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx"
         ]
       },
       {
-        "id": "REQ-2",
-        "summary": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+        "id": "REQ-47",
+        "summary": "Enable text label rotation in the attack path visualizer, allowing users to rotate text labels to any angle",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/data/mitreAttackData.ts",
-          "frontend/src/components/MitreTechniqueSelector.tsx",
-          "frontend/src/components/ReportForm.tsx"
+          "frontend/src/hooks/useAttackPathState.ts",
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/hooks/useSaveDiagramState.ts",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/data/mitreAttackData.ts",
-          "frontend/src/components/MitreTechniqueSelector.tsx",
-          "frontend/src/components/ReportForm.tsx"
+          "frontend/src/hooks/useAttackPathState.ts",
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ]
       },
       {
-        "id": "REQ-3",
-        "summary": "Store threat hunting reports in the backend with fields for report metadata (title, date, author), executive summary, threat actors, selected MITRE ATT&CK techniques, IOCs, and detailed findings",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+        "id": "REQ-48",
+        "summary": "Implement a free transform tool in the attack path visualizer that allows users to move and resize both icons and text labels with visual transformation controls",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/pdfGenerator.ts",
-          "frontend/src/components/PdfGeneratorButton.tsx",
-          "frontend/package.json"
+          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/hooks/useAttackPathState.ts",
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/hooks/useSaveDiagramState.ts",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/pdfGenerator.ts",
-          "frontend/src/components/PdfGeneratorButton.tsx"
+          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/hooks/useAttackPathState.ts",
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ]
       },
       {
-        "id": "REQ-5",
-        "summary": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+        "id": "REQ-49",
+        "summary": "Change the .exe icon in the attack path visualizer from a graphical icon to a text-based representation displaying '.exe'",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ReportListPage.tsx",
-          "frontend/src/pages/ReportDetailPage.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ReportListPage.tsx",
-          "frontend/src/pages/ReportDetailPage.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       },
       {
-        "id": "REQ-6",
-        "summary": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+        "id": "REQ-50",
+        "summary": "Change the Excel icon in the attack path visualizer to display as text reading 'Microsoft Excel' instead of a graphical icon",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
+      },
+      {
+        "id": "REQ-51",
+        "summary": "Change the Word icon in the attack path visualizer to display as text reading 'Microsoft Word' instead of a graphical icon",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
+      },
+      {
+        "id": "REQ-52",
+        "summary": "Remove the IP Address icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/package.json",
-    "build-template/pnpm-lock.yaml",
-    "build-template/pnpm-workspace.yaml",
-    "build-template/scripts/prune-unused-images.js",
-    "build-template/scripts/resize-images.js",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/backend/system-idl/aaaaa-aa.did",
-    "build-template/src/frontend/canister.yaml",
-    "build-template/src/frontend/components.json",
-    "build-template/src/frontend/env.json",
-    "build-template/src/frontend/eslint-rules/no-bigint-in-query-keys.js",
-    "build-template/src/frontend/eslint-rules/require-internet-identity-provider.js",
-    "build-template/src/frontend/eslint.config.js",
-    "build-template/src/frontend/package.json",
-    "build-template/src/frontend/postcss.config.js",
-    "build-template/src/frontend/src/components/ui/accordion.tsx",
-    "build-template/src/frontend/src/components/ui/alert-dialog.tsx",
-    "build-template/src/frontend/src/components/ui/alert.tsx",
-    "build-template/src/frontend/src/components/ui/aspect-ratio.tsx",
-    "build-template/src/frontend/src/components/ui/avatar.tsx",
-    "build-template/src/frontend/src/components/ui/badge.tsx",
-    "build-template/src/frontend/src/components/ui/breadcrumb.tsx",
-    "build-template/src/frontend/src/components/ui/button.tsx",
-    "build-template/src/frontend/src/components/ui/calendar.tsx",
-    "build-template/src/frontend/src/components/ui/card.tsx",
-    "build-template/src/frontend/src/components/ui/carousel.tsx",
-    "build-template/src/frontend/src/components/ui/chart.tsx",
-    "build-template/src/frontend/src/components/ui/checkbox.tsx",
-    "build-template/src/frontend/src/components/ui/collapsible.tsx",
-    "build-template/src/frontend/src/components/ui/command.tsx",
-    "build-template/src/frontend/src/components/ui/context-menu.tsx",
-    "build-template/src/frontend/src/components/ui/dialog.tsx",
-    "build-template/src/frontend/src/components/ui/drawer.tsx",
-    "build-template/src/frontend/src/components/ui/dropdown-menu.tsx",
-    "build-template/src/frontend/src/components/ui/form.tsx",
-    "build-template/src/frontend/src/components/ui/hover-card.tsx",
-    "build-template/src/frontend/src/components/ui/input-otp.tsx",
-    "build-template/src/frontend/src/components/ui/input.tsx",
-    "build-template/src/frontend/src/components/ui/label.tsx",
-    "build-template/src/frontend/src/components/ui/menubar.tsx",
-    "build-template/src/frontend/src/components/ui/navigation-menu.tsx",
-    "build-template/src/frontend/src/components/ui/pagination.tsx",
-    "build-template/src/frontend/src/components/ui/popover.tsx",
-    "build-template/src/frontend/src/components/ui/progress.tsx",
-    "build-template/src/frontend/src/components/ui/radio-group.tsx",
-    "build-template/src/frontend/src/components/ui/resizable.tsx",
-    "build-template/src/frontend/src/components/ui/scroll-area.tsx",
-    "build-template/src/frontend/src/components/ui/select.tsx",
-    "build-template/src/frontend/src/components/ui/separator.tsx",
-    "build-template/src/frontend/src/components/ui/sheet.tsx",
-    "build-template/src/frontend/src/components/ui/sidebar.tsx",
-    "build-template/src/frontend/src/components/ui/skeleton.tsx",
-    "build-template/src/frontend/src/components/ui/slider.tsx",
-    "build-template/src/frontend/src/components/ui/sonner.tsx",
-    "build-template/src/frontend/src/components/ui/switch.tsx",
-    "build-template/src/frontend/src/components/ui/table.tsx",
-    "build-template/src/frontend/src/components/ui/tabs.tsx",
-    "build-template/src/frontend/src/components/ui/textarea.tsx",
-    "build-template/src/frontend/src/components/ui/toggle-group.tsx",
-    "build-template/src/frontend/src/components/ui/toggle.tsx",
-    "build-template/src/frontend/src/components/ui/tooltip.tsx",
-    "build-template/src/frontend/src/hooks/use-mobile.tsx",
-    "build-template/src/frontend/src/lib/utils.ts",
-    "build-template/src/frontend/tsconfig.json",
-    "build-template/src/frontend/vite.config.js",
-    "build-template/tsconfig.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.css",
-    "frontend/index.html",
-    "frontend/public/assets/generated/hero-banner.dim_1200x400.png",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/MitreTechniqueSelector.tsx",
-    "frontend/src/components/PdfGeneratorButton.tsx",
-    "frontend/src/components/ReportForm.tsx",
-    "frontend/src/config.ts",
-    "frontend/src/data/mitreAttackData.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/pages/CreateReportPage.tsx",
-    "frontend/src/pages/ReportDetailPage.tsx",
-    "frontend/src/pages/ReportListPage.tsx",
-    "frontend/src/types/jspdf.d.ts",
-    "frontend/src/ui-summary.json",
-    "frontend/src/utils/StorageClient.ts",
-    "frontend/src/utils/pdfGenerator.ts",
-    "frontend/tailwind.config.js",
+    "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/components/AttackPathIcon.tsx",
+    "frontend/src/components/AttackPathToolbar.tsx",
+    "frontend/src/components/LoadDiagramDialog.tsx",
+    "frontend/src/hooks/useAttackPathState.ts",
+    "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
