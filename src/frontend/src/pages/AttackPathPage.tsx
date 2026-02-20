@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AttackPathToolbar from '@/components/AttackPathToolbar';
 import AttackPathCanvas from '@/components/AttackPathCanvas';
 import LoadDiagramDialog from '@/components/LoadDiagramDialog';
+import SaveDiagramDialog from '@/components/SaveDiagramDialog';
 import { useAttackPathState } from '@/hooks/useAttackPathState';
 import { useSaveDiagramState } from '@/hooks/useSaveDiagramState';
 import { Button } from '@/components/ui/button';
@@ -37,11 +38,14 @@ export default function AttackPathPage() {
     undo,
     canUndo,
     restoreState,
+    clearAll,
   } = useAttackPathState();
 
   const [mode, setMode] = useState<'place' | 'connect' | 'draw'>('place');
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const saveDiagramMutation = useSaveDiagramState();
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const handleModeChange = (newMode: 'place' | 'connect' | 'draw') => {
     setMode(newMode);
@@ -62,7 +66,11 @@ export default function AttackPathPage() {
     setSelectedElementType(type);
   };
 
-  const handleSave = async () => {
+  const handleSaveClick = () => {
+    setSaveDialogOpen(true);
+  };
+
+  const handleSave = async (name: string) => {
     try {
       const icons: Icon[] = placedIcons.map((icon) => ({
         id: icon.id,
@@ -113,7 +121,8 @@ export default function AttackPathPage() {
         lastModified: BigInt(Date.now()),
       };
 
-      await saveDiagramMutation.mutateAsync(diagramState);
+      await saveDiagramMutation.mutateAsync({ name, state: diagramState });
+      setSaveDialogOpen(false);
       toast.success('Diagram saved successfully!');
     } catch (error) {
       console.error('Failed to save diagram:', error);
@@ -136,8 +145,24 @@ export default function AttackPathPage() {
     toast.success('Diagram loaded successfully!');
   };
 
-  const handleExport = () => {
-    toast.info('To export as JPEG, use your browser\'s screenshot tool (e.g., Ctrl+Shift+S in Firefox, or browser extensions)');
+  const handleClear = () => {
+    if (placedIcons.length > 0 || connections.length > 0 || drawings.length > 0 || textLabels.length > 0) {
+      if (window.confirm('Are you sure you want to clear the entire diagram? This action cannot be undone.')) {
+        clearAll();
+        toast.success('Diagram cleared');
+      }
+    }
+  };
+
+  const handleExportPNG = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      toast.error('Canvas not found');
+      return;
+    }
+
+    // Fallback message for PNG export
+    toast.info('To export as PNG, use your browser\'s screenshot tool (e.g., Ctrl+Shift+S in Firefox, Cmd+Shift+4 on Mac, or browser extensions like Awesome Screenshot)');
   };
 
   return (
@@ -149,9 +174,10 @@ export default function AttackPathPage() {
           onDrawingToolChange={handleDrawingToolChange}
           onUndo={undo}
           canUndo={canUndo}
-          onSave={handleSave}
+          onSave={handleSaveClick}
           onLoad={handleLoad}
-          onExport={handleExport}
+          onExport={handleExportPNG}
+          onClear={handleClear}
           isSaving={saveDiagramMutation.isPending}
           textColor={textColor}
           onTextColorChange={setTextColor}
@@ -183,7 +209,7 @@ export default function AttackPathPage() {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1">
+        <div className="flex-1" ref={canvasRef}>
           <AttackPathCanvas
             placedIcons={placedIcons}
             connections={connections}
@@ -216,6 +242,14 @@ export default function AttackPathPage() {
         open={loadDialogOpen}
         onOpenChange={setLoadDialogOpen}
         onLoad={handleLoadComplete}
+      />
+
+      {/* Save Dialog */}
+      <SaveDiagramDialog
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        onSave={handleSave}
+        isSaving={saveDiagramMutation.isPending}
       />
     </div>
   );

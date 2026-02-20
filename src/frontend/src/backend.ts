@@ -96,6 +96,10 @@ export interface Line {
     startPosition: Position;
     strokeWidth: number;
 }
+export interface NamedDiagram {
+    name: string;
+    state: DiagramState;
+}
 export interface Icon {
     id: string;
     name: string;
@@ -160,17 +164,19 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    getAllConnections(): Promise<Array<Connection> | null>;
-    getAllIconPositions(): Promise<Array<Icon> | null>;
+    getAllConnections(diagramId: bigint): Promise<Array<Connection> | null>;
+    getAllDiagrams(): Promise<Array<NamedDiagram>>;
+    getAllIconPositions(diagramId: bigint): Promise<Array<Icon> | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getDiagramState(): Promise<DiagramState | null>;
+    getDiagramStateById(id: bigint): Promise<NamedDiagram | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    saveDiagramState(state: DiagramState): Promise<void>;
+    saveDiagramState(name: string, state: DiagramState): Promise<bigint>;
+    updateDiagramName(id: bigint, newName: string): Promise<void>;
 }
-import type { Connection as _Connection, DiagramState as _DiagramState, Icon as _Icon, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { Connection as _Connection, Icon as _Icon, NamedDiagram as _NamedDiagram, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -285,31 +291,45 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getAllConnections(): Promise<Array<Connection> | null> {
+    async getAllConnections(arg0: bigint): Promise<Array<Connection> | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllConnections();
+                const result = await this.actor.getAllConnections(arg0);
                 return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllConnections();
+            const result = await this.actor.getAllConnections(arg0);
             return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getAllIconPositions(): Promise<Array<Icon> | null> {
+    async getAllDiagrams(): Promise<Array<NamedDiagram>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllIconPositions();
+                const result = await this.actor.getAllDiagrams();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllDiagrams();
+            return result;
+        }
+    }
+    async getAllIconPositions(arg0: bigint): Promise<Array<Icon> | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllIconPositions(arg0);
                 return from_candid_opt_n11(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllIconPositions();
+            const result = await this.actor.getAllIconPositions(arg0);
             return from_candid_opt_n11(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -341,17 +361,17 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n13(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getDiagramState(): Promise<DiagramState | null> {
+    async getDiagramStateById(arg0: bigint): Promise<NamedDiagram | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getDiagramState();
+                const result = await this.actor.getDiagramStateById(arg0);
                 return from_candid_opt_n15(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getDiagramState();
+            const result = await this.actor.getDiagramStateById(arg0);
             return from_candid_opt_n15(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -397,17 +417,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async saveDiagramState(arg0: DiagramState): Promise<void> {
+    async saveDiagramState(arg0: string, arg1: DiagramState): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveDiagramState(arg0);
+                const result = await this.actor.saveDiagramState(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveDiagramState(arg0);
+            const result = await this.actor.saveDiagramState(arg0, arg1);
+            return result;
+        }
+    }
+    async updateDiagramName(arg0: bigint, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateDiagramName(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateDiagramName(arg0, arg1);
             return result;
         }
     }
@@ -427,7 +461,7 @@ function from_candid_opt_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_opt_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_DiagramState]): DiagramState | null {
+function from_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_NamedDiagram]): NamedDiagram | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {

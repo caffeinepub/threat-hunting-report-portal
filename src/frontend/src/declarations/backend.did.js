@@ -31,13 +31,6 @@ export const Connection = IDL.Record({
   'targetId' : IDL.Text,
 });
 export const Position = IDL.Record({ 'x' : IDL.Float64, 'y' : IDL.Float64 });
-export const Icon = IDL.Record({
-  'id' : IDL.Text,
-  'name' : IDL.Text,
-  'iconType' : IDL.Text,
-  'position' : Position,
-});
-export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 export const Line = IDL.Record({
   'color' : IDL.Text,
   'endPosition' : Position,
@@ -52,6 +45,12 @@ export const TextLabel = IDL.Record({
   'position' : Position,
   'fontSize' : IDL.Float64,
 });
+export const Icon = IDL.Record({
+  'id' : IDL.Text,
+  'name' : IDL.Text,
+  'iconType' : IDL.Text,
+  'position' : Position,
+});
 export const FreehandDrawing = IDL.Record({
   'color' : IDL.Text,
   'strokeWidth' : IDL.Float64,
@@ -65,6 +64,11 @@ export const DiagramState = IDL.Record({
   'icons' : IDL.Vec(Icon),
   'freehandDrawings' : IDL.Vec(FreehandDrawing),
 });
+export const NamedDiagram = IDL.Record({
+  'name' : IDL.Text,
+  'state' : DiagramState,
+});
+export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -95,11 +99,24 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'getAllConnections' : IDL.Func([], [IDL.Opt(IDL.Vec(Connection))], ['query']),
-  'getAllIconPositions' : IDL.Func([], [IDL.Opt(IDL.Vec(Icon))], ['query']),
+  'getAllConnections' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(IDL.Vec(Connection))],
+      ['query'],
+    ),
+  'getAllDiagrams' : IDL.Func([], [IDL.Vec(NamedDiagram)], ['query']),
+  'getAllIconPositions' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(IDL.Vec(Icon))],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getDiagramState' : IDL.Func([], [IDL.Opt(DiagramState)], ['query']),
+  'getDiagramStateById' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(NamedDiagram)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -107,7 +124,8 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'saveDiagramState' : IDL.Func([DiagramState], [], []),
+  'saveDiagramState' : IDL.Func([IDL.Text, DiagramState], [IDL.Nat], []),
+  'updateDiagramName' : IDL.Func([IDL.Nat, IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
@@ -136,13 +154,6 @@ export const idlFactory = ({ IDL }) => {
     'targetId' : IDL.Text,
   });
   const Position = IDL.Record({ 'x' : IDL.Float64, 'y' : IDL.Float64 });
-  const Icon = IDL.Record({
-    'id' : IDL.Text,
-    'name' : IDL.Text,
-    'iconType' : IDL.Text,
-    'position' : Position,
-  });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   const Line = IDL.Record({
     'color' : IDL.Text,
     'endPosition' : Position,
@@ -157,6 +168,12 @@ export const idlFactory = ({ IDL }) => {
     'position' : Position,
     'fontSize' : IDL.Float64,
   });
+  const Icon = IDL.Record({
+    'id' : IDL.Text,
+    'name' : IDL.Text,
+    'iconType' : IDL.Text,
+    'position' : Position,
+  });
   const FreehandDrawing = IDL.Record({
     'color' : IDL.Text,
     'strokeWidth' : IDL.Float64,
@@ -170,6 +187,11 @@ export const idlFactory = ({ IDL }) => {
     'icons' : IDL.Vec(Icon),
     'freehandDrawings' : IDL.Vec(FreehandDrawing),
   });
+  const NamedDiagram = IDL.Record({
+    'name' : IDL.Text,
+    'state' : DiagramState,
+  });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -201,14 +223,23 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'getAllConnections' : IDL.Func(
-        [],
+        [IDL.Nat],
         [IDL.Opt(IDL.Vec(Connection))],
         ['query'],
       ),
-    'getAllIconPositions' : IDL.Func([], [IDL.Opt(IDL.Vec(Icon))], ['query']),
+    'getAllDiagrams' : IDL.Func([], [IDL.Vec(NamedDiagram)], ['query']),
+    'getAllIconPositions' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(IDL.Vec(Icon))],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getDiagramState' : IDL.Func([], [IDL.Opt(DiagramState)], ['query']),
+    'getDiagramStateById' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(NamedDiagram)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -216,7 +247,8 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'saveDiagramState' : IDL.Func([DiagramState], [], []),
+    'saveDiagramState' : IDL.Func([IDL.Text, DiagramState], [IDL.Nat], []),
+    'updateDiagramName' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   });
 };
 

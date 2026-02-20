@@ -1,8 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useGetDiagramState } from '@/hooks/useGetDiagramState';
-import { Loader2, Calendar } from 'lucide-react';
+import { useGetAllDiagrams } from '@/hooks/useGetAllDiagrams';
+import { Loader2, Calendar, FileText } from 'lucide-react';
 import type { PlacedIcon, Connection, DrawingPath, TextLabel } from '@/hooks/useAttackPathState';
+import type { NamedDiagram } from '@/backend';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface LoadDiagramDialogProps {
   open: boolean;
@@ -11,10 +13,10 @@ interface LoadDiagramDialogProps {
 }
 
 export default function LoadDiagramDialog({ open, onOpenChange, onLoad }: LoadDiagramDialogProps) {
-  const { data: diagramState, isLoading, error } = useGetDiagramState();
+  const { data: diagrams, isLoading, error } = useGetAllDiagrams();
 
-  const handleLoad = () => {
-    if (!diagramState) return;
+  const handleLoadDiagram = (diagram: NamedDiagram) => {
+    const diagramState = diagram.state;
 
     // Convert backend DiagramState to frontend state
     const placedIcons: PlacedIcon[] = diagramState.icons.map((icon) => ({
@@ -62,15 +64,15 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoad }: LoadDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Load Diagram</DialogTitle>
           <DialogDescription>
-            Load your previously saved attack path diagram
+            Select a saved attack path diagram to load
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="py-4">
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -79,37 +81,48 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoad }: LoadDi
 
           {error && (
             <div className="text-center py-8 text-destructive">
-              <p>Failed to load diagram</p>
+              <p>Failed to load diagrams</p>
             </div>
           )}
 
-          {!isLoading && !error && !diagramState && (
+          {!isLoading && !error && (!diagrams || diagrams.length === 0) && (
             <div className="text-center py-8 text-muted-foreground">
-              <p>No saved diagram found</p>
+              <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>No saved diagrams found</p>
             </div>
           )}
 
-          {!isLoading && !error && diagramState && (
-            <div className="space-y-4">
-              <div className="border rounded-lg p-4 space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    Last modified: {new Date(Number(diagramState.lastModified)).toLocaleString()}
-                  </span>
-                </div>
-                <div className="text-sm space-y-1">
-                  <p>Icons: {diagramState.icons.length}</p>
-                  <p>Connections: {diagramState.connections.length}</p>
-                  <p>Drawings: {diagramState.freehandDrawings.length + diagramState.lines.length}</p>
-                  <p>Text Labels: {diagramState.textLabels.length}</p>
-                </div>
+          {!isLoading && !error && diagrams && diagrams.length > 0 && (
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-3">
+                {diagrams.map((diagram, index) => (
+                  <div
+                    key={index}
+                    className="border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
+                    onClick={() => handleLoadDiagram(diagram)}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <h3 className="font-semibold text-lg">{diagram.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            {new Date(Number(diagram.state.lastModified)).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="text-sm text-muted-foreground space-y-1">
+                          <p>Icons: {diagram.state.icons.length}</p>
+                          <p>Connections: {diagram.state.connections.length}</p>
+                          <p>Drawings: {diagram.state.freehandDrawings.length + diagram.state.lines.length}</p>
+                          <p>Text Labels: {diagram.state.textLabels.length}</p>
+                        </div>
+                      </div>
+                      <Button size="sm">Load</Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <Button onClick={handleLoad} className="w-full">
-                Load Diagram
-              </Button>
-            </div>
+            </ScrollArea>
           )}
         </div>
       </DialogContent>

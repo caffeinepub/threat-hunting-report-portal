@@ -75,6 +75,8 @@ export default function AttackPathCanvas({
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [rotationHandle, setRotationHandle] = useState<string | null>(null);
   const [rotationStart, setRotationStart] = useState({ x: 0, y: 0, rotation: 0 });
+  const [transformTarget, setTransformTarget] = useState<{ id: string; type: 'icon' | 'text' } | null>(null);
+  const [transformDragStart, setTransformDragStart] = useState({ x: 0, y: 0, elementX: 0, elementY: 0 });
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -96,6 +98,23 @@ export default function AttackPathCanvas({
   };
 
   const handleIconMouseDown = (e: React.MouseEvent, iconId: string) => {
+    if (activeDrawingTool === 'transform') {
+      e.preventDefault();
+      e.stopPropagation();
+      const icon = placedIcons.find((i) => i.id === iconId);
+      if (!icon) return;
+
+      setTransformTarget({ id: iconId, type: 'icon' });
+      setTransformDragStart({
+        x: e.clientX,
+        y: e.clientY,
+        elementX: icon.x,
+        elementY: icon.y,
+      });
+      onSelectElement(iconId, 'icon');
+      return;
+    }
+
     if (mode === 'place') {
       e.preventDefault();
       const icon = placedIcons.find((i) => i.id === iconId);
@@ -115,49 +134,252 @@ export default function AttackPathCanvas({
         setConnectingFrom(null);
         setSelectedIcon(null);
       }
-    } else if (mode === 'draw' && activeDrawingTool === 'eraser') {
-      // Eraser can delete icons
-      onRemoveIcon(iconId);
-    } else if (mode === 'draw' && activeDrawingTool === 'transform') {
-      // Select icon for transformation
-      onSelectElement(iconId, 'icon');
     }
   };
 
   const handleTextLabelMouseDown = (e: React.MouseEvent, labelId: string) => {
-    if (mode === 'draw' && activeDrawingTool === 'transform') {
+    if (activeDrawingTool === 'eraser') {
+      e.preventDefault();
       e.stopPropagation();
-      onSelectElement(labelId, 'text');
-    } else if (mode === 'draw' && activeDrawingTool === 'eraser') {
       onRemoveTextLabel(labelId);
+      return;
+    }
+
+    if (activeDrawingTool === 'transform') {
+      e.preventDefault();
+      e.stopPropagation();
+      const label = textLabels.find((l) => l.id === labelId);
+      if (!label) return;
+
+      setTransformTarget({ id: labelId, type: 'text' });
+      setTransformDragStart({
+        x: e.clientX,
+        y: e.clientY,
+        elementX: label.x,
+        elementY: label.y,
+      });
+      onSelectElement(labelId, 'text');
+      return;
     }
   };
 
-  const handleResizeMouseDown = (e: React.MouseEvent, handle: string) => {
-    e.stopPropagation();
-    if (!selectedElementId) return;
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
 
-    const element = selectedElementType === 'icon' 
-      ? placedIcons.find(i => i.id === selectedElementId)
-      : textLabels.find(t => t.id === selectedElementId);
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Handle transform tool dragging
+    if (transformTarget && activeDrawingTool === 'transform') {
+      const deltaX = e.clientX - transformDragStart.x;
+      const deltaY = e.clientY - transformDragStart.y;
+      const newX = transformDragStart.elementX + deltaX;
+      const newY = transformDragStart.elementY + deltaY;
+
+      if (transformTarget.type === 'icon') {
+        onMoveIcon(transformTarget.id, newX, newY);
+      } else if (transformTarget.type === 'text') {
+        onUpdateTextLabel(transformTarget.id, { x: newX, y: newY });
+      }
+      return;
+    }
+
+    // Handle icon dragging in place mode
+    if (draggedIconId && mode === 'place') {
+      const newX = e.clientX - dragOffset.x;
+      const newY = e.clientY - dragOffset.y;
+      onMoveIcon(draggedIconId, newX, newY);
+      return;
+    }
+
+    // Handle drawing
+    if (isDrawing && (activeDrawingTool === 'freehand' || activeDrawingTool === 'line' || activeDrawingTool === 'arrow')) {
+      if (activeDrawingTool === 'freehand') {
+        setCurrentDrawingPoints((prev) => [...prev, { x, y }]);
+      } else {
+        setCurrentDrawingPoints([currentDrawingPoints[0], { x, y }]);
+      }
+      return;
+    }
+
+    // Handle drawing movement
+    if (isDraggingDrawing && selectedDrawingId) {
+      const deltaX = x - drawingDragStart.x;
+      const deltaY = y - drawingDragStart.y;
+      onMoveDrawing(selectedDrawingId, deltaX, deltaY);
+      setDrawingDragStart({ x, y });
+      return;
+    }
+
+    // Handle resize
+    if (resizeHandle) {
+      const [elementId, handleType] = resizeHandle.split('-');
+      const element = selectedElementType === 'icon' 
+        ? placedIcons.find((i) => i.id === elementId)
+        : textLabels.find((l) => l.id === elementId);
+
+      if (!element) return;
+
+      const deltaX = e.clientX - resizeStart.x;
+      const deltaY = e.clientY - resizeStart.y;
+
+      let newWidth = resizeStart.width;
+      let newHeight = resizeStart.height;
+
+      if (handleType === 'se') {
+        newWidth = Math.max(20, resizeStart.width + deltaX);
+        newHeight = Math.max(20, resizeStart.height + deltaY);
+      } else if (handleType === 'sw') {
+        newWidth = Math.max(20, resizeStart.width - deltaX);
+        newHeight = Math.max(20, resizeStart.height + deltaY);
+      } else if (handleType === 'ne') {
+        newWidth = Math.max(20, resizeStart.width + deltaX);
+        newHeight = Math.max(20, resizeStart.height - deltaY);
+      } else if (handleType === 'nw') {
+        newWidth = Math.max(20, resizeStart.width - deltaX);
+        newHeight = Math.max(20, resizeStart.height - deltaY);
+      }
+
+      if (selectedElementType === 'icon') {
+        onResizeIcon(elementId, newWidth, newHeight);
+      } else if (selectedElementType === 'text') {
+        onUpdateTextLabel(elementId, { width: newWidth, height: newHeight });
+      }
+      return;
+    }
+
+    // Handle rotation
+    if (rotationHandle) {
+      const labelId = rotationHandle.replace('-rotate', '');
+      const label = textLabels.find((l) => l.id === labelId);
+      if (!label) return;
+
+      const centerX = label.x + (label.width || 100) / 2;
+      const centerY = label.y + (label.height || 30) / 2;
+
+      const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+      onUpdateTextLabel(labelId, { rotation: angle });
+      return;
+    }
+  };
+
+  const handleCanvasMouseUp = () => {
+    setDraggedIconId(null);
+    setTransformTarget(null);
+    setIsDraggingDrawing(false);
+    setSelectedDrawingId(null);
+    setResizeHandle(null);
+    setRotationHandle(null);
+
+    if (isDrawing && currentDrawingPoints.length > 0) {
+      if (activeDrawingTool === 'freehand' && currentDrawingPoints.length > 1) {
+        onAddDrawing('freehand', currentDrawingPoints);
+      } else if ((activeDrawingTool === 'line' || activeDrawingTool === 'arrow') && currentDrawingPoints.length === 2) {
+        onAddDrawing(activeDrawingTool, currentDrawingPoints);
+      }
+      setIsDrawing(false);
+      setCurrentDrawingPoints([]);
+    }
+  };
+
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Handle text tool
+    if (activeDrawingTool === 'text') {
+      setTextDialogPosition({ x, y });
+      setTextDialogOpen(true);
+      return;
+    }
+
+    // Handle drawing tools
+    if (activeDrawingTool === 'freehand' || activeDrawingTool === 'line' || activeDrawingTool === 'arrow') {
+      setIsDrawing(true);
+      setCurrentDrawingPoints([{ x, y }]);
+      return;
+    }
+
+    // Handle eraser
+    if (activeDrawingTool === 'eraser') {
+      // Check if clicking on a drawing
+      const clickedDrawing = drawings.find((drawing) => {
+        return drawing.points.some((point) => {
+          const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+          return distance < 10;
+        });
+      });
+
+      if (clickedDrawing) {
+        onRemoveDrawing(clickedDrawing.id);
+        return;
+      }
+    }
+
+    // Deselect when clicking on empty canvas
+    onSelectElement(null, null);
+  };
+
+  const handleTextSubmit = () => {
+    if (textInput.trim()) {
+      onAddTextLabel(textInput, textDialogPosition.x, textDialogPosition.y, textColor);
+      setTextInput('');
+      setTextDialogOpen(false);
+    }
+  };
+
+  const handleDrawingMouseDown = (e: React.MouseEvent, drawingId: string) => {
+    if (activeDrawingTool === 'eraser') {
+      e.preventDefault();
+      e.stopPropagation();
+      onRemoveDrawing(drawingId);
+      return;
+    }
+
+    if (!canvasRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setSelectedDrawingId(drawingId);
+    setIsDraggingDrawing(true);
+    setDrawingDragStart({ x, y });
+  };
+
+  const handleResizeMouseDown = (e: React.MouseEvent, elementId: string, handleType: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const element = selectedElementType === 'icon'
+      ? placedIcons.find((i) => i.id === elementId)
+      : textLabels.find((l) => l.id === elementId);
 
     if (!element) return;
 
-    setResizeHandle(handle);
+    setResizeHandle(`${elementId}-${handleType}`);
     setResizeStart({
       x: e.clientX,
       y: e.clientY,
-      width: element.width || 48,
-      height: element.height || 48,
+      width: selectedElementType === 'icon' ? (element as PlacedIcon).width || 48 : (element as TextLabel).width || 100,
+      height: selectedElementType === 'icon' ? (element as PlacedIcon).height || 48 : (element as TextLabel).height || 30,
     });
   };
 
-  const handleRotationMouseDown = (e: React.MouseEvent, labelId: string) => {
+  const handleRotateMouseDown = (e: React.MouseEvent, labelId: string) => {
+    e.preventDefault();
     e.stopPropagation();
-    const label = textLabels.find(t => t.id === labelId);
+
+    const label = textLabels.find((l) => l.id === labelId);
     if (!label) return;
 
-    setRotationHandle(labelId);
+    setRotationHandle(`${labelId}-rotate`);
     setRotationStart({
       x: e.clientX,
       y: e.clientY,
@@ -165,450 +387,251 @@ export default function AttackPathCanvas({
     });
   };
 
-  const isPointNearPath = (x: number, y: number, points: { x: number; y: number }[], threshold: number = 10): boolean => {
-    for (let i = 0; i < points.length - 1; i++) {
-      const p1 = points[i];
-      const p2 = points[i + 1];
-      
-      // Calculate distance from point to line segment
-      const A = x - p1.x;
-      const B = y - p1.y;
-      const C = p2.x - p1.x;
-      const D = p2.y - p1.y;
-
-      const dot = A * C + B * D;
-      const lenSq = C * C + D * D;
-      let param = -1;
-      
-      if (lenSq !== 0) param = dot / lenSq;
-
-      let xx, yy;
-
-      if (param < 0) {
-        xx = p1.x;
-        yy = p1.y;
-      } else if (param > 1) {
-        xx = p2.x;
-        yy = p2.y;
-      } else {
-        xx = p1.x + param * C;
-        yy = p1.y + param * D;
-      }
-
-      const dx = x - xx;
-      const dy = y - yy;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < threshold) return true;
-    }
-    return false;
-  };
-
-  const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (mode === 'draw' && activeDrawingTool && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (activeDrawingTool === 'text') {
-        // Open text input dialog
-        setTextDialogPosition({ x, y });
-        setTextDialogOpen(true);
-      } else if (activeDrawingTool === 'eraser') {
-        // Check if clicking on a drawing element
-        for (const drawing of drawings) {
-          if (isPointNearPath(x, y, drawing.points)) {
-            onRemoveDrawing(drawing.id);
-            return;
-          }
-        }
-        // Check if clicking on a text label
-        for (const label of textLabels) {
-          const labelWidth = label.width || label.text.length * 8;
-          const labelHeight = label.height || 20;
-          if (
-            x >= label.x &&
-            x <= label.x + labelWidth &&
-            y >= label.y - labelHeight &&
-            y <= label.y
-          ) {
-            onRemoveTextLabel(label.id);
-            return;
-          }
-        }
-      } else if (activeDrawingTool === 'transform') {
-        // Deselect if clicking on empty canvas
-        onSelectElement(null, null);
-      } else {
-        // Check if clicking on a drawing to select it for moving
-        for (const drawing of drawings) {
-          if (isPointNearPath(x, y, drawing.points)) {
-            setSelectedDrawingId(drawing.id);
-            setIsDraggingDrawing(true);
-            setDrawingDragStart({ x, y });
-            return;
-          }
-        }
-        // Start new drawing
-        setIsDrawing(true);
-        setCurrentDrawingPoints([{ x, y }]);
-      }
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (draggedIconId && canvasRef.current && mode === 'place') {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left - dragOffset.x;
-      const y = e.clientY - rect.top - dragOffset.y;
-
-      onMoveIcon(draggedIconId, Math.max(0, Math.min(x, rect.width - 48)), Math.max(0, Math.min(y, rect.height - 48)));
-    } else if (resizeHandle && selectedElementId && canvasRef.current) {
-      const deltaX = e.clientX - resizeStart.x;
-      const deltaY = e.clientY - resizeStart.y;
-
-      let newWidth = resizeStart.width;
-      let newHeight = resizeStart.height;
-
-      if (resizeHandle.includes('e')) {
-        newWidth = Math.max(20, resizeStart.width + deltaX);
-      }
-      if (resizeHandle.includes('w')) {
-        newWidth = Math.max(20, resizeStart.width - deltaX);
-      }
-      if (resizeHandle.includes('s')) {
-        newHeight = Math.max(20, resizeStart.height + deltaY);
-      }
-      if (resizeHandle.includes('n')) {
-        newHeight = Math.max(20, resizeStart.height - deltaY);
-      }
-
-      if (selectedElementType === 'icon') {
-        onResizeIcon(selectedElementId, newWidth, newHeight);
-      } else if (selectedElementType === 'text') {
-        onUpdateTextLabel(selectedElementId, { width: newWidth, height: newHeight });
-      }
-    } else if (rotationHandle && canvasRef.current) {
-      const label = textLabels.find(t => t.id === rotationHandle);
-      if (!label) return;
-
-      const rect = canvasRef.current.getBoundingClientRect();
-      const centerX = label.x + (label.width || 100) / 2;
-      const centerY = label.y - (label.height || 20) / 2;
-
-      const startAngle = Math.atan2(rotationStart.y - rect.top - centerY, rotationStart.x - rect.left - centerX);
-      const currentAngle = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
-      
-      const deltaAngle = (currentAngle - startAngle) * (180 / Math.PI);
-      const newRotation = (rotationStart.rotation + deltaAngle) % 360;
-
-      onUpdateTextLabel(rotationHandle, { rotation: newRotation });
-    } else if (isDraggingDrawing && selectedDrawingId && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const offsetX = x - drawingDragStart.x;
-      const offsetY = y - drawingDragStart.y;
-      
-      onMoveDrawing(selectedDrawingId, offsetX, offsetY);
-      setDrawingDragStart({ x, y });
-    } else if (isDrawing && canvasRef.current && mode === 'draw' && activeDrawingTool) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (activeDrawingTool === 'freehand') {
-        setCurrentDrawingPoints((prev) => [...prev, { x, y }]);
-      } else {
-        // For line and arrow, only update the end point
-        setCurrentDrawingPoints((prev) => [prev[0], { x, y }]);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (isDrawing && currentDrawingPoints.length > 1 && activeDrawingTool && activeDrawingTool !== 'text' && activeDrawingTool !== 'eraser' && activeDrawingTool !== 'transform') {
-      onAddDrawing(activeDrawingTool as 'freehand' | 'line' | 'arrow', currentDrawingPoints);
-    }
-    setIsDrawing(false);
-    setCurrentDrawingPoints([]);
-    setDraggedIconId(null);
-    setIsDraggingDrawing(false);
-    setSelectedDrawingId(null);
-    setResizeHandle(null);
-    setRotationHandle(null);
-  };
-
-  const handleIconDoubleClick = (iconId: string) => {
-    if (mode === 'place') {
-      onRemoveIcon(iconId);
-    }
-  };
-
-  const handleConnectionClick = (connectionId: string) => {
-    if (activeDrawingTool === 'eraser') {
-      onRemoveConnection(connectionId);
-    }
-  };
-
-  const handleTextSubmit = () => {
-    if (textInput.trim()) {
-      onAddTextLabel(textInput, textDialogPosition.x, textDialogPosition.y, textColor);
-      setTextInput('');
-    }
-    setTextDialogOpen(false);
-  };
-
   useEffect(() => {
     const handleGlobalMouseUp = () => {
-      if (isDrawing && currentDrawingPoints.length > 1 && activeDrawingTool && activeDrawingTool !== 'text' && activeDrawingTool !== 'eraser' && activeDrawingTool !== 'transform') {
-        onAddDrawing(activeDrawingTool as 'freehand' | 'line' | 'arrow', currentDrawingPoints);
-      }
-      setIsDrawing(false);
-      setCurrentDrawingPoints([]);
-      setDraggedIconId(null);
-      setIsDraggingDrawing(false);
-      setSelectedDrawingId(null);
-      setResizeHandle(null);
-      setRotationHandle(null);
+      handleCanvasMouseUp();
     };
 
     window.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [isDrawing, currentDrawingPoints, activeDrawingTool, onAddDrawing]);
-
-  const renderDrawing = (drawing: DrawingPath) => {
-    if (drawing.type === 'freehand') {
-      const pathData = drawing.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-      return (
-        <path
-          key={drawing.id}
-          d={pathData}
-          stroke="black"
-          strokeWidth="2"
-          fill="none"
-          style={{ pointerEvents: 'stroke' }}
-        />
-      );
-    } else if (drawing.type === 'line' || drawing.type === 'arrow') {
-      const start = drawing.points[0];
-      const end = drawing.points[1];
-      return (
-        <g key={drawing.id}>
-          <line
-            x1={start.x}
-            y1={start.y}
-            x2={end.x}
-            y2={end.y}
-            stroke="black"
-            strokeWidth="2"
-            style={{ pointerEvents: 'stroke' }}
-          />
-          {drawing.type === 'arrow' && (
-            <polygon
-              points={`${end.x},${end.y} ${end.x - 10},${end.y - 5} ${end.x - 10},${end.y + 5}`}
-              fill="black"
-              transform={`rotate(${Math.atan2(end.y - start.y, end.x - start.x) * (180 / Math.PI)}, ${end.x}, ${end.y})`}
-            />
-          )}
-        </g>
-      );
-    }
-    return null;
-  };
-
-  const renderTransformHandles = (element: PlacedIcon | TextLabel, type: 'icon' | 'text') => {
-    const width = element.width || (type === 'icon' ? 48 : 100);
-    const height = element.height || (type === 'icon' ? 48 : 20);
-    const x = element.x;
-    const y = type === 'icon' ? element.y : element.y - height;
-
-    const handles = [
-      { id: 'nw', x: x - 4, y: y - 4, cursor: 'nw-resize' },
-      { id: 'ne', x: x + width - 4, y: y - 4, cursor: 'ne-resize' },
-      { id: 'sw', x: x - 4, y: y + height - 4, cursor: 'sw-resize' },
-      { id: 'se', x: x + width - 4, y: y + height - 4, cursor: 'se-resize' },
-      { id: 'n', x: x + width / 2 - 4, y: y - 4, cursor: 'n-resize' },
-      { id: 's', x: x + width / 2 - 4, y: y + height - 4, cursor: 's-resize' },
-      { id: 'w', x: x - 4, y: y + height / 2 - 4, cursor: 'w-resize' },
-      { id: 'e', x: x + width - 4, y: y + height / 2 - 4, cursor: 'e-resize' },
-    ];
-
-    return (
-      <>
-        <div
-          style={{
-            position: 'absolute',
-            left: x,
-            top: y,
-            width: width,
-            height: height,
-            border: '2px solid #3B82F6',
-            pointerEvents: 'none',
-          }}
-        />
-        {handles.map((handle) => (
-          <div
-            key={handle.id}
-            onMouseDown={(e) => handleResizeMouseDown(e, handle.id)}
-            style={{
-              position: 'absolute',
-              left: handle.x,
-              top: handle.y,
-              width: 8,
-              height: 8,
-              backgroundColor: '#3B82F6',
-              border: '1px solid white',
-              cursor: handle.cursor,
-              zIndex: 1000,
-            }}
-          />
-        ))}
-        {type === 'text' && (
-          <div
-            onMouseDown={(e) => handleRotationMouseDown(e, element.id)}
-            style={{
-              position: 'absolute',
-              left: x + width / 2 - 12,
-              top: y - 30,
-              width: 24,
-              height: 24,
-              backgroundColor: '#3B82F6',
-              border: '1px solid white',
-              borderRadius: '50%',
-              cursor: 'grab',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-            }}
-          >
-            <RotateCw className="w-4 h-4 text-white" />
-          </div>
-        )}
-      </>
-    );
-  };
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDrawing, currentDrawingPoints, activeDrawingTool]);
 
   return (
     <>
       <div
         ref={canvasRef}
+        className="relative w-full h-full bg-white border-2 border-border rounded-lg overflow-hidden"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        className="relative w-full h-full bg-white border border-border rounded-lg overflow-hidden"
-        style={{ cursor: mode === 'draw' && activeDrawingTool ? 'crosshair' : 'default' }}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseUp={handleCanvasMouseUp}
+        style={{ cursor: activeDrawingTool === 'eraser' ? 'crosshair' : activeDrawingTool === 'text' ? 'text' : 'default' }}
       >
-        {/* SVG Layer for connections and drawings */}
+        {/* Render connections */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
           {connections.map((conn) => {
             const sourceIcon = placedIcons.find((icon) => icon.id === conn.sourceId);
             const targetIcon = placedIcons.find((icon) => icon.id === conn.targetId);
+
             if (!sourceIcon || !targetIcon) return null;
 
             return (
               <AttackPathConnector
                 key={conn.id}
                 id={conn.id}
-                sourceX={sourceIcon.x + 24}
-                sourceY={sourceIcon.y + 24}
-                targetX={targetIcon.x + 24}
-                targetY={targetIcon.y + 24}
-                onClick={handleConnectionClick}
+                sourceX={sourceIcon.x + (sourceIcon.width || 48) / 2}
+                sourceY={sourceIcon.y + (sourceIcon.height || 48) / 2}
+                targetX={targetIcon.x + (targetIcon.width || 48) / 2}
+                targetY={targetIcon.y + (targetIcon.height || 48) / 2}
+                onClick={onRemoveConnection}
               />
             );
           })}
-          {drawings.map(renderDrawing)}
-          {isDrawing && currentDrawingPoints.length > 0 && renderDrawing({
-            id: 'temp',
-            type: activeDrawingTool as 'freehand' | 'line' | 'arrow',
-            points: currentDrawingPoints,
-          })}
         </svg>
 
-        {/* Icons Layer */}
+        {/* Render drawings */}
+        <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
+          {drawings.map((drawing) => {
+            if (drawing.type === 'freehand') {
+              const pathData = drawing.points.map((point, index) => 
+                `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+              ).join(' ');
+
+              return (
+                <path
+                  key={drawing.id}
+                  d={pathData}
+                  stroke="#000000"
+                  strokeWidth={2}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="cursor-move"
+                  onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)}
+                />
+              );
+            } else if (drawing.type === 'line' || drawing.type === 'arrow') {
+              const start = drawing.points[0];
+              const end = drawing.points[1];
+
+              return (
+                <g key={drawing.id} onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)} className="cursor-move">
+                  <line
+                    x1={start.x}
+                    y1={start.y}
+                    x2={end.x}
+                    y2={end.y}
+                    stroke="#000000"
+                    strokeWidth={2}
+                  />
+                  {drawing.type === 'arrow' && (
+                    <polygon
+                      points={`${end.x},${end.y} ${end.x - 10},${end.y - 5} ${end.x - 10},${end.y + 5}`}
+                      fill="#000000"
+                      transform={`rotate(${Math.atan2(end.y - start.y, end.x - start.x) * (180 / Math.PI)} ${end.x} ${end.y})`}
+                    />
+                  )}
+                </g>
+              );
+            }
+            return null;
+          })}
+
+          {/* Current drawing preview */}
+          {isDrawing && currentDrawingPoints.length > 0 && (
+            <>
+              {activeDrawingTool === 'freehand' && (
+                <path
+                  d={currentDrawingPoints.map((point, index) => 
+                    `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+                  ).join(' ')}
+                  stroke="#000000"
+                  strokeWidth={2}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={0.5}
+                />
+              )}
+              {(activeDrawingTool === 'line' || activeDrawingTool === 'arrow') && currentDrawingPoints.length === 2 && (
+                <g>
+                  <line
+                    x1={currentDrawingPoints[0].x}
+                    y1={currentDrawingPoints[0].y}
+                    x2={currentDrawingPoints[1].x}
+                    y2={currentDrawingPoints[1].y}
+                    stroke="#000000"
+                    strokeWidth={2}
+                    opacity={0.5}
+                  />
+                  {activeDrawingTool === 'arrow' && (
+                    <polygon
+                      points={`${currentDrawingPoints[1].x},${currentDrawingPoints[1].y} ${currentDrawingPoints[1].x - 10},${currentDrawingPoints[1].y - 5} ${currentDrawingPoints[1].x - 10},${currentDrawingPoints[1].y + 5}`}
+                      fill="#000000"
+                      opacity={0.5}
+                      transform={`rotate(${Math.atan2(currentDrawingPoints[1].y - currentDrawingPoints[0].y, currentDrawingPoints[1].x - currentDrawingPoints[0].x) * (180 / Math.PI)} ${currentDrawingPoints[1].x} ${currentDrawingPoints[1].y})`}
+                    />
+                  )}
+                </g>
+              )}
+            </>
+          )}
+        </svg>
+
+        {/* Render placed icons */}
         {placedIcons.map((icon) => (
           <div
             key={icon.id}
+            className={`absolute ${selectedIcon === icon.id ? 'ring-2 ring-primary' : ''} ${selectedElementId === icon.id && activeDrawingTool === 'transform' ? 'ring-2 ring-blue-500' : ''}`}
             style={{
-              position: 'absolute',
               left: icon.x,
               top: icon.y,
-              zIndex: 2,
+              width: icon.width || 48,
+              height: icon.height || 48,
+              zIndex: 10,
             }}
             onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
-            onDoubleClick={() => handleIconDoubleClick(icon.id)}
           >
-            <AttackPathIcon 
-              type={icon.type} 
-              width={icon.width}
-              height={icon.height}
-            />
+            <AttackPathIcon type={icon.type} width={icon.width} height={icon.height} />
+            
+            {/* Transform handles */}
+            {selectedElementId === icon.id && activeDrawingTool === 'transform' && (
+              <>
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nwse-resize"
+                  style={{ top: -6, left: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, icon.id, 'nw')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nesw-resize"
+                  style={{ top: -6, right: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, icon.id, 'ne')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nesw-resize"
+                  style={{ bottom: -6, left: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, icon.id, 'sw')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nwse-resize"
+                  style={{ bottom: -6, right: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, icon.id, 'se')}
+                />
+              </>
+            )}
           </div>
         ))}
 
-        {/* Text Labels Layer */}
+        {/* Render text labels */}
         {textLabels.map((label) => (
           <div
             key={label.id}
-            onMouseDown={(e) => handleTextLabelMouseDown(e, label.id)}
+            className={`absolute font-bold cursor-move select-none ${selectedElementId === label.id && activeDrawingTool === 'transform' ? 'ring-2 ring-blue-500' : ''}`}
             style={{
-              position: 'absolute',
               left: label.x,
               top: label.y,
               color: label.color,
-              fontSize: '16px',
-              fontWeight: 'bold',
-              userSelect: 'none',
-              cursor: activeDrawingTool === 'transform' ? 'move' : 'default',
-              zIndex: 3,
               transform: `rotate(${label.rotation || 0}deg)`,
-              transformOrigin: 'top left',
+              transformOrigin: 'center',
               width: label.width || 'auto',
               height: label.height || 'auto',
-              overflow: 'hidden',
+              zIndex: 20,
             }}
+            onMouseDown={(e) => handleTextLabelMouseDown(e, label.id)}
           >
             {label.text}
+            
+            {/* Transform handles for text */}
+            {selectedElementId === label.id && activeDrawingTool === 'transform' && (
+              <>
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nwse-resize"
+                  style={{ top: -6, left: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, label.id, 'nw')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nesw-resize"
+                  style={{ top: -6, right: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, label.id, 'ne')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nesw-resize"
+                  style={{ bottom: -6, left: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, label.id, 'sw')}
+                />
+                <div
+                  className="absolute w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nwse-resize"
+                  style={{ bottom: -6, right: -6 }}
+                  onMouseDown={(e) => handleResizeMouseDown(e, label.id, 'se')}
+                />
+                <div
+                  className="absolute w-4 h-4 bg-green-500 border border-white rounded-full cursor-grab"
+                  style={{ top: -20, left: '50%', transform: 'translateX(-50%)' }}
+                  onMouseDown={(e) => handleRotateMouseDown(e, label.id)}
+                >
+                  <RotateCw className="w-3 h-3 text-white" style={{ margin: '2px' }} />
+                </div>
+              </>
+            )}
           </div>
         ))}
-
-        {/* Transform Handles */}
-        {activeDrawingTool === 'transform' && selectedElementId && selectedElementType === 'icon' && (
-          <>
-            {placedIcons.filter(i => i.id === selectedElementId).map(icon => (
-              <div key={`transform-${icon.id}`}>
-                {renderTransformHandles(icon, 'icon')}
-              </div>
-            ))}
-          </>
-        )}
-        {activeDrawingTool === 'transform' && selectedElementId && selectedElementType === 'text' && (
-          <>
-            {textLabels.filter(t => t.id === selectedElementId).map(label => (
-              <div key={`transform-${label.id}`}>
-                {renderTransformHandles(label, 'text')}
-              </div>
-            ))}
-          </>
-        )}
       </div>
 
       {/* Text Input Dialog */}
       <Dialog open={textDialogOpen} onOpenChange={setTextDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Text Label</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
               <Label htmlFor="text-input">Text</Label>
               <Input
                 id="text-input"
+                placeholder="Enter text..."
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -616,7 +639,6 @@ export default function AttackPathCanvas({
                     handleTextSubmit();
                   }
                 }}
-                placeholder="Enter text..."
                 autoFocus
               />
             </div>
@@ -625,7 +647,9 @@ export default function AttackPathCanvas({
             <Button variant="outline" onClick={() => setTextDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleTextSubmit}>Add</Button>
+            <Button onClick={handleTextSubmit} disabled={!textInput.trim()}>
+              Add
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

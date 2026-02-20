@@ -7,12 +7,13 @@ export function useSaveDiagramState() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (state: DiagramState) => {
+    mutationFn: async ({ name, state }: { name: string; state: DiagramState }) => {
       if (!actor) throw new Error('Actor not initialized');
-      return actor.saveDiagramState(state);
+      return actor.saveDiagramState(name, state);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['diagramState'] });
+      queryClient.invalidateQueries({ queryKey: ['allDiagrams'] });
     },
   });
 }

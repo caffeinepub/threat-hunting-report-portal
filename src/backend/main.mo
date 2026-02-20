@@ -3,12 +3,14 @@ import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import Migration "migration";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 
-
+// Apply migration on upgrade.
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -21,7 +23,7 @@ actor {
   // Icon Types
   public type Icon = {
     id : Text;
-    iconType : Text; // e.g. "server", "database"
+    iconType : Text;
     position : Position;
     name : Text;
   };
@@ -30,7 +32,7 @@ actor {
   public type Connection = {
     sourceId : Text;
     targetId : Text;
-    connectionType : Text; // e.g. "solid", "dashed"
+    connectionType : Text;
     color : Text;
   };
 
@@ -56,7 +58,7 @@ actor {
     position : Position;
     fontSize : Float;
     color : Text;
-    fontWeight : Text; // e.g. "bold", "normal"
+    fontWeight : Text;
   };
 
   // Complete Diagram State
@@ -69,14 +71,20 @@ actor {
     lastModified : Int;
   };
 
-  // User Profile Type
+  // Named Diagram with Name Field Addition
+  public type NamedDiagram = {
+    name : Text;
+    state : DiagramState;
+  };
+
   public type UserProfile = {
     name : Text;
   };
 
-  let diagramStore = Map.empty<Principal, DiagramState>();
+  let diagramStore = Map.empty<Principal, Map.Map<Nat, NamedDiagram>>();
   let userProfiles = Map.empty<Principal, UserProfile>();
   let accessControlState = AccessControl.initState();
+
   include MixinAuthorization(accessControlState);
 
   // User Profile Functions
@@ -101,41 +109,106 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Save or update a diagram state
-  public shared ({ caller }) func saveDiagramState(state : DiagramState) : async () {
+  // Save a named diagram state
+  public shared ({ caller }) func saveDiagramState(name : Text, state : DiagramState) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save diagram state");
     };
-    diagramStore.add(caller, state);
+
+    let userDiagrams = switch (diagramStore.get(caller)) {
+      case (null) { Map.empty<Nat, NamedDiagram>() };
+      case (?existing) { existing };
+    };
+
+    let id = userDiagrams.size();
+    let namedDiagram : NamedDiagram = { name; state };
+    userDiagrams.add(id, namedDiagram);
+
+    diagramStore.add(caller, userDiagrams);
+    id;
   };
 
-  // Retrieve a diagram state
-  public query ({ caller }) func getDiagramState() : async ?DiagramState {
+  // Retrieve a specific diagram state by ID
+  public query ({ caller }) func getDiagramStateById(id : Nat) : async ?NamedDiagram {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access diagram state");
     };
-    diagramStore.get(caller);
+
+    switch (diagramStore.get(caller)) {
+      case (?userDiagrams) { userDiagrams.get(id) };
+      case (null) { null };
+    };
   };
 
-  // Get all icon positions for a user
-  public query ({ caller }) func getAllIconPositions() : async ?[Icon] {
+  // Get all icon positions for a specific diagram
+  public query ({ caller }) func getAllIconPositions(diagramId : Nat) : async ?[Icon] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access icon positions");
     };
+
     switch (diagramStore.get(caller)) {
-      case (?state) { ?state.icons };
+      case (?userDiagrams) {
+        switch (userDiagrams.get(diagramId)) {
+          case (?diagram) { ?diagram.state.icons };
+          case (null) { null };
+        };
+      };
       case (null) { null };
     };
   };
 
-  // Get all connections for a user
-  public query ({ caller }) func getAllConnections() : async ?[Connection] {
+  // Get all connections for a specific diagram
+  public query ({ caller }) func getAllConnections(diagramId : Nat) : async ?[Connection] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access connections");
     };
+
     switch (diagramStore.get(caller)) {
-      case (?state) { ?state.connections };
+      case (?userDiagrams) {
+        switch (userDiagrams.get(diagramId)) {
+          case (?diagram) { ?diagram.state.connections };
+          case (null) { null };
+        };
+      };
       case (null) { null };
+    };
+  };
+
+  // Retrieve all diagrams of a user
+  public query ({ caller }) func getAllDiagrams() : async [NamedDiagram] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access diagrams");
+    };
+
+    switch (diagramStore.get(caller)) {
+      case (?userDiagrams) {
+        userDiagrams.values().toArray();
+      };
+      case (null) { [] };
+    };
+  };
+
+  // Update the name of a specific diagram
+  public shared ({ caller }) func updateDiagramName(id : Nat, newName : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update diagram names");
+    };
+
+    switch (diagramStore.get(caller)) {
+      case (?userDiagrams) {
+        switch (userDiagrams.get(id)) {
+          case (?diagram) {
+            let updatedDiagram : NamedDiagram = { diagram with name = newName };
+            userDiagrams.add(id, updatedDiagram);
+          };
+          case (null) {
+            Runtime.trap("Diagram with ID " # id.toText() # " not found");
+          };
+        };
+      };
+      case (null) {
+        Runtime.trap("No diagrams found for user");
+      };
     };
   };
 };

@@ -42,6 +42,7 @@ export interface Line {
   'startPosition' : Position,
   'strokeWidth' : number,
 }
+export interface NamedDiagram { 'name' : string, 'state' : DiagramState }
 export interface Position { 'x' : number, 'y' : number }
 export interface TextLabel {
   'content' : string,
@@ -83,15 +84,17 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'getAllConnections' : ActorMethod<[], [] | [Array<Connection>]>,
-  'getAllIconPositions' : ActorMethod<[], [] | [Array<Icon>]>,
+  'getAllConnections' : ActorMethod<[bigint], [] | [Array<Connection>]>,
+  'getAllDiagrams' : ActorMethod<[], Array<NamedDiagram>>,
+  'getAllIconPositions' : ActorMethod<[bigint], [] | [Array<Icon>]>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getDiagramState' : ActorMethod<[], [] | [DiagramState]>,
+  'getDiagramStateById' : ActorMethod<[bigint], [] | [NamedDiagram]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'saveDiagramState' : ActorMethod<[DiagramState], undefined>,
+  'saveDiagramState' : ActorMethod<[string, DiagramState], bigint>,
+  'updateDiagramName' : ActorMethod<[bigint, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

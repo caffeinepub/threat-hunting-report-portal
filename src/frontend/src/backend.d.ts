@@ -14,6 +14,10 @@ export interface Line {
     startPosition: Position;
     strokeWidth: number;
 }
+export interface NamedDiagram {
+    name: string;
+    state: DiagramState;
+}
 export interface Icon {
     id: string;
     name: string;
@@ -60,13 +64,15 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    getAllConnections(): Promise<Array<Connection> | null>;
-    getAllIconPositions(): Promise<Array<Icon> | null>;
+    getAllConnections(diagramId: bigint): Promise<Array<Connection> | null>;
+    getAllDiagrams(): Promise<Array<NamedDiagram>>;
+    getAllIconPositions(diagramId: bigint): Promise<Array<Icon> | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getDiagramState(): Promise<DiagramState | null>;
+    getDiagramStateById(id: bigint): Promise<NamedDiagram | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    saveDiagramState(state: DiagramState): Promise<void>;
+    saveDiagramState(name: string, state: DiagramState): Promise<bigint>;
+    updateDiagramName(id: bigint, newName: string): Promise<void>;
 }

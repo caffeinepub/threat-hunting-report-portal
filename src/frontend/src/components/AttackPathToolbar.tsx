@@ -1,10 +1,10 @@
 import AttackPathIcon from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Download, Move } from 'lucide-react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Download, Move, Trash2 } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 
-export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'bidirectional-arrow';
+export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script';
 
 const iconTypes: { type: IconType; label: string }[] = [
   { type: 'email', label: 'Email' },
@@ -22,7 +22,6 @@ const iconTypes: { type: IconType; label: string }[] = [
   { type: 'zip', label: '.zip' },
   { type: 'doc', label: 'Microsoft Word' },
   { type: 'c2', label: 'Command & Control' },
-  { type: 'bidirectional-arrow', label: 'Bidirectional Arrow' },
 ];
 
 interface AttackPathToolbarProps {
@@ -33,6 +32,7 @@ interface AttackPathToolbarProps {
   onSave: () => void;
   onLoad: () => void;
   onExport: () => void;
+  onClear: () => void;
   isSaving: boolean;
   textColor: string;
   onTextColorChange: (color: string) => void;
@@ -46,6 +46,7 @@ export default function AttackPathToolbar({
   onSave,
   onLoad,
   onExport,
+  onClear,
   isSaving,
   textColor,
   onTextColorChange,
@@ -198,7 +199,16 @@ export default function AttackPathToolbar({
           onClick={onExport}
         >
           <Download className="h-4 w-4 mr-2" />
-          Export as JPEG
+          Export as PNG
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="w-full justify-start"
+          onClick={onClear}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Clear Diagram
         </Button>
       </div>
     </div>

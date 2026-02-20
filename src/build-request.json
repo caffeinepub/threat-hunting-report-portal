@@ -1,155 +1,146 @@
 {
   "kind": "build_request",
-  "title": "Add bidirectional arrow, text rotation, free transform tool, and update icon styles in attack path visualizer",
+  "title": "Add diagram naming, selection interface, clear button, PNG export, fix transform tool, and remove bidirectional arrow",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-46",
-      "text": "Add an up and down parallel arrow (bidirectional vertical arrow) icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
+      "id": "REQ-53",
+      "text": "Add diagram naming functionality when saving attack path diagrams in the attack path visualizer, prompting users to input a name for the diagram before saving",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "In attack path visualizer, put an up and down parallel arrow"
+          "once I save the diagram I should input a name for it"
         ]
       },
       "acceptanceCriteria": [
-        "A bidirectional vertical arrow icon appears in the AttackPathToolbar",
-        "The arrow icon can be dragged from the toolbar and placed onto the canvas",
-        "The placed arrow icon can be repositioned like other icons",
-        "The arrow icon maintains consistent styling with other attack path elements"
+        "When the save button is clicked, a dialog or input prompt appears requesting a diagram name",
+        "The diagram name is stored with the diagram state when saved to the backend",
+        "Users cannot save without providing a name"
       ]
     },
     {
-      "id": "REQ-47",
-      "text": "Enable text label rotation in the attack path visualizer, allowing users to rotate text labels to any angle",
+      "id": "REQ-54",
+      "text": "Implement diagram selection interface in the load functionality to display and choose from multiple saved diagrams by name",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "I should be able to rotate the text label"
+          "When I load the diagram, I could select the diagrams that was saved"
         ]
       },
       "acceptanceCriteria": [
-        "Text labels can be rotated using a rotation control or handle",
-        "Rotation angle is persisted in the text label state",
-        "Rotated text labels maintain their rotation when saved and loaded",
-        "Rotation is smooth and intuitive to use"
+        "The LoadDiagramDialog component displays a list of saved diagrams with their names",
+        "Users can select a specific diagram from the list to load",
+        "The selected diagram's complete state is restored to the canvas"
       ]
     },
     {
-      "id": "REQ-48",
-      "text": "Implement a free transform tool in the attack path visualizer that allows users to move and resize both icons and text labels with visual transformation controls",
+      "id": "REQ-55",
+      "text": "Add a clear button to the attack path visualizer toolbar that removes all elements from the canvas (icons, connections, drawings, text labels)",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Put a free transform tool, to move and resize the icons and text label"
+          "Put a clear button for the diagram"
         ]
       },
       "acceptanceCriteria": [
-        "A free transform tool is available in the toolbar",
-        "When active, selected icons display resize handles at corners/edges",
-        "When active, selected text labels display resize handles",
-        "Icons and text labels can be resized by dragging handles",
-        "Icons and text labels can be moved while in transform mode",
-        "Resized dimensions are persisted in element state",
-        "Transform handles are visible and easy to interact with"
+        "A clear button is visible in the AttackPathToolbar component",
+        "Clicking the clear button removes all placed icons, connections, drawings, and text labels from the canvas",
+        "The canvas returns to an empty state after clearing"
       ]
     },
     {
-      "id": "REQ-49",
-      "text": "Change the .exe icon in the attack path visualizer from a graphical icon to a text-based representation displaying '.exe'",
+      "id": "REQ-56",
+      "text": "Remove the JPEG export functionality and replace it with PNG export functionality that captures the entire attack path canvas and downloads it as a PNG image file",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Change the .exe icon into a .exe word icon"
+          "Remove the export as JPEG, put a save it as .png file for extraction for my diagram"
         ]
       },
       "acceptanceCriteria": [
-        "The .exe icon in the toolbar displays as text reading '.exe'",
-        "When placed on the canvas, the .exe element renders as text '.exe'",
-        "The text-based .exe element maintains consistent styling with other elements",
-        "The .exe element remains draggable and functional"
+        "The export button in the toolbar triggers PNG export instead of JPEG",
+        "The exported PNG file contains all canvas elements including icons, connections, drawings, and text labels",
+        "The PNG file is downloaded with an appropriate filename"
       ]
     },
     {
-      "id": "REQ-50",
-      "text": "Change the Excel icon in the attack path visualizer to display as text reading 'Microsoft Excel' instead of a graphical icon",
+      "id": "REQ-57",
+      "text": "Fix the free transform tool to properly move and resize both icons and text labels with working transformation controls",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Change the excel icon into microsoft excel icon"
+          "Fix the free transform tool to move icons and text label and modify their sizes"
         ]
       },
       "acceptanceCriteria": [
-        "The Excel icon in the toolbar displays as text reading 'Microsoft Excel'",
-        "When placed on the canvas, the Excel element renders as text 'Microsoft Excel'",
-        "The text-based Excel element maintains consistent styling",
-        "The Excel element remains draggable and functional"
+        "The free transform tool successfully moves icons when dragged",
+        "The free transform tool successfully moves text labels when dragged",
+        "The free transform tool resizes icons using transformation handles",
+        "The free transform tool resizes text labels using transformation handles",
+        "Transformations persist correctly in the canvas state"
       ]
     },
     {
-      "id": "REQ-51",
-      "text": "Change the Word icon in the attack path visualizer to display as text reading 'Microsoft Word' instead of a graphical icon",
+      "id": "REQ-58",
+      "text": "Remove the bidirectional arrow icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Change the word icon into microsoft word icon"
+          "Remove bidirectional arrow icon"
         ]
       },
       "acceptanceCriteria": [
-        "The Word icon in the toolbar displays as text reading 'Microsoft Word'",
-        "When placed on the canvas, the Word element renders as text 'Microsoft Word'",
-        "The text-based Word element maintains consistent styling",
-        "The Word element remains draggable and functional"
+        "The bidirectional arrow icon is not visible in the AttackPathToolbar",
+        "Users cannot place bidirectional arrow icons on the canvas",
+        "The icon type is removed from the AttackPathIcon component's supported types"
       ]
     },
     {
-      "id": "REQ-52",
-      "text": "Remove the IP Address icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
-      "target": "frontend",
+      "id": "REQ-59",
+      "text": "Update the backend diagram storage to support diagram names for saved attack path diagrams",
+      "target": "backend",
       "source": {
         "messageIds": [
           "msg-latest"
-        ],
-        "quotes": [
-          "Remove the IP address Icon"
         ]
       },
       "acceptanceCriteria": [
-        "The IP Address icon is not visible in the AttackPathToolbar",
-        "Existing diagrams with IP Address icons remain unaffected",
-        "The IP Address icon type is removed from the available icon types for new placements"
+        "The DiagramState type includes a name field for storing diagram names",
+        "The saveDiagramState method accepts and persists diagram names",
+        "The backend returns diagram names when retrieving saved diagrams"
       ]
     }
   ],
   "constraints": [
-    "Preserve existing attack path state management structure in useAttackPathState hook",
-    "Maintain compatibility with saved diagram state in the backend",
-    "Do not modify backend main.mo file for this request",
-    "Keep existing icon functionality (drag, drop, connect, erase) intact"
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts",
+    "Do not modify frontend/src/hooks/useActor.ts",
+    "Do not modify frontend/src/main.tsx",
+    "Do not modify frontend/src/components/ui components",
+    "Maintain single-actor architecture in backend/main.mo"
   ],
   "nonGoals": [
-    "Modifying other icon types not mentioned in the request",
-    "Changing the toolbar layout or organization",
-    "Adding new drawing tools beyond the free transform capability",
-    "Modifying the save/load diagram functionality"
+    "Adding new icon types to the attack path visualizer",
+    "Changing the color scheme or visual styling",
+    "Modifying the authentication system",
+    "Adding new report features"
   ],
   "imageRequirements": {
     "required": [],

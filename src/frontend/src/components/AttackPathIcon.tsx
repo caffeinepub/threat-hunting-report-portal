@@ -1,5 +1,4 @@
 import { IconType } from './AttackPathToolbar';
-import { ArrowUpDown } from 'lucide-react';
 
 interface AttackPathIconProps {
   type: IconType;
@@ -27,7 +26,6 @@ const iconPaths: Record<IconType, string> = {
   zip: '/assets/generated/zip-icon.dim_128x128.png',
   doc: '', // Text-based
   c2: '/assets/generated/c2-icon.dim_128x128.png',
-  'bidirectional-arrow': '', // SVG-based
 };
 
 export default function AttackPathIcon({ 
@@ -88,20 +86,6 @@ export default function AttackPathIcon({
         className={`flex items-center justify-center text-[9px] font-bold text-foreground bg-background border-2 border-border rounded ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
       >
         <span className="text-center leading-tight">Microsoft Word</span>
-      </div>
-    );
-  }
-
-  // Bidirectional arrow icon
-  if (type === 'bidirectional-arrow') {
-    return (
-      <div
-        draggable={isDraggable}
-        onDragStart={handleDragStart}
-        style={{ width: displayWidth, height: displayHeight, ...style }}
-        className={`flex items-center justify-center ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
-      >
-        <ArrowUpDown className="w-full h-full text-foreground" strokeWidth={2} />
       </div>
     );
   }

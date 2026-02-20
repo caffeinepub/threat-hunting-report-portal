@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
+  "projectStateVersion": 23,
   "summary": "Threat hunting report portal based on MITRE ATT&CK framework with PDF generation capability",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
@@ -381,6 +381,54 @@
         "REQ-52"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-diagram-naming-functionality-when-saving-attack-path-diagrams-in-the-attack-path-visualizer-prompting-users-to-input-a-name-for-the-diagram-before-saving",
+      "title": "Add diagram naming functionality when saving attack path diagrams in the attack path visualizer, prompting users to input a name for the diagram before saving",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-diagram-selection-interface-in-the-load-functionality-to-display-and-choose-from-multiple-saved-diagrams-by-name",
+      "title": "Implement diagram selection interface in the load functionality to display and choose from multiple saved diagrams by name",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-clear-button-to-the-attack-path-visualizer-toolbar-that-removes-all-elements-from-the-canvas-icons-connections-drawings-text-labels",
+      "title": "Add a clear button to the attack path visualizer toolbar that removes all elements from the canvas (icons, connections, drawings, text labels)",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-jpeg-export-functionality-and-replace-it-with-png-export-functionality-that-captures-the-entire-attack-path-canvas-and-downloads-it-as-a-png-image-file",
+      "title": "Remove the JPEG export functionality and replace it with PNG export functionality that captures the entire attack path canvas and downloads it as a PNG image file",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-free-transform-tool-to-properly-move-and-resize-both-icons-and-text-labels-with-working-transformation-controls",
+      "title": "Fix the free transform tool to properly move and resize both icons and text labels with working transformation controls",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-bidirectional-arrow-icon-from-the-attack-path-visualizer-toolbar-and-prevent-it-from-being-placed-on-the-canvas",
+      "title": "Remove the bidirectional arrow icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -578,6 +626,50 @@
       "id": "AR-47",
       "summary": "Remove the IP address icon from the attack path visualizer toolbar",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Add diagram naming functionality when saving attack path diagrams",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-49",
+      "summary": "Implement diagram selection interface in load functionality to choose from saved diagrams",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Add a clear/reset button to the attack path visualizer to remove all elements from the canvas",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-51",
+      "summary": "Replace JPEG export with PNG export functionality for attack path diagrams",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-52",
+      "summary": "Fix free transform tool to properly move and resize both icons and text labels",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-53",
+      "summary": "Remove the bidirectional arrow icon from the attack path visualizer toolbar",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-60",
+      "summary": "Update the backend diagram storage to support diagram names for saved attack path diagrams",
+      "reqIds": [
+        "REQ-59"
+      ],
       "status": "pending"
     }
   ],

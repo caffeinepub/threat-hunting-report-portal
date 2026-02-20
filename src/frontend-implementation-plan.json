@@ -1,191 +1,143 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add bidirectional arrow, text rotation, free transform tool, and update icon styles in attack path visualizer",
+  "title": "Add diagram naming, selection interface, clear button, PNG export, fix transform tool, and remove bidirectional arrow",
   "requirements": [
     {
-      "id": "REQ-46",
-      "summary": "Add bidirectional vertical arrow icon to attack path visualizer toolbar as draggable element",
+      "id": "REQ-53",
+      "summary": "Add diagram naming functionality when saving attack path diagrams",
       "acceptanceCriteria": [
-        "A bidirectional vertical arrow icon appears in the AttackPathToolbar",
-        "The arrow icon can be dragged from the toolbar and placed onto the canvas",
-        "The placed arrow icon can be repositioned like other icons",
-        "The arrow icon maintains consistent styling with other attack path elements"
+        "When the save button is clicked, a dialog or input prompt appears requesting a diagram name",
+        "The diagram name is stored with the diagram state when saved to the backend",
+        "Users cannot save without providing a name"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a new bidirectional vertical arrow icon to the toolbar's draggable icons array. Include the icon with type 'bidirectional-arrow' alongside existing icons like 'attacker', 'computer', etc. Ensure the icon is draggable using the same onDragStart mechanism as other toolbar icons."
+          "path": "frontend/src/components/SaveDiagramDialog.tsx",
+          "operation": "create",
+          "description": "Create a new dialog component that prompts users to enter a diagram name before saving. Include a text input field for the name, validation to prevent empty names, and save/cancel buttons. Use shadcn/ui Dialog and Input components for consistent styling."
         },
         {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "path": "frontend/src/pages/AttackPathPage.tsx",
           "operation": "modify",
-          "description": "Add rendering logic for the 'bidirectional-arrow' icon type. Create an SVG-based bidirectional vertical arrow (up and down parallel arrows) that matches the styling of existing attack path elements. Ensure the icon maintains draggability and interaction consistency with other icon types."
+          "description": "Replace the direct save operation with the SaveDiagramDialog component. When the save button is clicked, open the dialog and pass the diagram state. Only trigger the saveDiagramState mutation after the user provides a valid name in the dialog."
         },
         {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "path": "frontend/src/hooks/useSaveDiagramState.ts",
           "operation": "modify",
-          "description": "Ensure the canvas correctly handles drop and placement of the new 'bidirectional-arrow' icon type, treating it like other draggable icons with full repositioning support."
+          "description": "Update the mutation to accept a diagram name parameter and pass it to the backend's saveDiagramState method alongside the diagram state."
         }
       ]
     },
     {
-      "id": "REQ-47",
-      "summary": "Enable text label rotation in attack path visualizer",
+      "id": "REQ-54",
+      "summary": "Implement diagram selection interface in the load functionality",
       "acceptanceCriteria": [
-        "Text labels can be rotated using a rotation control or handle",
-        "Rotation angle is persisted in the text label state",
-        "Rotated text labels maintain their rotation when saved and loaded",
-        "Rotation is smooth and intuitive to use"
+        "The LoadDiagramDialog component displays a list of saved diagrams with their names",
+        "Users can select a specific diagram from the list to load",
+        "The selected diagram's complete state is restored to the canvas"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useGetAllDiagrams.ts",
+          "operation": "create",
+          "description": "Create a React Query hook that fetches all saved diagrams using the backend's getAllDiagrams method, returning an array of NamedDiagram objects with diagram IDs, names, and state."
+        },
+        {
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "operation": "modify",
+          "description": "Replace the current diagram loading logic with a list-based selection interface. Use the useGetAllDiagrams hook to fetch all saved diagrams and display them in a scrollable list with diagram names. Add click handlers to select and load a specific diagram by its ID. Show loading and error states appropriately."
+        },
+        {
+          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "operation": "modify",
+          "description": "Update the LoadDiagramDialog usage to handle the new selection-based loading flow. Ensure the selected diagram's state is properly converted and applied to the canvas state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-55",
+      "summary": "Add a clear button to the attack path visualizer toolbar",
+      "acceptanceCriteria": [
+        "A clear button is visible in the AttackPathToolbar component",
+        "Clicking the clear button removes all placed icons, connections, drawings, and text labels from the canvas",
+        "The canvas returns to an empty state after clearing"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Add a 'rotation' property (number, default 0) to the TextLabel type in the state management hook. Update state setters to handle rotation changes for individual text labels."
+          "description": "Add a clearCanvas function to the hook that resets all state arrays (placedIcons, connections, freehandDrawings, lines, textLabels) to empty arrays and clears the undo history."
         },
         {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Add rotation control UI for selected text labels. Implement a rotation handle (e.g., circular handle above the text label) that allows users to rotate text by dragging. Apply CSS transform rotation to text labels based on their rotation state. Ensure rotation persists when text is moved or edited."
+          "description": "Add a clear button to the toolbar with an appropriate icon (e.g., trash or X). Position it near the other file operation buttons (save, load, export). Wire it to call the clearCanvas function from useAttackPathState when clicked."
         },
         {
-          "path": "frontend/src/hooks/useSaveDiagramState.ts",
+          "path": "frontend/src/pages/AttackPathPage.tsx",
           "operation": "modify",
-          "description": "Update the diagram state serialization to include the rotation property when converting text labels to backend DiagramState format. Ensure rotation values are preserved during save operations."
-        },
-        {
-          "path": "frontend/src/components/LoadDiagramDialog.tsx",
-          "operation": "modify",
-          "description": "Update the diagram state deserialization logic to extract and apply the rotation property when loading text labels from the backend DiagramState format into frontend state."
+          "description": "Pass the clearCanvas function from useAttackPathState to the AttackPathToolbar component as a prop."
         }
       ]
     },
     {
-      "id": "REQ-48",
-      "summary": "Implement free transform tool for moving and resizing icons and text labels",
+      "id": "REQ-56",
+      "summary": "Replace JPEG export with PNG export functionality",
       "acceptanceCriteria": [
-        "A free transform tool is available in the toolbar",
-        "When active, selected icons display resize handles at corners/edges",
-        "When active, selected text labels display resize handles",
-        "Icons and text labels can be resized by dragging handles",
-        "Icons and text labels can be moved while in transform mode",
-        "Resized dimensions are persisted in element state",
-        "Transform handles are visible and easy to interact with"
+        "The export button in the toolbar triggers PNG export instead of JPEG",
+        "The exported PNG file contains all canvas elements including icons, connections, drawings, and text labels",
+        "The PNG file is downloaded with an appropriate filename"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Add a 'Free Transform' tool button to the toolbar alongside existing drawing tools (freehand, line, arrow, text). The button should toggle the transform mode and provide visual feedback when active."
+          "description": "Update the export functionality to generate PNG instead of JPEG. Modify the canvas toBlob or toDataURL call to use 'image/png' format. Update the downloaded filename to use .png extension instead of .jpeg."
+        }
+      ]
+    },
+    {
+      "id": "REQ-57",
+      "summary": "Fix the free transform tool to properly move and resize icons and text labels",
+      "acceptanceCriteria": [
+        "The free transform tool successfully moves icons when dragged",
+        "The free transform tool successfully moves text labels when dragged",
+        "The free transform tool resizes icons using transformation handles",
+        "The free transform tool resizes text labels using transformation handles",
+        "Transformations persist correctly in the canvas state"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Fix the free transform tool's event handlers for dragging and resizing. Ensure mouse down, move, and up events properly update the position and size of both icons and text labels. Add proper bounds checking and state updates to persist transformations. Fix any issues with the transformation handles not responding correctly."
         },
         {
           "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Add 'width' and 'height' properties to Icon and TextLabel types. Add a new state property 'activeTransformTool' (boolean) to track when free transform mode is active. Add a 'selectedElementId' state to track which element is currently selected for transformation."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Implement free transform functionality: When free transform mode is active, display resize handles (corner and edge handles) around the selected icon or text label. Implement drag handlers for resize handles that update element width/height. Allow moving elements while in transform mode. Ensure all transform changes persist in state."
-        },
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Update icon rendering to support custom width and height properties from state. Apply dimensions using CSS or SVG attributes while maintaining aspect ratio or allowing free resize as needed."
-        },
-        {
-          "path": "frontend/src/hooks/useSaveDiagramState.ts",
-          "operation": "modify",
-          "description": "Update diagram state serialization to include width and height properties for icons and text labels when saving to backend."
-        },
-        {
-          "path": "frontend/src/components/LoadDiagramDialog.tsx",
-          "operation": "modify",
-          "description": "Update diagram state deserialization to extract and apply width and height properties when loading icons and text labels from backend."
+          "description": "Review and fix the state update logic for icon and text label transformations. Ensure the updateIconPosition, updateIconSize, updateTextLabelPosition, and updateTextLabelSize functions (or equivalent) correctly update the state and trigger re-renders."
         }
       ]
     },
     {
-      "id": "REQ-49",
-      "summary": "Change .exe icon to text-based representation displaying '.exe'",
+      "id": "REQ-58",
+      "summary": "Remove the bidirectional arrow icon from the toolbar",
       "acceptanceCriteria": [
-        "The .exe icon in the toolbar displays as text reading '.exe'",
-        "When placed on the canvas, the .exe element renders as text '.exe'",
-        "The text-based .exe element maintains consistent styling with other elements",
-        "The .exe element remains draggable and functional"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Update the rendering logic for the 'exe' icon type to display as text '.exe' instead of using the image asset frontend/public/assets/generated/exe-icon.dim_64x64.png. Apply consistent text styling (font, color, background) that matches other text-based elements in the attack path visualizer."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Update the toolbar representation of the .exe icon to display as text '.exe' instead of the image icon. Ensure the text representation is clearly visible and maintains the draggable behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-50",
-      "summary": "Change Excel icon to display 'Microsoft Excel' text instead of graphical icon",
-      "acceptanceCriteria": [
-        "The Excel icon in the toolbar displays as text reading 'Microsoft Excel'",
-        "When placed on the canvas, the Excel element renders as text 'Microsoft Excel'",
-        "The text-based Excel element maintains consistent styling",
-        "The Excel element remains draggable and functional"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Update the rendering logic for the Excel icon type to display as text 'Microsoft Excel' instead of using the image asset frontend/public/assets/generated/excel-icon.dim_64x64.png. Apply consistent text styling that matches other text-based elements."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Update the toolbar representation of the Excel icon to display as text 'Microsoft Excel' instead of the image icon. Ensure the text is readable and maintains draggable behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-51",
-      "summary": "Change Word icon to display 'Microsoft Word' text instead of graphical icon",
-      "acceptanceCriteria": [
-        "The Word icon in the toolbar displays as text reading 'Microsoft Word'",
-        "When placed on the canvas, the Word element renders as text 'Microsoft Word'",
-        "The text-based Word element maintains consistent styling",
-        "The Word element remains draggable and functional"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Update the rendering logic for the Word icon type to display as text 'Microsoft Word' instead of using the image asset frontend/public/assets/generated/word-icon.dim_64x64.png. Apply consistent text styling that matches other text-based elements."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Update the toolbar representation of the Word icon to display as text 'Microsoft Word' instead of the image icon. Ensure the text is readable and maintains draggable behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-52",
-      "summary": "Remove IP Address icon from attack path visualizer toolbar",
-      "acceptanceCriteria": [
-        "The IP Address icon is not visible in the AttackPathToolbar",
-        "Existing diagrams with IP Address icons remain unaffected",
-        "The IP Address icon type is removed from the available icon types for new placements"
+        "The bidirectional arrow icon is not visible in the AttackPathToolbar",
+        "Users cannot place bidirectional arrow icons on the canvas",
+        "The icon type is removed from the AttackPathIcon component's supported types"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Remove the IP Address icon from the toolbar's draggable icons array. Ensure that any references to 'ip' or 'ip-address' icon type are removed from the toolbar UI, preventing users from adding new IP Address icons to the canvas."
+          "description": "Remove the bidirectional arrow icon from the icon options array in the toolbar. Filter out any references to 'bidirectional-arrow' icon type."
+        },
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Remove the 'bidirectional-arrow' case from the icon type rendering logic. Remove any SVG or component code related to rendering bidirectional arrows."
         }
       ]
     }
