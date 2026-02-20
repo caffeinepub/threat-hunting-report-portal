@@ -1,0 +1,145 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Threat Hunt Portal - Frontend Implementation",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Create threat hunting report form interface with dynamic technique and IOC management",
+      "acceptanceCriteria": [
+        "Form includes fields for report title, date, executive summary, threat actors, techniques, IOCs, and findings",
+        "Form validates required fields before submission",
+        "Users can add multiple techniques and IOCs dynamically"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ReportForm.tsx",
+          "operation": "create",
+          "description": "Create comprehensive report form component with fields for title, date, author, executive summary, threat actors (name and description), MITRE ATT&CK techniques, IOCs, and findings. Implement dynamic arrays for threat actors, techniques, IOCs, and findings with add/remove functionality. Include form validation for required fields (title, date, author, executive summary). Use shadcn-ui form components (Input, Textarea, Button) for consistent UI."
+        },
+        {
+          "path": "frontend/src/pages/CreateReportPage.tsx",
+          "operation": "create",
+          "description": "Create page component that renders ReportForm and handles form submission by calling backend saveReport method. Handle success and error states, show loading indicators during submission, and navigate to report listing page on successful save."
+        },
+        {
+          "path": "frontend/src/hooks/useBackend.ts",
+          "operation": "create",
+          "description": "Create custom hook that provides typed access to backend methods (saveReport, getAllReports, getReport, deleteReport) with error handling and loading states."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Integrate MITRE ATT&CK framework with searchable technique selection interface",
+      "acceptanceCriteria": [
+        "Users can search and select MITRE ATT&CK techniques by ID or name",
+        "Selected techniques display their full ID and description",
+        "Multiple techniques can be added to a single report"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/data/mitreAttackData.ts",
+          "operation": "create",
+          "description": "Create static MITRE ATT&CK technique data file containing an array of techniques with id (e.g., T1059.001), name, and description. Include commonly used techniques across tactics like Initial Access, Execution, Persistence, Privilege Escalation, Defense Evasion, Credential Access, Discovery, Lateral Movement, Collection, and Exfiltration."
+        },
+        {
+          "path": "frontend/src/components/MitreTechniqueSelector.tsx",
+          "operation": "create",
+          "description": "Create searchable technique selector component using shadcn-ui Combobox or Command component. Implement fuzzy search across technique IDs, names, and descriptions. Display selected techniques as removable tags with full ID and description. Allow multiple technique selection. Integrate with ReportForm for technique management."
+        },
+        {
+          "path": "frontend/src/components/ReportForm.tsx",
+          "operation": "modify",
+          "description": "Integrate MitreTechniqueSelector component into the report form. Manage selected techniques state and ensure technique IDs are included in form submission to backend."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Implement client-side PDF generation for threat hunting reports",
+      "acceptanceCriteria": [
+        "Users can generate and download PDF reports from saved threat hunting data",
+        "PDF includes all report sections in a readable format",
+        "PDF displays MITRE ATT&CK techniques with their IDs and descriptions",
+        "Generated PDF is properly formatted and downloadable"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/pdfGenerator.ts",
+          "operation": "create",
+          "description": "Create PDF generation utility using jsPDF library. Implement formatReportAsPDF function that takes Report data and generates professionally formatted PDF with sections: title page with report metadata, executive summary, threat actors with descriptions, MITRE ATT&CK techniques table with IDs and descriptions, IOCs list, and detailed findings. Apply professional formatting with headers, spacing, tables, and page breaks. Return PDF blob for download."
+        },
+        {
+          "path": "frontend/src/components/PdfGeneratorButton.tsx",
+          "operation": "create",
+          "description": "Create button component that accepts report data, triggers PDF generation using pdfGenerator utility, and initiates browser download with filename format 'ThreatHuntReport_<title>_<date>.pdf'. Show loading state during PDF generation. Use shadcn-ui Button component."
+        },
+        {
+          "path": "frontend/package.json",
+          "operation": "modify",
+          "description": "Add jsPDF library as dependency for client-side PDF generation functionality."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Create report listing page with view and PDF generation capabilities",
+      "acceptanceCriteria": [
+        "Page displays all saved reports in a list or table format",
+        "Each report shows title, date, and number of techniques",
+        "Users can click to view full report details",
+        "Users can generate PDF from the listing page"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ReportListPage.tsx",
+          "operation": "create",
+          "description": "Create report listing page that fetches all reports using useBackend hook and displays them in a table using shadcn-ui Table component. Show columns for report title, date, number of MITRE techniques, and actions (View Details, Generate PDF, Delete). Implement navigation to detail view page. Integrate PdfGeneratorButton for each report row. Handle loading and error states. Include button to navigate to CreateReportPage."
+        },
+        {
+          "path": "frontend/src/pages/ReportDetailPage.tsx",
+          "operation": "create",
+          "description": "Create report detail page that fetches and displays complete report data for a specific report ID. Show all sections: metadata, executive summary, threat actors with descriptions, MITRE ATT&CK techniques with full details from mitreAttackData, IOCs list, and findings. Include PdfGeneratorButton for downloading PDF of current report. Use shadcn-ui Card components for section organization. Handle loading and error states."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire React Router routes for CreateReportPage (/create), ReportListPage (/ as default), and ReportDetailPage (/report/:id). Add navigation structure with links to main pages. Set ReportListPage as the default landing page."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Design professional security-focused theme with clear information hierarchy",
+      "acceptanceCriteria": [
+        "Visual design uses a consistent, professional color scheme appropriate for security applications",
+        "Typography is clear and readable for technical content",
+        "Layout emphasizes information hierarchy and data organization",
+        "Design conveys authority and technical professionalism"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Define security-focused color palette using CSS variables avoiding blue and purple. Use dark greens, grays, reds, and oranges for professional security aesthetic. Set typography with clear, monospace-friendly fonts for technical content. Define spacing and layout utilities that emphasize information hierarchy. Ensure high contrast for readability of threat data and IOCs."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Extend Tailwind theme with security-themed color palette (dark greens, charcoal, slate, amber, red tones). Configure typography plugin for technical content readability. Set custom spacing and border radius for professional appearance. Ensure configuration supports the security-focused design system."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "create",
+          "description": "Create main layout component with professional header featuring app title 'Threat Hunt Portal' and navigation links. Include the generated security-themed hero banner image (frontend/public/assets/generated/hero-banner.dim_1200x400.png) on the homepage/landing view. Use security-focused styling with dark theme elements. Provide consistent page structure wrapper for all views."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wrap all routes with Layout component to ensure consistent header, navigation, and styling across all pages. Verify Layout correctly displays the hero banner on the ReportListPage."
+        }
+      ]
+    }
+  ]
+}

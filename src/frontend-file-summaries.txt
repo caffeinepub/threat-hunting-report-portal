@@ -1,0 +1,17 @@
+{
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup, theme provider, and routes for report listing, creation, and detail views.",
+  "frontend/src/components/Layout.tsx": "Layout wrapper component with header navigation, hero banner display on homepage, and footer with attribution.",
+  "frontend/src/pages/ReportListPage.tsx": "Report listing page displaying all threat hunting reports in a table with view, PDF generation, and delete actions using navigate function for routing.",
+  "frontend/src/pages/CreateReportPage.tsx": "Page component for creating new threat hunting reports with form submission handling and navigation.",
+  "frontend/src/pages/ReportDetailPage.tsx": "Detailed report view page showing all report sections including metadata, executive summary, threat actors, MITRE techniques, IOCs, and findings.",
+  "frontend/src/components/ReportForm.tsx": "Comprehensive form component for creating threat hunting reports with dynamic fields for threat actors, techniques, IOCs, and findings.",
+  "frontend/src/components/MitreTechniqueSelector.tsx": "Searchable MITRE ATT&CK technique selector using Command component with technique ID, name, and description display.",
+  "frontend/src/components/PdfGeneratorButton.tsx": "Button component that triggers PDF generation by opening a printable report view with loading state and error handling.",
+  "frontend/src/utils/pdfGenerator.ts": "PDF generation utility that creates a printable HTML document with professional styling and triggers the browser's print dialog for PDF export.",
+  "frontend/src/data/mitreAttackData.ts": "Static MITRE ATT&CK technique data containing IDs, names, and descriptions across all tactics.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for backend operations including fetching, saving, and deleting threat hunting reports.",
+  "frontend/src/index.css": "Global styles with OKLCH color system using security-focused dark blue/teal palette for professional cybersecurity aesthetic.",
+  "frontend/tailwind.config.js": "Tailwind configuration with security-themed color palette, custom fonts, and extended design tokens.",
+  "frontend/package.json": "Package configuration with jsPDF and jsPDF-AutoTable dependencies added for PDF generation functionality.",
+  "frontend/src/types/jspdf.d.ts": "Type declaration file providing TypeScript definitions for jsPDF and jspdf-autotable modules."
+}

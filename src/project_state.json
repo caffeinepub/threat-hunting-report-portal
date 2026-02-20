@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Threat hunting report portal based on MITRE ATT&CK framework with PDF generation capability",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Security-themed hero banner showing abstract network or threat visualization in dark tones (hero-banner.dim_1200x400.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
+      "title": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-mitre-att-ck-framework-data-by-providing-a-searchable-dropdown-or-selection-interface-for-mitre-att-ck-techniques-with-their-ids-e-g-t1059-001-and-descriptions",
+      "title": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-pdf-generation-functionality-that-creates-a-professionally-formatted-threat-hunting-report-containing-all-report-sections-including-mitre-att-ck-techniques-iocs-and-findings",
+      "title": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-report-listing-page-that-displays-all-saved-threat-hunting-reports-with-basic-information-title-date-techniques-count-and-allows-users-to-view-full-details-or-generate-pdfs",
+      "title": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-a-professional-security-focused-visual-theme-with-a-cohesive-color-palette-avoiding-blue-and-purple-clear-typography-optimized-for-readability-of-technical-content-and-a-layout-that-emphasizes-structured-information-and-data-clarity-suitable-for-cybersecurity-professionals",
+      "title": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create threat hunting report portal interface",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Integrate MITRE ATT&CK framework data",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement PDF report generation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Store threat hunting reports in the backend with fields for report metadata (title, date, author), executive summary, threat actors, selected MITRE ATT&CK techniques, IOCs, and detailed findings",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Threat Hunting Report Portal",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

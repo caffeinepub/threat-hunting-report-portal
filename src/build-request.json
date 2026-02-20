@@ -1,0 +1,119 @@
+{
+  "kind": "build_request",
+  "title": "Create threat hunting report portal with MITRE ATT&CK and PDF generation",
+  "projectName": "Threat Hunt Portal",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Form includes fields for report title, date, executive summary, threat actors, techniques, IOCs, and findings",
+        "Form validates required fields before submission",
+        "Users can add multiple techniques and IOCs dynamically"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can search and select MITRE ATT&CK techniques by ID or name",
+        "Selected techniques display their full ID and description",
+        "Multiple techniques can be added to a single report"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Store threat hunting reports in the backend with fields for report metadata (title, date, author), executive summary, threat actors, selected MITRE ATT&CK techniques, IOCs, and detailed findings",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend stores complete report data including all sections",
+        "Reports are persisted across canister upgrades",
+        "Each report has a unique identifier"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can generate and download PDF reports from saved threat hunting data",
+        "PDF includes all report sections in a readable format",
+        "PDF displays MITRE ATT&CK techniques with their IDs and descriptions",
+        "Generated PDF is properly formatted and downloadable"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Page displays all saved reports in a list or table format",
+        "Each report shows title, date, and number of techniques",
+        "Users can click to view full report details",
+        "Users can generate PDF from the listing page"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Visual design uses a consistent, professional color scheme appropriate for security applications",
+        "Typography is clear and readable for technical content",
+        "Layout emphasizes information hierarchy and data organization",
+        "Design conveys authority and technical professionalism"
+      ]
+    }
+  ],
+  "constraints": [
+    "PDF generation must be handled client-side in the frontend",
+    "MITRE ATT&CK technique data should be embedded or statically available in the frontend",
+    "All report data must persist across canister upgrades"
+  ],
+  "nonGoals": [
+    "Real-time threat intelligence feeds or external API integration",
+    "Automated threat detection or scanning capabilities",
+    "User authentication beyond Internet Identity",
+    "Email notification or sharing features",
+    "Export formats other than PDF"
+  ],
+  "imageRequirements": {
+    "required": [
+      "Security-themed hero banner showing abstract network or threat visualization in dark tones (hero-banner.dim_1200x400.png)"
+    ],
+    "edits": []
+  }
+}

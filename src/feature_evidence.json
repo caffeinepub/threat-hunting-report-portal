@@ -1,0 +1,104 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
+      "featureTitle": "Create a threat hunting report form interface where users can input threat hunting details including report title, date, executive summary, threat actors, techniques observed, indicators of compromise (IOCs), and findings",
+      "files": [
+        "frontend/src/components/ReportForm.tsx",
+        "frontend/src/pages/CreateReportPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-mitre-att-ck-framework-data-by-providing-a-searchable-dropdown-or-selection-interface-for-mitre-att-ck-techniques-with-their-ids-e-g-t1059-001-and-descriptions",
+      "featureTitle": "Integrate MITRE ATT&CK framework data by providing a searchable dropdown or selection interface for MITRE ATT&CK techniques with their IDs (e.g., T1059.001) and descriptions",
+      "files": [
+        "frontend/src/components/MitreTechniqueSelector.tsx",
+        "frontend/src/components/ReportForm.tsx",
+        "frontend/src/data/mitreAttackData.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-pdf-generation-functionality-that-creates-a-professionally-formatted-threat-hunting-report-containing-all-report-sections-including-mitre-att-ck-techniques-iocs-and-findings",
+      "featureTitle": "Implement PDF generation functionality that creates a professionally formatted threat hunting report containing all report sections including MITRE ATT&CK techniques, IOCs, and findings",
+      "files": [
+        "frontend/src/components/PdfGeneratorButton.tsx",
+        "frontend/src/utils/pdfGenerator.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-report-listing-page-that-displays-all-saved-threat-hunting-reports-with-basic-information-title-date-techniques-count-and-allows-users-to-view-full-details-or-generate-pdfs",
+      "featureTitle": "Create a report listing page that displays all saved threat hunting reports with basic information (title, date, techniques count) and allows users to view full details or generate PDFs",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/ReportDetailPage.tsx",
+        "frontend/src/pages/ReportListPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-design-a-professional-security-focused-visual-theme-with-a-cohesive-color-palette-avoiding-blue-and-purple-clear-typography-optimized-for-readability-of-technical-content-and-a-layout-that-emphasizes-structured-information-and-data-clarity-suitable-for-cybersecurity-professionals",
+      "featureTitle": "Design a professional, security-focused visual theme with a cohesive color palette (avoiding blue and purple), clear typography optimized for readability of technical content, and a layout that emphasizes structured information and data clarity suitable for cybersecurity professionals",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-20T10:17:30.597Z",
+  "summary": "The implementation successfully addresses all core requirements. The threat hunting report portal includes a comprehensive form interface, searchable MITRE ATT&CK technique integration, backend persistence, client-side PDF generation via browser print dialog, and a report listing page. The security-themed design uses a professional dark palette avoiding blue/purple. All acceptance criteria appear to be met based on the file evidence.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "Internet Identity authentication integration with login/logout functionality",
+      "reason": "The BuildRequest explicitly states non-goals include 'User authentication beyond Internet Identity', yet the implementation includes full Internet Identity provider setup, auth hooks (useInternetIdentity.ts), and actor authentication flows. The constraint was about not going beyond II, not implementing II itself, but the presence of authentication wasn't requested in any requirement.",
+      "evidence": [
+        "frontend/src/hooks/useInternetIdentity.ts",
+        "frontend/src/hooks/useActor.ts",
+        "frontend/src/main.tsx"
+      ]
+    },
+    {
+      "description": "Report deletion functionality",
+      "reason": "No requirement requested the ability to delete reports. REQ-5 specifies viewing details and generating PDFs from the listing page, but deletion was not mentioned in any requirement or acceptance criteria.",
+      "evidence": [
+        "backend/main.mo (deleteReport function)",
+        "frontend/src/hooks/useQueries.ts (useDeleteReport)",
+        "frontend/src/pages/ReportListPage.tsx (delete actions with Trash2 icon)"
+      ]
+    },
+    {
+      "description": "Theme provider with dark/light mode switching capability",
+      "reason": "REQ-6 requests a professional security-focused visual theme with specific color palette requirements, but does not request theme switching or multiple theme modes. The implementation includes next-themes provider with system theme detection.",
+      "evidence": [
+        "frontend/src/App.tsx (ThemeProvider with defaultTheme='dark' enableSystem)",
+        "frontend/index.css (both :root and .dark theme definitions)"
+      ]
+    }
+  ],
+  "confidence": 0.92,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/MitreTechniqueSelector.tsx",
+    "frontend/src/components/PdfGeneratorButton.tsx",
+    "frontend/src/components/ReportForm.tsx",
+    "frontend/src/data/mitreAttackData.ts",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/CreateReportPage.tsx",
+    "frontend/src/pages/ReportDetailPage.tsx",
+    "frontend/src/pages/ReportListPage.tsx",
+    "frontend/src/types/jspdf.d.ts",
+    "frontend/src/utils/pdfGenerator.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}
