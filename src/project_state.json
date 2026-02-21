@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 33,
+  "projectStateVersion": 35,
   "summary": "Threat hunting report portal based on MITRE ATT&CK framework with PDF generation capability",
   "architectural_notes": [],
   "known_issues": [
     "Free transform tool not properly resizing icons and text labels",
-    "Load diagram functionality has issues with date/time display",
-    "Deployment to Internet Computer network failing due to configuration or build issues"
+    "Deployment to Internet Computer network failing due to configuration or build issues",
+    "Load diagram selection interface not accurately displaying or loading saved diagrams"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -521,6 +521,38 @@
         "REQ-74"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-the-load-diagram-selection-interface-in-loaddiagramdialog-tsx-to-accurately-display-saved-diagrams-and-ensure-the-correct-diagram-state-loads-when-a-user-selects-a-diagram-from-the-list",
+      "title": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-font-size-control-to-the-text-tool-in-attackpathtoolbar-tsx-that-allows-users-to-select-a-font-size-before-placing-text-labels-on-the-canvas",
+      "title": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enable-manual-line-breaks-in-text-labels-in-attackpathcanvas-tsx-by-allowing-users-to-press-enter-key-to-create-new-lines-within-text-input",
+      "title": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-useattackpathstate-hook-to-manage-font-size-state-for-text-labels-and-pass-the-selected-font-size-to-newly-created-text-elements",
+      "title": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -842,6 +874,24 @@
       "reqIds": [
         "REQ-73"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-75",
+      "summary": "Fix the load diagram selection interface in the attack path visualizer to accurately display and load saved diagrams",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-76",
+      "summary": "Add font size control to the text tool toolbar in the attack path visualizer allowing users to select font size before placing text labels on the canvas",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-77",
+      "summary": "Enable manual line breaks in text labels in the attack path visualizer allowing users to press Enter to create new lines within text content",
+      "reqIds": [],
       "status": "pending"
     }
   ],

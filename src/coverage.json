@@ -1,88 +1,77 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T00:45:04.852Z",
+  "generatedAt": "2026-02-21T01:08:46.414Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-70",
-        "summary": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment, including correct canister types, build commands, and dependency declarations",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/package.json"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-71",
-        "summary": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
+        "id": "REQ-75",
+        "summary": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/pages/AttackPathPage.tsx",
-          "frontend/src/main.tsx",
-          "frontend/package.json",
-          "frontend/tsconfig.json"
+          "frontend/src/components/LoadDiagramDialog.tsx",
+          "frontend/src/pages/AttackPathPage.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/components/LoadDiagramDialog.tsx",
           "frontend/src/pages/AttackPathPage.tsx"
         ]
       },
       {
-        "id": "REQ-72",
-        "summary": "Ensure html2canvas dependency is properly declared in package.json with correct version specification to support PNG export functionality",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/package.json",
-          "frontend/src/components/AttackPathToolbar.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-73",
-        "summary": "Verify backend Motoko code compiles successfully and fix any syntax errors, type mismatches, or compilation issues in main.mo that could block deployment",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-74",
-        "summary": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
+        "id": "REQ-76",
+        "summary": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx",
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/App.tsx",
           "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/index.html",
-          "frontend/vite.config.ts"
+          "frontend/src/pages/AttackPathPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/index.html",
-          "frontend/vite.config.ts"
+          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/pages/AttackPathPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-77",
+        "summary": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/hooks/useAttackPathState.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/hooks/useAttackPathState.ts"
+        ]
+      },
+      {
+        "id": "REQ-78",
+        "summary": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.html",
+    "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/components/AttackPathToolbar.tsx",
+    "frontend/src/components/LoadDiagramDialog.tsx",
+    "frontend/src/hooks/useAttackPathState.ts",
     "frontend/src/pages/AttackPathPage.tsx",
-    "frontend/src/types/html2canvas.d.ts",
-    "frontend/vite.config.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

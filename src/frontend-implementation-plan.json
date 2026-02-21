@@ -1,137 +1,88 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix deployment configuration and build issues for Internet Computer network",
+  "title": "Fix load diagram interface and add text customization features",
   "requirements": [
     {
-      "id": "REQ-70",
-      "summary": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment",
+      "id": "REQ-75",
+      "summary": "Fix the load diagram selection interface to accurately display saved diagrams and ensure correct diagram state loads when selected",
       "acceptanceCriteria": [
-        "dfx.json contains valid canister configurations for both frontend and backend",
-        "All canister type declarations are correct for Internet Computer deployment",
-        "Build commands and dependencies are properly specified",
-        "Configuration passes dfx validation without errors"
+        "The load diagram dialog displays all saved diagrams with accurate metadata",
+        "When a user clicks on a diagram in the selection interface, the correct diagram state loads onto the canvas",
+        "All diagram elements (icons, connections, drawings, text labels) restore accurately from the saved state",
+        "The selection interface provides clear visual feedback when a diagram is selected"
       ],
       "file_operations": [
         {
-          "path": "frontend/package.json",
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
           "operation": "modify",
-          "description": "Review and verify that build scripts are correctly configured for Internet Computer deployment. Ensure the build script produces output compatible with dfx.json frontend canister source settings. Verify all dependencies required for TypeScript compilation and Vite bundling are present."
-        }
-      ]
-    },
-    {
-      "id": "REQ-71",
-      "summary": "Fix TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code",
-      "acceptanceCriteria": [
-        "TypeScript compilation completes without errors",
-        "All imported modules resolve correctly",
-        "No missing dependencies in package.json",
-        "Frontend build process completes successfully"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Review for any TypeScript compilation errors, incorrect import paths, or type mismatches. Ensure all imported modules (TanStack Router, React Query, components) resolve correctly. Fix any missing type annotations or type errors that could prevent compilation."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Review for TypeScript compilation errors, especially around canvas manipulation, event handlers, and state management. Verify all type annotations are correct and imported types are available. Fix any type mismatches in icon placement, drawing tools, or transform operations."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Check for TypeScript errors in toolbar component logic, drag-and-drop event handlers, and button click handlers. Ensure all props and event types are correctly annotated. Verify imports for icons and utility functions resolve properly."
-        },
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Review custom hook for TypeScript compilation errors, particularly in state management logic, history operations, and type definitions for diagram elements. Ensure all return types and parameter types are correctly specified."
+          "description": "Fix the diagram selection and loading logic to ensure accurate display of saved diagrams in the list. Update the click handler to properly load the selected diagram state including all icons, connections, freehand drawings, and text labels. Ensure metadata (icon count, connection count, last modified) displays correctly for each diagram. Add visual feedback (hover states, selection highlight) to improve user experience when selecting a diagram."
         },
         {
           "path": "frontend/src/pages/AttackPathPage.tsx",
           "operation": "modify",
-          "description": "Check for TypeScript errors in page component, especially around component composition, prop passing, and state management integration. Verify all imported components and hooks have correct types."
-        },
-        {
-          "path": "frontend/src/main.tsx",
-          "operation": "modify",
-          "description": "Review application entry point for TypeScript compilation errors. Ensure React Query client setup, Internet Identity provider configuration, and root component rendering are correctly typed. Verify all imports resolve without module resolution errors."
-        },
-        {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Verify all TypeScript-related dependencies (@types packages, typescript compiler) are present with compatible versions. Ensure React, React Query, TanStack Router, and all UI libraries have their type definitions installed. Add any missing dependencies that are imported in the codebase."
-        },
-        {
-          "path": "frontend/tsconfig.json",
-          "operation": "modify",
-          "description": "Review TypeScript configuration for proper compiler options, module resolution settings, and path mappings. Ensure strict mode settings are appropriate and lib includes necessary DOM types. Verify include/exclude patterns cover all source files correctly."
+          "description": "Verify and fix the integration between LoadDiagramDialog and the canvas state restoration. Ensure that when a diagram is loaded via the dialog, the complete DiagramState (including textLabels array with fontSize property) is correctly passed to useAttackPathState and all elements render on the canvas. Test that the dialog's onLoad callback properly updates the canvas with icons, connections, drawings, and text labels from the selected diagram."
         }
       ]
     },
     {
-      "id": "REQ-72",
-      "summary": "Ensure html2canvas dependency is properly declared in package.json to support PNG export functionality",
+      "id": "REQ-76",
+      "summary": "Add font size control to the text tool that allows users to select a font size before placing text labels",
       "acceptanceCriteria": [
-        "html2canvas is listed in package.json dependencies",
-        "Package version is compatible with the project",
-        "Dependency installs without errors during npm install"
+        "A font size selector is visible in the toolbar when the text tool is active",
+        "Users can choose from predefined font sizes (e.g., 12, 14, 16, 18, 20, 24, 28, 32, 36, 48)",
+        "The selected font size applies to text labels when placed on the canvas",
+        "The font size control is intuitive and clearly labeled"
       ],
       "file_operations": [
         {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add or verify html2canvas dependency is present in the dependencies section with a compatible version (e.g., ^1.4.1). Ensure the package version is stable and supports the PNG export functionality used in the attack path canvas export feature."
-        },
-        {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Verify the html2canvas import statement is correct and the library is used properly in the export functionality. Ensure error handling is in place for cases where html2canvas fails to load or execute."
+          "description": "Add a font size selector control to the toolbar that appears when the text tool is active. Implement a dropdown or button group displaying predefined font sizes (12, 14, 16, 18, 20, 24, 28, 32, 36, 48 pixels). Add state management for the currently selected font size and pass this value to the parent component via a new prop callback (e.g., onFontSizeChange). Position the font size selector near the text color picker for logical grouping. Use shadcn/ui Select component for the dropdown if appropriate."
+        },
+        {
+          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "operation": "modify",
+          "description": "Wire the font size selection from AttackPathToolbar to the useAttackPathState hook. Add state to track the selected font size and pass it down to AttackPathToolbar as a prop along with the change handler. Ensure the selected font size is passed to AttackPathCanvas so new text labels use the correct font size."
         }
       ]
     },
     {
-      "id": "REQ-74",
-      "summary": "Ensure all frontend asset paths and imports reference valid files and no broken imports or missing asset references exist",
+      "id": "REQ-77",
+      "summary": "Enable manual line breaks in text labels by allowing users to press Enter key to create new lines within text input",
       "acceptanceCriteria": [
-        "All import statements reference existing files",
-        "Asset paths in components point to valid resources",
-        "No 404 errors for missing resources during build",
-        "Static assets are properly included in build output"
+        "When entering text for a label, pressing Enter creates a new line instead of submitting the text",
+        "Multi-line text labels display correctly on the canvas with proper line spacing",
+        "Line breaks are preserved when saving and loading diagrams",
+        "The text input interface provides clear visual indication of multi-line support"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Review icon type to asset path mapping to ensure all referenced icon assets exist in the public/assets directory. Verify paths for generated icons including: frontend/public/assets/generated/icon-attacker.dim_64x64.png, frontend/public/assets/generated/icon-computer.dim_64x64.png, frontend/public/assets/generated/icon-domain.dim_64x64.png, frontend/public/assets/generated/icon-email.dim_64x64.png, frontend/public/assets/generated/icon-file.dim_64x64.png, frontend/public/assets/generated/icon-ip.dim_64x64.png, frontend/public/assets/generated/icon-server.dim_64x64.png, frontend/public/assets/generated/user-icon.dim_128x128.png, frontend/public/assets/generated/computer-icon.dim_128x128.png. Fix any incorrect paths or add fallback handling for missing assets."
+          "description": "Update the text input mechanism to support multi-line text entry. Change the text input from a single-line input element to a textarea that allows Enter key to create new lines. Implement a different submission mechanism (e.g., Shift+Enter, separate submit button, or click outside to finish). Update the text rendering logic to properly display multi-line text with correct line breaks and spacing using SVG text or HTML foreignObject. Ensure line breaks (\\n characters) are preserved in the textLabel content string. Add visual indication that multi-line entry is supported (e.g., placeholder text or helper text)."
         },
         {
-          "path": "frontend/src/components/Layout.tsx",
+          "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Verify the hero banner image path references the correct generated asset at frontend/public/assets/generated/hero-banner.dim_1200x400.png. Ensure the image is properly imported or referenced as a static asset that will be included in the build output."
-        },
+          "description": "Verify that the TextLabel type and state management properly handle multi-line text content with newline characters. Ensure that when text labels are saved and loaded from the backend, newline characters are preserved. Update any text label creation or modification logic to correctly store the content field with line breaks intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "summary": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+      "acceptanceCriteria": [
+        "The hook tracks the currently selected font size for the text tool",
+        "Newly placed text labels use the selected font size",
+        "Font size state persists while the text tool is active",
+        "The hook provides methods to update the font size selection"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Review all component imports to ensure they reference existing files with correct paths. Check that route components, hook imports, and utility imports all resolve to valid files. Fix any broken import paths or missing files."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Verify all icon asset paths used in draggable toolbar items reference valid generated assets. Ensure paths for file type icons (exe-icon.dim_64x64.png, dll-icon.dim_64x64.png, script-icon.dim_64x64.png, excel-icon.dim_64x64.png, word-icon.dim_64x64.png) and other toolbar icons point to existing files in frontend/public/assets/generated/."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Verify the HTML entry point correctly references the main TypeScript module and any static assets. Ensure the script src attribute points to the correct entry file and that the root div id matches what React expects."
-        },
-        {
-          "path": "frontend/vite.config.ts",
-          "operation": "modify",
-          "description": "Review Vite configuration to ensure static asset handling is properly configured. Verify that the public directory is correctly set and that asset file patterns are included in the build. Ensure build output directory matches dfx.json frontend canister source configuration."
+          "description": "Add state management for the currently selected font size (default to 16 pixels). Implement a setter function (e.g., setSelectedFontSize) that can be called from the parent component. Update the text label creation logic to use the selected font size when creating new TextLabel objects. Ensure the fontSize property on TextLabel matches the backend DiagramState interface (DiagramState.textLabels contains TextLabel with fontSize: number). Export the selected font size state and setter function so they can be used in AttackPathPage and passed to the toolbar."
         }
       ]
     }

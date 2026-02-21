@@ -15,11 +15,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
+import type { NamedDiagram } from '@/backend';
 
 interface LoadDiagramDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onLoadDiagram: (diagramId: bigint) => void;
+  onLoadDiagram: (diagram: NamedDiagram) => void;
 }
 
 export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }: LoadDiagramDialogProps) {
@@ -27,10 +28,11 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }:
   const deleteMutation = useDeleteDiagramState();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [diagramToDelete, setDiagramToDelete] = useState<{ id: bigint; name: string } | null>(null);
+  const [selectedDiagramIndex, setSelectedDiagramIndex] = useState<number | null>(null);
 
-  const handleDeleteClick = (e: React.MouseEvent, diagramId: bigint, diagramName: string) => {
+  const handleDeleteClick = (e: React.MouseEvent, index: number, diagramName: string) => {
     e.stopPropagation();
-    setDiagramToDelete({ id: diagramId, name: diagramName });
+    setDiagramToDelete({ id: BigInt(index), name: diagramName });
     setDeleteDialogOpen(true);
   };
 
@@ -39,12 +41,15 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }:
       await deleteMutation.mutateAsync(diagramToDelete.id);
       setDeleteDialogOpen(false);
       setDiagramToDelete(null);
+      setSelectedDiagramIndex(null);
     }
   };
 
-  const handleLoadClick = (diagramId: bigint) => {
-    onLoadDiagram(diagramId);
+  const handleLoadClick = (diagram: NamedDiagram, index: number) => {
+    setSelectedDiagramIndex(index);
+    onLoadDiagram(diagram);
     onOpenChange(false);
+    setSelectedDiagramIndex(null);
   };
 
   return (
@@ -63,7 +68,6 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }:
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-2">
                   {diagrams.map((diagram, index) => {
-                    const diagramId = BigInt(index);
                     // Convert nanoseconds to milliseconds for JavaScript Date
                     const lastModifiedMs = Number(diagram.state.lastModified) / 1_000_000;
                     const lastModified = new Date(lastModifiedMs);
@@ -71,13 +75,16 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }:
                     return (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors group"
+                        className={`flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors group ${
+                          selectedDiagramIndex === index ? 'bg-accent border-primary' : ''
+                        }`}
                       >
-                        <div className="flex-1" onClick={() => handleLoadClick(diagramId)}>
+                        <div className="flex-1" onClick={() => handleLoadClick(diagram, index)}>
                           <h3 className="font-semibold text-lg">{diagram.name}</h3>
                           <div className="text-sm text-muted-foreground mt-1">
                             <p>Icons: {diagram.state.icons.length}</p>
                             <p>Connections: {diagram.state.connections.length}</p>
+                            <p>Text Labels: {diagram.state.textLabels.length}</p>
                             <p>Last modified: {lastModified.toLocaleString()}</p>
                           </div>
                         </div>
@@ -85,10 +92,10 @@ export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }:
                           variant="ghost"
                           size="icon"
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => handleDeleteClick(e, diagramId, diagram.name)}
+                          onClick={(e) => handleDeleteClick(e, index, diagram.name)}
                           disabled={deleteMutation.isPending}
                         >
-                          {deleteMutation.isPending && diagramToDelete?.id === diagramId ? (
+                          {deleteMutation.isPending && diagramToDelete?.id === BigInt(index) ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <Trash2 className="h-4 w-4 text-destructive" />

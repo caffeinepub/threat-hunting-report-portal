@@ -2,9 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-any-typescript-compilation-errors-missing-dependencies-or-module-resolution-issues-in-the-frontend-code-that-could-prevent-successful-build-or-deployment",
-      "featureTitle": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
+      "featureId": "feature-fix-the-load-diagram-selection-interface-in-loaddiagramdialog-tsx-to-accurately-display-saved-diagrams-and-ensure-the-correct-diagram-state-loads-when-a-user-selects-a-diagram-from-the-list",
+      "featureTitle": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
       "files": [
+        "frontend/src/components/LoadDiagramDialog.tsx",
         "frontend/src/pages/AttackPathPage.tsx"
       ],
       "components": [
@@ -17,16 +18,16 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-71"
+        "REQ-75"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-all-frontend-asset-paths-and-imports-reference-valid-files-and-that-no-broken-imports-or-missing-asset-references-exist-that-could-cause-deployment-failures",
-      "featureTitle": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
+      "featureId": "feature-add-font-size-control-to-the-text-tool-in-attackpathtoolbar-tsx-that-allows-users-to-select-a-font-size-before-placing-text-labels-on-the-canvas",
+      "featureTitle": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
       "files": [
-        "frontend/index.html",
-        "frontend/vite.config.ts"
+        "frontend/src/components/AttackPathToolbar.tsx",
+        "frontend/src/pages/AttackPathPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -38,7 +39,48 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-74"
+        "REQ-76"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-enable-manual-line-breaks-in-text-labels-in-attackpathcanvas-tsx-by-allowing-users-to-press-enter-key-to-create-new-lines-within-text-input",
+      "featureTitle": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-77"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-useattackpathstate-hook-to-manage-font-size-state-for-text-labels-and-pass-the-selected-font-size-to-newly-created-text-elements",
+      "featureTitle": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+      "files": [
+        "frontend/src/hooks/useAttackPathState.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-78"
       ],
       "confidence": "high"
     }

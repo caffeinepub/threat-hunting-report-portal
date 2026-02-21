@@ -5,7 +5,7 @@ import { useAttackPathState } from '@/hooks/useAttackPathState';
 import SaveDiagramDialog from '@/components/SaveDiagramDialog';
 import LoadDiagramDialog from '@/components/LoadDiagramDialog';
 import { useSaveDiagramState } from '@/hooks/useSaveDiagramState';
-import { useGetDiagramState } from '@/hooks/useGetDiagramState';
+import type { NamedDiagram } from '@/backend';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +28,8 @@ export default function AttackPathPage() {
     setActiveDrawingTool,
     textColor,
     setTextColor,
+    fontSize,
+    setFontSize,
     selectedElementId,
     setSelectedElementId,
     selectedElementType,
@@ -55,10 +57,6 @@ export default function AttackPathPage() {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const saveMutation = useSaveDiagramState();
-  const [selectedDiagramId, setSelectedDiagramId] = useState<bigint | null>(null);
-  
-  // Only fetch when we have a valid ID
-  const { data: loadedDiagram } = useGetDiagramState(selectedDiagramId || BigInt(0));
 
   const handleModeChange = (newMode: 'place' | 'connect' | 'draw') => {
     setMode(newMode);
@@ -100,7 +98,7 @@ export default function AttackPathPage() {
       textLabels: textLabels.map((label) => ({
         content: label.text,
         position: { x: label.x, y: label.y },
-        fontSize: 16,
+        fontSize: label.fontSize || 16,
         color: label.color,
         fontWeight: 'bold',
       })),
@@ -117,13 +115,8 @@ export default function AttackPathPage() {
     }
   };
 
-  const handleLoad = (diagramId: bigint) => {
-    setSelectedDiagramId(diagramId);
-  };
-
-  // Load diagram when data is fetched
-  if (loadedDiagram && selectedDiagramId !== null) {
-    const state = loadedDiagram.state;
+  const handleLoad = (diagram: NamedDiagram) => {
+    const state = diagram.state;
     
     const restoredState = {
       placedIcons: state.icons.map((icon) => ({
@@ -160,6 +153,7 @@ export default function AttackPathPage() {
         x: label.position.x,
         y: label.position.y,
         color: label.color,
+        fontSize: label.fontSize,
         rotation: 0,
         width: undefined,
         height: undefined,
@@ -167,9 +161,8 @@ export default function AttackPathPage() {
     };
 
     restoreState(restoredState);
-    setSelectedDiagramId(null);
-    toast.success('Diagram loaded successfully');
-  }
+    toast.success(`Diagram "${diagram.name}" loaded successfully`);
+  };
 
   const handleExport = () => {
     toast.info('To export this diagram as PNG, please use your browser\'s screenshot tool or print to PDF feature.', {
@@ -197,6 +190,8 @@ export default function AttackPathPage() {
           isSaving={saveMutation.isPending}
           textColor={textColor}
           onTextColorChange={setTextColor}
+          fontSize={fontSize}
+          onFontSizeChange={setFontSize}
         />
       </div>
 
@@ -249,6 +244,7 @@ export default function AttackPathPage() {
           mode={mode}
           activeDrawingTool={activeDrawingTool}
           textColor={textColor}
+          fontSize={fontSize}
           selectedElementId={selectedElementId}
           selectedElementType={selectedElementType}
           onAddIcon={addIcon}

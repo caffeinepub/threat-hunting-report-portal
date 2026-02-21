@@ -1,111 +1,94 @@
 {
   "kind": "build_request",
-  "title": "Fix deployment configuration and build issues for Internet Computer network",
-  "projectName": "Threat Hunting Portal",
-  "priority": "high",
+  "title": "Fix load diagram interface and add text customization features",
+  "projectName": "Threat Hunter Portal",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-70",
-      "text": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment, including correct canister types, build commands, and dependency declarations",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-deployment-request"
-        ],
-        "quotes": [
-          "Update deployment configuration: modify thhe dfx.json or deployment settings if there are configuration issues"
-        ]
-      },
-      "acceptanceCriteria": [
-        "dfx.json contains valid canister configurations for both frontend and backend",
-        "All canister type declarations are correct for Internet Computer deployment",
-        "Build commands and dependencies are properly specified",
-        "Configuration passes dfx validation without errors"
-      ]
-    },
-    {
-      "id": "REQ-71",
-      "text": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
+      "id": "REQ-75",
+      "text": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-deployment-request"
+          "msg-user-selection-interface"
         ],
         "quotes": [
-          "Fix code that prevents deployment: If there are build errors or code issues blocking deployment, address those"
+          "Selection interface"
         ]
       },
       "acceptanceCriteria": [
-        "TypeScript compilation completes without errors",
-        "All imported modules resolve correctly",
-        "No missing dependencies in package.json",
-        "Frontend build process completes successfully"
+        "The load diagram dialog displays all saved diagrams with accurate metadata",
+        "When a user clicks on a diagram in the selection interface, the correct diagram state loads onto the canvas",
+        "All diagram elements (icons, connections, drawings, text labels) restore accurately from the saved state",
+        "The selection interface provides clear visual feedback when a diagram is selected"
       ]
     },
     {
-      "id": "REQ-72",
-      "text": "Ensure html2canvas dependency is properly declared in package.json with correct version specification to support PNG export functionality",
+      "id": "REQ-76",
+      "text": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-deployment-request"
-        ]
-      },
-      "acceptanceCriteria": [
-        "html2canvas is listed in package.json dependencies",
-        "Package version is compatible with the project",
-        "Dependency installs without errors during npm install"
-      ]
-    },
-    {
-      "id": "REQ-73",
-      "text": "Verify backend Motoko code compiles successfully and fix any syntax errors, type mismatches, or compilation issues in main.mo that could block deployment",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-deployment-request"
+          "msg-user-font-size-before"
         ],
         "quotes": [
-          "Fix code that prevents deployment: If there are build errors or code issues blocking deployment, address those"
+          "Before placing a text"
         ]
       },
       "acceptanceCriteria": [
-        "Backend Motoko code compiles without errors",
-        "All type declarations are valid",
-        "No syntax errors in main.mo",
-        "Backend canister builds successfully"
+        "A font size selector is visible in the toolbar when the text tool is active",
+        "Users can choose from predefined font sizes (e.g., 12, 14, 16, 18, 20, 24, 28, 32, 36, 48)",
+        "The selected font size applies to text labels when placed on the canvas",
+        "The font size control is intuitive and clearly labeled"
       ]
     },
     {
-      "id": "REQ-74",
-      "text": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
+      "id": "REQ-77",
+      "text": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-deployment-request"
+          "msg-user-manual-breaks"
+        ],
+        "quotes": [
+          "Manual line breaks"
         ]
       },
       "acceptanceCriteria": [
-        "All import statements reference existing files",
-        "Asset paths in components point to valid resources",
-        "No 404 errors for missing resources during build",
-        "Static assets are properly included in build output"
+        "When entering text for a label, pressing Enter creates a new line instead of submitting the text",
+        "Multi-line text labels display correctly on the canvas with proper line spacing",
+        "Line breaks are preserved when saving and loading diagrams",
+        "The text input interface provides clear visual indication of multi-line support"
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "text": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-font-size-before"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The hook tracks the currently selected font size for the text tool",
+        "Newly placed text labels use the selected font size",
+        "Font size state persists while the text tool is active",
+        "The hook provides methods to update the font size selection"
       ]
     }
   ],
   "constraints": [
-    "Maintain single-actor Motoko architecture in backend/main.mo",
-    "Do not modify immutable frontend paths: useInternetIdentity.ts, useInternetIdentity.tsx, useActor.ts, main.tsx, components/ui/*",
-    "Preserve existing Internet Identity authentication implementation",
-    "Keep all existing attack path visualizer functionality intact",
-    "Do not change the backend schema or data structures for diagram storage"
+    "Do not modify the backend diagram storage structure",
+    "Maintain compatibility with existing saved diagrams",
+    "Do not alter the existing free transform tool functionality",
+    "Preserve all existing attack path visualizer features"
   ],
   "nonGoals": [
-    "Adding new features or functionality beyond deployment fixes",
-    "Redesigning the application architecture",
-    "Modifying existing UI components or visual styling",
-    "Changing authentication mechanisms",
-    "Migrating to different frameworks or technologies"
+    "Changing font family or other text styling options beyond size",
+    "Automatic text wrapping or word break functionality",
+    "Font size adjustment after text placement (separate from free transform)",
+    "Rich text formatting or text alignment controls"
   ],
   "imageRequirements": {
     "required": [],

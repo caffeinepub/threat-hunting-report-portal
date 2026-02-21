@@ -3,6 +3,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Download, Move, Trash2 } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user';
 
@@ -37,6 +38,8 @@ interface AttackPathToolbarProps {
   isSaving: boolean;
   textColor: string;
   onTextColorChange: (color: string) => void;
+  fontSize: number;
+  onFontSizeChange: (size: number) => void;
 }
 
 export default function AttackPathToolbar({ 
@@ -51,7 +54,11 @@ export default function AttackPathToolbar({
   isSaving,
   textColor,
   onTextColorChange,
+  fontSize,
+  onFontSizeChange,
 }: AttackPathToolbarProps) {
+  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+
   return (
     <div className="space-y-4">
       <div>
@@ -119,25 +126,42 @@ export default function AttackPathToolbar({
           Text Label
         </Button>
         {activeDrawingTool === 'text' && (
-          <div className="ml-6 space-y-2">
-            <p className="text-xs text-muted-foreground">Text Color:</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => onTextColorChange('#000000')}
-                className={`w-8 h-8 rounded border-2 ${
-                  textColor === '#000000' ? 'border-primary ring-2 ring-primary/50' : 'border-border'
-                }`}
-                style={{ backgroundColor: '#000000' }}
-                title="Black"
-              />
-              <button
-                onClick={() => onTextColorChange('#FF0000')}
-                className={`w-8 h-8 rounded border-2 ${
-                  textColor === '#FF0000' ? 'border-primary ring-2 ring-primary/50' : 'border-border'
-                }`}
-                style={{ backgroundColor: '#FF0000' }}
-                title="Red"
-              />
+          <div className="ml-6 space-y-3">
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Font Size:</p>
+              <Select value={fontSize.toString()} onValueChange={(value) => onFontSizeChange(Number(value))}>
+                <SelectTrigger className="w-full h-8">
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontSizes.map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size}px
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Text Color:</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onTextColorChange('#000000')}
+                  className={`w-8 h-8 rounded border-2 ${
+                    textColor === '#000000' ? 'border-primary ring-2 ring-primary/50' : 'border-border'
+                  }`}
+                  style={{ backgroundColor: '#000000' }}
+                  title="Black"
+                />
+                <button
+                  onClick={() => onTextColorChange('#FF0000')}
+                  className={`w-8 h-8 rounded border-2 ${
+                    textColor === '#FF0000' ? 'border-primary ring-2 ring-primary/50' : 'border-border'
+                  }`}
+                  style={{ backgroundColor: '#FF0000' }}
+                  title="Red"
+                />
+              </div>
             </div>
           </div>
         )}

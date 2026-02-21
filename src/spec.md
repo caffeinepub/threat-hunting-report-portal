@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix deployment configuration and build issues to enable successful deployment to the Internet Computer network.
+**Goal:** Fix the load diagram interface and add text customization features to the threat hunter attack path visualizer.
 
 **Planned changes:**
-- Review and update dfx.json configuration for proper canister settings
-- Fix TypeScript compilation errors and module resolution issues in frontend
-- Ensure html2canvas dependency is properly declared in package.json
-- Verify and fix any Motoko compilation issues in backend code
-- Validate all frontend asset paths and imports reference valid files
+- Fix the load diagram selection interface to display saved diagrams accurately and load the correct diagram state when selected
+- Add a font size selector to the text tool toolbar that allows users to choose font size before placing text labels
+- Enable manual line breaks in text labels by allowing Enter key to create new lines instead of submitting
+- Update state management to track and apply selected font size to newly created text elements
 
-**User-visible outcome:** The application deploys successfully to the Internet Computer network without build or configuration errors.
+**User-visible outcome:** Users can reliably load saved diagrams from the selection interface, customize text label font sizes before placement, and create multi-line text labels using the Enter key for better diagram annotation control.

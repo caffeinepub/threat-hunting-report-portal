@@ -28,6 +28,7 @@ export interface TextLabel {
   x: number;
   y: number;
   color: string;
+  fontSize?: number;
   rotation?: number;
   width?: number;
   height?: number;
@@ -49,6 +50,7 @@ export function useAttackPathState() {
   const [textLabels, setTextLabels] = useState<TextLabel[]>([]);
   const [activeDrawingTool, setActiveDrawingTool] = useState<DrawingTool>(null);
   const [textColor, setTextColor] = useState<string>('#000000');
+  const [fontSize, setFontSize] = useState<number>(16);
   const [history, setHistory] = useState<AttackPathState[]>([]);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | null>(null);
@@ -174,7 +176,7 @@ export function useAttackPathState() {
     );
   };
 
-  const addTextLabel = (text: string, x: number, y: number, color: string) => {
+  const addTextLabel = (text: string, x: number, y: number, color: string, fontSize: number) => {
     saveToHistory();
     const newLabel: TextLabel = {
       id: `text-${Date.now()}-${Math.random()}`,
@@ -182,6 +184,7 @@ export function useAttackPathState() {
       x,
       y,
       color,
+      fontSize,
       rotation: 0,
       width: undefined,
       height: undefined,
@@ -225,6 +228,8 @@ export function useAttackPathState() {
     setActiveDrawingTool,
     textColor,
     setTextColor,
+    fontSize,
+    setFontSize,
     selectedElementId,
     setSelectedElementId,
     selectedElementType,
