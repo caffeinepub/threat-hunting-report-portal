@@ -84,6 +84,7 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'deleteDiagramState' : ActorMethod<[bigint], undefined>,
   'getAllConnections' : ActorMethod<[bigint], [] | [Array<Connection>]>,
   'getAllDiagrams' : ActorMethod<[], Array<NamedDiagram>>,
   'getAllIconPositions' : ActorMethod<[bigint], [] | [Array<Icon>]>,

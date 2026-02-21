@@ -1,85 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T18:31:39.442Z",
+  "generatedAt": "2026-02-21T00:20:13.458Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 6,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-53",
-        "summary": "Add diagram naming functionality when saving attack path diagrams in the attack path visualizer, prompting users to input a name for the diagram before saving",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/SaveDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx",
-          "frontend/src/hooks/useSaveDiagramState.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/SaveDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx",
-          "frontend/src/hooks/useSaveDiagramState.ts"
-        ]
-      },
-      {
-        "id": "REQ-54",
-        "summary": "Implement diagram selection interface in the load functionality to display and choose from multiple saved diagrams by name",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useGetAllDiagrams.ts",
-          "frontend/src/components/LoadDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useGetAllDiagrams.ts",
-          "frontend/src/components/LoadDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-55",
-        "summary": "Add a clear button to the attack path visualizer toolbar that removes all elements from the canvas (icons, connections, drawings, text labels)",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-56",
-        "summary": "Remove the JPEG export functionality and replace it with PNG export functionality that captures the entire attack path canvas and downloads it as a PNG image file",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx"
-        ]
-      },
-      {
-        "id": "REQ-57",
-        "summary": "Fix the free transform tool to properly move and resize both icons and text labels with working transformation controls",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx"
-        ]
-      },
-      {
-        "id": "REQ-58",
-        "summary": "Remove the bidirectional arrow icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+        "id": "REQ-67",
+        "summary": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/AttackPathToolbar.tsx",
@@ -91,34 +24,29 @@
         ]
       },
       {
-        "id": "REQ-59",
-        "summary": "Update the backend diagram storage to support diagram names for saved attack path diagrams",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "id": "REQ-68",
+        "summary": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/public/assets/generated/computer-icon.dim_128x128.png",
+    "frontend/public/assets/generated/user-icon.dim_128x128.png",
     "frontend/src/components/AttackPathIcon.tsx",
     "frontend/src/components/AttackPathToolbar.tsx",
-    "frontend/src/components/LoadDiagramDialog.tsx",
-    "frontend/src/components/SaveDiagramDialog.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useGetAllDiagrams.ts",
-    "frontend/src/hooks/useGetDiagramState.ts",
-    "frontend/src/hooks/useSaveDiagramState.ts",
-    "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

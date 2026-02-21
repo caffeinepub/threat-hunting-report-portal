@@ -1,10 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 23,
+  "projectStateVersion": 29,
   "summary": "Threat hunting report portal based on MITRE ATT&CK framework with PDF generation capability",
   "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": true,
+  "known_issues": [
+    "Free transform tool not properly resizing icons and text labels",
+    "Load diagram functionality has issues with date/time display"
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Simple user profile icon illustration in black and white, showing a person silhouette (user-icon.dim_128x128.png)\n- Single desktop computer icon illustration in black and white, showing one computer monitor and base unit (computer-icon.dim_128x128.png)",
   "existing_features": [
     {
       "id": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
@@ -429,6 +433,78 @@
         "REQ-58"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-free-transform-tool-in-the-attack-path-visualizer-to-properly-resize-icons-in-addition-to-text-labels-ensuring-transformation-handles-work-correctly-for-both-element-types",
+      "title": "Update the free transform tool in the attack path visualizer to properly resize icons in addition to text labels, ensuring transformation handles work correctly for both element types",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-delete-functionality-to-the-load-diagram-interface-allowing-users-to-remove-saved-diagrams-from-backend-storage",
+      "title": "Add delete functionality to the load diagram interface allowing users to remove saved diagrams from backend storage",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-eraser-tool-in-the-attack-path-visualizer-to-properly-delete-icons-when-clicked-in-addition-to-its-existing-ability-to-remove-connections-drawings-and-text-labels",
+      "title": "Fix the eraser tool in the attack path visualizer to properly delete icons when clicked, in addition to its existing ability to remove connections, drawings, and text labels",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-png-export-functionality-in-the-attack-path-visualizer-to-properly-capture-and-download-the-entire-canvas-including-all-icons-connections-drawings-and-text-labels-as-a-png-image-file",
+      "title": "Fix the PNG export functionality in the attack path visualizer to properly capture and download the entire canvas including all icons, connections, drawings, and text labels as a PNG image file",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-free-transform-tool-in-attackpathcanvas-tsx-to-properly-resize-icons-when-transformation-handles-are-dragged-ensuring-the-width-and-height-of-placed-icons-update-correctly-with-the-visual-resize-controls",
+      "title": "Fix the free transform tool in AttackPathCanvas.tsx to properly resize icons when transformation handles are dragged, ensuring the width and height of placed icons update correctly with the visual resize controls",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-free-transform-tool-in-attackpathcanvas-tsx-to-properly-resize-text-labels-when-transformation-handles-are-dragged-ensuring-font-size-or-text-container-dimensions-update-correctly-with-the-visual-resize-controls",
+      "title": "Fix the free transform tool in AttackPathCanvas.tsx to properly resize text labels when transformation handles are dragged, ensuring font size or text container dimensions update correctly with the visual resize controls",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-loaddiagramdialog-tsx-component-to-display-the-current-date-and-time-for-each-saved-diagram-s-last-modified-timestamp-ensuring-dates-show-the-actual-save-time-rather-than-placeholder-or-incorrect-values",
+      "title": "Fix the LoadDiagramDialog.tsx component to display the current date and time for each saved diagram's last modified timestamp, ensuring dates show the actual save time rather than placeholder or incorrect values",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-user-icon-to-the-attack-path-visualizer-toolbar-as-a-draggable-element-that-can-be-placed-on-the-canvas",
+      "title": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-computer-icon-in-the-attack-path-visualizer-with-a-single-computer-icon-image",
+      "title": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -653,12 +729,6 @@
       "status": "pending"
     },
     {
-      "id": "AR-52",
-      "summary": "Fix free transform tool to properly move and resize both icons and text labels",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-53",
       "summary": "Remove the bidirectional arrow icon from the attack path visualizer toolbar",
       "reqIds": [],
@@ -670,6 +740,54 @@
       "reqIds": [
         "REQ-59"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-61",
+      "summary": "Fix free transform tool to properly resize icons and text labels in attack path visualizer",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-62",
+      "summary": "Add delete functionality to remove saved diagrams from the load diagram interface",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-63",
+      "summary": "Fix eraser tool to delete icons in the attack path diagram",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-64",
+      "summary": "Fix PNG export functionality for attack path diagrams",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-65",
+      "summary": "Fix the free transform tool to properly edit the size of both icons and text labels",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-66",
+      "summary": "Fix the load diagram functionality and set dates to current date and time",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-67",
+      "summary": "Add a user icon to the attack path visualizer toolbar",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-68",
+      "summary": "Update the computer icon in attack path visualizer to display as a single computer icon image",
+      "reqIds": [],
       "status": "pending"
     }
   ],

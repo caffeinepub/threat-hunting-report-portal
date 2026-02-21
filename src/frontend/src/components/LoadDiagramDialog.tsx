@@ -1,131 +1,130 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useGetAllDiagrams } from '@/hooks/useGetAllDiagrams';
-import { Loader2, Calendar, FileText } from 'lucide-react';
-import type { PlacedIcon, Connection, DrawingPath, TextLabel } from '@/hooks/useAttackPathState';
-import type { NamedDiagram } from '@/backend';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useGetAllDiagrams } from '@/hooks/useGetAllDiagrams';
+import { useDeleteDiagramState } from '@/hooks/useDeleteDiagramState';
+import { Loader2, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
 
 interface LoadDiagramDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onLoad: (state: { placedIcons: PlacedIcon[]; connections: Connection[]; drawings: DrawingPath[]; textLabels: TextLabel[] }) => void;
+  onLoadDiagram: (diagramId: bigint) => void;
 }
 
-export default function LoadDiagramDialog({ open, onOpenChange, onLoad }: LoadDiagramDialogProps) {
-  const { data: diagrams, isLoading, error } = useGetAllDiagrams();
+export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }: LoadDiagramDialogProps) {
+  const { data: diagrams, isLoading } = useGetAllDiagrams();
+  const deleteMutation = useDeleteDiagramState();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [diagramToDelete, setDiagramToDelete] = useState<{ id: bigint; name: string } | null>(null);
 
-  const handleLoadDiagram = (diagram: NamedDiagram) => {
-    const diagramState = diagram.state;
+  const handleDeleteClick = (e: React.MouseEvent, diagramId: bigint, diagramName: string) => {
+    e.stopPropagation();
+    setDiagramToDelete({ id: diagramId, name: diagramName });
+    setDeleteDialogOpen(true);
+  };
 
-    // Convert backend DiagramState to frontend state
-    const placedIcons: PlacedIcon[] = diagramState.icons.map((icon) => ({
-      id: icon.id,
-      type: icon.iconType as any,
-      x: icon.position.x,
-      y: icon.position.y,
-      width: 48,
-      height: 48,
-    }));
+  const handleConfirmDelete = async () => {
+    if (diagramToDelete) {
+      await deleteMutation.mutateAsync(diagramToDelete.id);
+      setDeleteDialogOpen(false);
+      setDiagramToDelete(null);
+    }
+  };
 
-    const connections: Connection[] = diagramState.connections.map((conn, index) => ({
-      id: `conn-${index}`,
-      sourceId: conn.sourceId,
-      targetId: conn.targetId,
-    }));
-
-    const freehandDrawings: DrawingPath[] = diagramState.freehandDrawings.map((drawing, index) => ({
-      id: `freehand-${index}`,
-      type: 'freehand',
-      points: drawing.points.map((p) => ({ x: p.x, y: p.y })),
-    }));
-
-    const lineDrawings: DrawingPath[] = diagramState.lines.map((line, index) => ({
-      id: `line-${index}`,
-      type: line.isArrow ? 'arrow' : 'line',
-      points: [line.startPosition, line.endPosition],
-    }));
-
-    const drawings: DrawingPath[] = [...freehandDrawings, ...lineDrawings];
-
-    const textLabels: TextLabel[] = diagramState.textLabels.map((label, index) => ({
-      id: `text-${index}`,
-      text: label.content,
-      x: label.position.x,
-      y: label.position.y,
-      color: label.color,
-      rotation: 0,
-      width: undefined,
-      height: undefined,
-    }));
-
-    onLoad({ placedIcons, connections, drawings, textLabels });
+  const handleLoadClick = (diagramId: bigint) => {
+    onLoadDiagram(diagramId);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Load Diagram</DialogTitle>
-          <DialogDescription>
-            Select a saved attack path diagram to load
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-4">
-          {isLoading && (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          )}
-
-          {error && (
-            <div className="text-center py-8 text-destructive">
-              <p>Failed to load diagrams</p>
-            </div>
-          )}
-
-          {!isLoading && !error && (!diagrams || diagrams.length === 0) && (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No saved diagrams found</p>
-            </div>
-          )}
-
-          {!isLoading && !error && diagrams && diagrams.length > 0 && (
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-3">
-                {diagrams.map((diagram, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
-                    onClick={() => handleLoadDiagram(diagram)}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <h3 className="font-semibold text-lg">{diagram.name}</h3>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(Number(diagram.state.lastModified)).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="text-sm text-muted-foreground space-y-1">
-                          <p>Icons: {diagram.state.icons.length}</p>
-                          <p>Connections: {diagram.state.connections.length}</p>
-                          <p>Drawings: {diagram.state.freehandDrawings.length + diagram.state.lines.length}</p>
-                          <p>Text Labels: {diagram.state.textLabels.length}</p>
-                        </div>
-                      </div>
-                      <Button size="sm">Load</Button>
-                    </div>
-                  </div>
-                ))}
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Load Diagram</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            </ScrollArea>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+            ) : diagrams && diagrams.length > 0 ? (
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-2">
+                  {diagrams.map((diagram, index) => {
+                    const diagramId = BigInt(index);
+                    // Convert nanoseconds to milliseconds for JavaScript Date
+                    const lastModifiedMs = Number(diagram.state.lastModified) / 1_000_000;
+                    const lastModified = new Date(lastModifiedMs);
+                    
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors group"
+                      >
+                        <div className="flex-1" onClick={() => handleLoadClick(diagramId)}>
+                          <h3 className="font-semibold text-lg">{diagram.name}</h3>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            <p>Icons: {diagram.state.icons.length}</p>
+                            <p>Connections: {diagram.state.connections.length}</p>
+                            <p>Last modified: {lastModified.toLocaleString()}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => handleDeleteClick(e, diagramId, diagram.name)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          {deleteMutation.isPending && diagramToDelete?.id === diagramId ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No saved diagrams found.</p>
+                <p className="text-sm mt-2">Create and save a diagram to see it here.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the diagram "{diagramToDelete?.name}". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

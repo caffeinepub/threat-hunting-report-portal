@@ -1,149 +1,65 @@
 {
   "kind": "build_request",
-  "title": "Add diagram naming, selection interface, clear button, PNG export, fix transform tool, and remove bidirectional arrow",
+  "title": "Add user icon and replace computer icon in attack path visualizer",
+  "projectName": "Threat Hunt Portal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-53",
-      "text": "Add diagram naming functionality when saving attack path diagrams in the attack path visualizer, prompting users to input a name for the diagram before saving",
+      "id": "REQ-67",
+      "text": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-user-final"
         ],
         "quotes": [
-          "once I save the diagram I should input a name for it"
+          "In attackpath visualizer, put a user icon"
         ]
       },
       "acceptanceCriteria": [
-        "When the save button is clicked, a dialog or input prompt appears requesting a diagram name",
-        "The diagram name is stored with the diagram state when saved to the backend",
-        "Users cannot save without providing a name"
+        "A user icon appears in the attack path visualizer toolbar alongside existing icons",
+        "The user icon can be dragged from the toolbar and placed on the canvas",
+        "Placed user icons can be moved, resized, and deleted like other icons",
+        "The user icon is included in save/load operations and PNG export"
       ]
     },
     {
-      "id": "REQ-54",
-      "text": "Implement diagram selection interface in the load functionality to display and choose from multiple saved diagrams by name",
+      "id": "REQ-68",
+      "text": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-user-final"
         ],
         "quotes": [
-          "When I load the diagram, I could select the diagrams that was saved"
+          "Change the Computer Icon into a one computer icon image"
         ]
       },
       "acceptanceCriteria": [
-        "The LoadDiagramDialog component displays a list of saved diagrams with their names",
-        "Users can select a specific diagram from the list to load",
-        "The selected diagram's complete state is restored to the canvas"
-      ]
-    },
-    {
-      "id": "REQ-55",
-      "text": "Add a clear button to the attack path visualizer toolbar that removes all elements from the canvas (icons, connections, drawings, text labels)",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Put a clear button for the diagram"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A clear button is visible in the AttackPathToolbar component",
-        "Clicking the clear button removes all placed icons, connections, drawings, and text labels from the canvas",
-        "The canvas returns to an empty state after clearing"
-      ]
-    },
-    {
-      "id": "REQ-56",
-      "text": "Remove the JPEG export functionality and replace it with PNG export functionality that captures the entire attack path canvas and downloads it as a PNG image file",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Remove the export as JPEG, put a save it as .png file for extraction for my diagram"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The export button in the toolbar triggers PNG export instead of JPEG",
-        "The exported PNG file contains all canvas elements including icons, connections, drawings, and text labels",
-        "The PNG file is downloaded with an appropriate filename"
-      ]
-    },
-    {
-      "id": "REQ-57",
-      "text": "Fix the free transform tool to properly move and resize both icons and text labels with working transformation controls",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Fix the free transform tool to move icons and text label and modify their sizes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The free transform tool successfully moves icons when dragged",
-        "The free transform tool successfully moves text labels when dragged",
-        "The free transform tool resizes icons using transformation handles",
-        "The free transform tool resizes text labels using transformation handles",
-        "Transformations persist correctly in the canvas state"
-      ]
-    },
-    {
-      "id": "REQ-58",
-      "text": "Remove the bidirectional arrow icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Remove bidirectional arrow icon"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The bidirectional arrow icon is not visible in the AttackPathToolbar",
-        "Users cannot place bidirectional arrow icons on the canvas",
-        "The icon type is removed from the AttackPathIcon component's supported types"
-      ]
-    },
-    {
-      "id": "REQ-59",
-      "text": "Update the backend diagram storage to support diagram names for saved attack path diagrams",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The DiagramState type includes a name field for storing diagram names",
-        "The saveDiagramState method accepts and persists diagram names",
-        "The backend returns diagram names when retrieving saved diagrams"
+        "The computer icon in the toolbar displays as a single computer icon image",
+        "The visual representation clearly depicts one computer",
+        "Existing diagrams with computer icons continue to render correctly",
+        "The computer icon maintains consistent styling with other attack path icons"
       ]
     }
   ],
   "constraints": [
     "Do not modify frontend/src/hooks/useInternetIdentity.ts",
+    "Do not modify frontend/src/hooks/useInternetIdentity.tsx",
     "Do not modify frontend/src/hooks/useActor.ts",
     "Do not modify frontend/src/main.tsx",
-    "Do not modify frontend/src/components/ui components",
-    "Maintain single-actor architecture in backend/main.mo"
+    "Do not modify frontend/src/components/ui directory"
   ],
   "nonGoals": [
-    "Adding new icon types to the attack path visualizer",
-    "Changing the color scheme or visual styling",
-    "Modifying the authentication system",
-    "Adding new report features"
+    "Changes to other attack path icons beyond user and computer",
+    "Modifications to backend diagram storage schema",
+    "Changes to authentication or user profile functionality"
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Simple user profile icon illustration in black and white, showing a person silhouette (user-icon.dim_128x128.png)",
+      "Single desktop computer icon illustration in black and white, showing one computer monitor and base unit (computer-icon.dim_128x128.png)"
+    ],
     "edits": []
   }
 }

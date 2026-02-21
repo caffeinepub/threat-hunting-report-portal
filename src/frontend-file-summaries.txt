@@ -14,10 +14,10 @@
   "frontend/tailwind.config.js": "Tailwind configuration with security-themed color palette, custom fonts, and extended design tokens.",
   "frontend/package.json": "Package configuration with html2canvas dependency added for PNG export functionality.",
   "frontend/src/types/jspdf.d.ts": "Type declaration file providing TypeScript definitions for jsPDF and jspdf-autotable modules.",
-  "frontend/src/pages/AttackPathPage.tsx": "Attack path visualization page with mode switching, save/load dialogs with naming support, clear confirmation, simplified PNG export message (removed html2canvas dependency), and transform tool support.",
-  "frontend/src/components/AttackPathToolbar.tsx": "Sidebar toolbar with draggable icons (bidirectional arrow removed), drawing tools including free transform, text color picker, undo, save/load/export/clear buttons.",
-  "frontend/src/components/AttackPathIcon.tsx": "Reusable icon component rendering attack path elements with text-based .exe/Excel/Word displays and image-based icons, bidirectional arrow removed.",
-  "frontend/src/components/AttackPathCanvas.tsx": "Interactive canvas with white background supporting icon placement with resize, connections, drawing modes, enhanced eraser for text labels, text labels with rotation/resize controls, and fixed free transform tool with visual handles for moving and resizing both icons and text labels; uses onClick prop for AttackPathConnector.",
+  "frontend/src/pages/AttackPathPage.tsx": "Attack path visualization page with mode switching, save/load/clear dialogs, transform tool support, diagram state restoration with proper const assertions for type safety, and placeholder export message (html2canvas not available in package.json).",
+  "frontend/src/components/AttackPathToolbar.tsx": "Sidebar toolbar with draggable icons including new user icon, drawing tools, transform tool, text color picker, undo, and save/load/export/clear buttons for attack path diagrams.",
+  "frontend/src/components/AttackPathIcon.tsx": "Reusable icon component rendering attack path elements with dynamic width and height props, including mappings for user icon and updated computer icon using new 128x128 assets, with built-in drag-and-drop functionality.",
+  "frontend/src/components/AttackPathCanvas.tsx": "Interactive canvas supporting icon placement with resize, connections, drawing modes, eraser for icons/drawings/connections/text, text labels with rotation/resize, and free transform tool with visual handles for moving and resizing both icons and text labels with proper dimension updates including position adjustments for northwest/southwest/northeast handles.",
   "frontend/src/components/AttackPathConnector.tsx": "SVG-based connector component that renders directional arrows between placed icons with click-to-remove functionality.",
   "frontend/src/hooks/useAttackPathState.ts": "Custom React hook managing attack path diagram state including icons with width/height, connections, movable drawings, text labels with rotation/width/height support, transform tool selection, undo functionality, and state restoration for load feature.",
   "frontend/src/components/LoginPage.tsx": "Login page component displaying authentication UI with Internet Identity integration for secure access to the application.",
@@ -27,7 +27,8 @@
   "frontend/src/hooks/useSaveCallerUserProfile.ts": "React Query mutation hook for saving user profile data to the backend.",
   "frontend/src/hooks/useSaveDiagramState.ts": "React Query mutation hook for saving diagram state with name parameter, invalidating both diagram state and all diagrams queries on success.",
   "frontend/src/hooks/useGetDiagramState.ts": "React Query hook that fetches a specific diagram by ID using getDiagramStateById method from the backend.",
-  "frontend/src/components/LoadDiagramDialog.tsx": "Dialog component displaying a scrollable list of saved diagrams with names, metadata, and click-to-load functionality for selecting and restoring specific diagrams.",
+  "frontend/src/components/LoadDiagramDialog.tsx": "Dialog component displaying saved diagrams with names, metadata including accurate current date/time timestamps converted from nanoseconds, load functionality, and delete buttons with confirmation dialog using AlertDialog.",
   "frontend/src/components/SaveDiagramDialog.tsx": "Dialog component that prompts users to enter a name before saving their attack path diagram with validation and keyboard support.",
-  "frontend/src/hooks/useGetAllDiagrams.ts": "React Query hook that fetches all saved diagrams from the backend using the getAllDiagrams method."
+  "frontend/src/hooks/useGetAllDiagrams.ts": "React Query hook that fetches all saved diagrams from the backend using the getAllDiagrams method.",
+  "frontend/src/hooks/useDeleteDiagramState.ts": "React Query mutation hook for deleting saved diagrams by ID, invalidating the allDiagrams query on success."
 }

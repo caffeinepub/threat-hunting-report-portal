@@ -2,113 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-diagram-naming-functionality-when-saving-attack-path-diagrams-in-the-attack-path-visualizer-prompting-users-to-input-a-name-for-the-diagram-before-saving",
-      "featureTitle": "Add diagram naming functionality when saving attack path diagrams in the attack path visualizer, prompting users to input a name for the diagram before saving",
-      "files": [
-        "frontend/src/components/SaveDiagramDialog.tsx",
-        "frontend/src/hooks/useSaveDiagramState.ts",
-        "frontend/src/pages/AttackPathPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-53"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-diagram-selection-interface-in-the-load-functionality-to-display-and-choose-from-multiple-saved-diagrams-by-name",
-      "featureTitle": "Implement diagram selection interface in the load functionality to display and choose from multiple saved diagrams by name",
-      "files": [
-        "frontend/src/components/LoadDiagramDialog.tsx",
-        "frontend/src/hooks/useGetAllDiagrams.ts",
-        "frontend/src/pages/AttackPathPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-54"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-clear-button-to-the-attack-path-visualizer-toolbar-that-removes-all-elements-from-the-canvas-icons-connections-drawings-text-labels",
-      "featureTitle": "Add a clear button to the attack path visualizer toolbar that removes all elements from the canvas (icons, connections, drawings, text labels)",
-      "files": [
-        "frontend/src/components/AttackPathToolbar.tsx",
-        "frontend/src/pages/AttackPathPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-55"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-the-jpeg-export-functionality-and-replace-it-with-png-export-functionality-that-captures-the-entire-attack-path-canvas-and-downloads-it-as-a-png-image-file",
-      "featureTitle": "Remove the JPEG export functionality and replace it with PNG export functionality that captures the entire attack path canvas and downloads it as a PNG image file",
-      "files": [
-        "frontend/src/components/AttackPathToolbar.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-56"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-fix-the-free-transform-tool-to-properly-move-and-resize-both-icons-and-text-labels-with-working-transformation-controls",
-      "featureTitle": "Fix the free transform tool to properly move and resize both icons and text labels with working transformation controls",
-      "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-57"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-the-bidirectional-arrow-icon-from-the-attack-path-visualizer-toolbar-and-prevent-it-from-being-placed-on-the-canvas",
-      "featureTitle": "Remove the bidirectional arrow icon from the attack path visualizer toolbar and prevent it from being placed on the canvas",
+      "featureId": "feature-add-a-user-icon-to-the-attack-path-visualizer-toolbar-as-a-draggable-element-that-can-be-placed-on-the-canvas",
+      "featureTitle": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
       "files": [
         "frontend/src/components/AttackPathIcon.tsx",
         "frontend/src/components/AttackPathToolbar.tsx"
@@ -123,7 +18,28 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-58"
+        "REQ-67"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-replace-the-current-computer-icon-in-the-attack-path-visualizer-with-a-single-computer-icon-image",
+      "featureTitle": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "files": [
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-68"
       ],
       "confidence": "high"
     }

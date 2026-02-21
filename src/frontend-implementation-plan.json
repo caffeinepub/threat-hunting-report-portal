@@ -1,143 +1,49 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add diagram naming, selection interface, clear button, PNG export, fix transform tool, and remove bidirectional arrow",
+  "title": "Add user icon and replace computer icon in attack path visualizer",
   "requirements": [
     {
-      "id": "REQ-53",
-      "summary": "Add diagram naming functionality when saving attack path diagrams",
+      "id": "REQ-67",
+      "summary": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
       "acceptanceCriteria": [
-        "When the save button is clicked, a dialog or input prompt appears requesting a diagram name",
-        "The diagram name is stored with the diagram state when saved to the backend",
-        "Users cannot save without providing a name"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/SaveDiagramDialog.tsx",
-          "operation": "create",
-          "description": "Create a new dialog component that prompts users to enter a diagram name before saving. Include a text input field for the name, validation to prevent empty names, and save/cancel buttons. Use shadcn/ui Dialog and Input components for consistent styling."
-        },
-        {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
-          "operation": "modify",
-          "description": "Replace the direct save operation with the SaveDiagramDialog component. When the save button is clicked, open the dialog and pass the diagram state. Only trigger the saveDiagramState mutation after the user provides a valid name in the dialog."
-        },
-        {
-          "path": "frontend/src/hooks/useSaveDiagramState.ts",
-          "operation": "modify",
-          "description": "Update the mutation to accept a diagram name parameter and pass it to the backend's saveDiagramState method alongside the diagram state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-54",
-      "summary": "Implement diagram selection interface in the load functionality",
-      "acceptanceCriteria": [
-        "The LoadDiagramDialog component displays a list of saved diagrams with their names",
-        "Users can select a specific diagram from the list to load",
-        "The selected diagram's complete state is restored to the canvas"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useGetAllDiagrams.ts",
-          "operation": "create",
-          "description": "Create a React Query hook that fetches all saved diagrams using the backend's getAllDiagrams method, returning an array of NamedDiagram objects with diagram IDs, names, and state."
-        },
-        {
-          "path": "frontend/src/components/LoadDiagramDialog.tsx",
-          "operation": "modify",
-          "description": "Replace the current diagram loading logic with a list-based selection interface. Use the useGetAllDiagrams hook to fetch all saved diagrams and display them in a scrollable list with diagram names. Add click handlers to select and load a specific diagram by its ID. Show loading and error states appropriately."
-        },
-        {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
-          "operation": "modify",
-          "description": "Update the LoadDiagramDialog usage to handle the new selection-based loading flow. Ensure the selected diagram's state is properly converted and applied to the canvas state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-55",
-      "summary": "Add a clear button to the attack path visualizer toolbar",
-      "acceptanceCriteria": [
-        "A clear button is visible in the AttackPathToolbar component",
-        "Clicking the clear button removes all placed icons, connections, drawings, and text labels from the canvas",
-        "The canvas returns to an empty state after clearing"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Add a clearCanvas function to the hook that resets all state arrays (placedIcons, connections, freehandDrawings, lines, textLabels) to empty arrays and clears the undo history."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a clear button to the toolbar with an appropriate icon (e.g., trash or X). Position it near the other file operation buttons (save, load, export). Wire it to call the clearCanvas function from useAttackPathState when clicked."
-        },
-        {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
-          "operation": "modify",
-          "description": "Pass the clearCanvas function from useAttackPathState to the AttackPathToolbar component as a prop."
-        }
-      ]
-    },
-    {
-      "id": "REQ-56",
-      "summary": "Replace JPEG export with PNG export functionality",
-      "acceptanceCriteria": [
-        "The export button in the toolbar triggers PNG export instead of JPEG",
-        "The exported PNG file contains all canvas elements including icons, connections, drawings, and text labels",
-        "The PNG file is downloaded with an appropriate filename"
+        "A user icon appears in the attack path visualizer toolbar alongside existing icons",
+        "The user icon can be dragged from the toolbar and placed on the canvas",
+        "Placed user icons can be moved, resized, and deleted like other icons",
+        "The user icon is included in save/load operations and PNG export"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Update the export functionality to generate PNG instead of JPEG. Modify the canvas toBlob or toDataURL call to use 'image/png' format. Update the downloaded filename to use .png extension instead of .jpeg."
-        }
-      ]
-    },
-    {
-      "id": "REQ-57",
-      "summary": "Fix the free transform tool to properly move and resize icons and text labels",
-      "acceptanceCriteria": [
-        "The free transform tool successfully moves icons when dragged",
-        "The free transform tool successfully moves text labels when dragged",
-        "The free transform tool resizes icons using transformation handles",
-        "The free transform tool resizes text labels using transformation handles",
-        "Transformations persist correctly in the canvas state"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Fix the free transform tool's event handlers for dragging and resizing. Ensure mouse down, move, and up events properly update the position and size of both icons and text labels. Add proper bounds checking and state updates to persist transformations. Fix any issues with the transformation handles not responding correctly."
-        },
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Review and fix the state update logic for icon and text label transformations. Ensure the updateIconPosition, updateIconSize, updateTextLabelPosition, and updateTextLabelSize functions (or equivalent) correctly update the state and trigger re-renders."
-        }
-      ]
-    },
-    {
-      "id": "REQ-58",
-      "summary": "Remove the bidirectional arrow icon from the toolbar",
-      "acceptanceCriteria": [
-        "The bidirectional arrow icon is not visible in the AttackPathToolbar",
-        "Users cannot place bidirectional arrow icons on the canvas",
-        "The icon type is removed from the AttackPathIcon component's supported types"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Remove the bidirectional arrow icon from the icon options array in the toolbar. Filter out any references to 'bidirectional-arrow' icon type."
+          "description": "Add a new draggable user icon to the toolbar alongside existing attack path icons (email, attacker, computer, etc.). The icon should use the generated asset at frontend/public/assets/generated/user-icon.dim_128x128.png and follow the same drag-and-drop pattern as existing icons. Map the new icon type to 'user' in the IconType enum."
         },
         {
           "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Remove the 'bidirectional-arrow' case from the icon type rendering logic. Remove any SVG or component code related to rendering bidirectional arrows."
+          "description": "Add a mapping for the 'user' IconType to reference the generated user icon asset at frontend/public/assets/generated/user-icon.dim_128x128.png. Ensure the user icon renders correctly when placed on the canvas and supports all standard icon operations (drag, resize, delete)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-68",
+      "summary": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "acceptanceCriteria": [
+        "The computer icon in the toolbar displays as a single computer icon image",
+        "The visual representation clearly depicts one computer",
+        "Existing diagrams with computer icons continue to render correctly",
+        "The computer icon maintains consistent styling with other attack path icons"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Update the mapping for the 'computer' IconType to reference the newly generated computer icon asset at frontend/public/assets/generated/computer-icon.dim_128x128.png instead of the existing icon-computer.dim_64x64.png. This replaces the current computer icon with a single computer icon image while maintaining backward compatibility with existing diagrams."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Update the computer icon displayed in the toolbar to use the newly generated computer icon asset at frontend/public/assets/generated/computer-icon.dim_128x128.png. Ensure the toolbar preview clearly shows a single computer and maintains visual consistency with other toolbar icons."
         }
       ]
     }

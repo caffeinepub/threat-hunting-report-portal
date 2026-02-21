@@ -1,13 +1,21 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import AttackPathToolbar from '@/components/AttackPathToolbar';
 import AttackPathCanvas from '@/components/AttackPathCanvas';
-import LoadDiagramDialog from '@/components/LoadDiagramDialog';
-import SaveDiagramDialog from '@/components/SaveDiagramDialog';
 import { useAttackPathState } from '@/hooks/useAttackPathState';
+import SaveDiagramDialog from '@/components/SaveDiagramDialog';
+import LoadDiagramDialog from '@/components/LoadDiagramDialog';
 import { useSaveDiagramState } from '@/hooks/useSaveDiagramState';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import type { DiagramState, Icon, Connection as BackendConnection, FreehandDrawing, Line, TextLabel as BackendTextLabel } from '@/backend';
+import { useGetDiagramState } from '@/hooks/useGetDiagramState';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AttackPathPage() {
   const {
@@ -35,17 +43,21 @@ export default function AttackPathPage() {
     addTextLabel,
     removeTextLabel,
     updateTextLabel,
+    clearAll,
     undo,
     canUndo,
     restoreState,
-    clearAll,
   } = useAttackPathState();
 
   const [mode, setMode] = useState<'place' | 'connect' | 'draw'>('place');
-  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const saveDiagramMutation = useSaveDiagramState();
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const saveMutation = useSaveDiagramState();
+  const [selectedDiagramId, setSelectedDiagramId] = useState<bigint | null>(null);
+  
+  // Only fetch when we have a valid ID
+  const { data: loadedDiagram } = useGetDiagramState(selectedDiagramId || BigInt(0));
 
   const handleModeChange = (newMode: 'place' | 'connect' | 'draw') => {
     setMode(newMode);
@@ -54,11 +66,105 @@ export default function AttackPathPage() {
     }
   };
 
-  const handleDrawingToolChange = (tool: typeof activeDrawingTool) => {
-    setActiveDrawingTool(tool);
-    if (tool !== null) {
-      setMode('draw');
-    }
+  const handleSave = async (name: string) => {
+    const diagramState = {
+      icons: placedIcons.map((icon) => ({
+        id: icon.id,
+        iconType: icon.type,
+        position: { x: icon.x, y: icon.y },
+        name: icon.type,
+      })),
+      connections: connections.map((conn) => ({
+        sourceId: conn.sourceId,
+        targetId: conn.targetId,
+        connectionType: 'default',
+        color: '#000000',
+      })),
+      freehandDrawings: drawings
+        .filter((d) => d.type === 'freehand')
+        .map((d) => ({
+          points: d.points.map((p) => ({ x: p.x, y: p.y })),
+          color: '#000000',
+          strokeWidth: 2,
+        })),
+      lines: drawings
+        .filter((d) => d.type === 'line' || d.type === 'arrow')
+        .map((d) => ({
+          startPosition: d.points[0],
+          endPosition: d.points[1],
+          color: '#000000',
+          strokeWidth: 2,
+          isArrow: d.type === 'arrow',
+        })),
+      textLabels: textLabels.map((label) => ({
+        content: label.text,
+        position: { x: label.x, y: label.y },
+        fontSize: 16,
+        color: label.color,
+        fontWeight: 'bold',
+      })),
+      lastModified: BigInt(Date.now() * 1000000),
+    };
+
+    await saveMutation.mutateAsync({ name, state: diagramState });
+    setSaveDialogOpen(false);
+  };
+
+  const handleLoad = (diagramId: bigint) => {
+    setSelectedDiagramId(diagramId);
+  };
+
+  // Load diagram when data is fetched
+  if (loadedDiagram && selectedDiagramId !== null) {
+    const state = loadedDiagram.state;
+    
+    const restoredState = {
+      placedIcons: state.icons.map((icon) => ({
+        id: icon.id,
+        type: icon.iconType as any,
+        x: icon.position.x,
+        y: icon.position.y,
+        width: 48,
+        height: 48,
+      })),
+      connections: state.connections.map((conn) => ({
+        id: `conn-${Date.now()}-${Math.random()}`,
+        sourceId: conn.sourceId,
+        targetId: conn.targetId,
+      })),
+      drawings: [
+        ...state.freehandDrawings.map((drawing) => ({
+          id: `drawing-${Date.now()}-${Math.random()}`,
+          type: 'freehand' as const,
+          points: drawing.points,
+        })),
+        ...state.lines.map((line) => {
+          const drawingType = line.isArrow ? 'arrow' : 'line';
+          return {
+            id: `drawing-${Date.now()}-${Math.random()}`,
+            type: drawingType as 'arrow' | 'line',
+            points: [line.startPosition, line.endPosition],
+          };
+        }),
+      ],
+      textLabels: state.textLabels.map((label) => ({
+        id: `text-${Date.now()}-${Math.random()}`,
+        text: label.content,
+        x: label.position.x,
+        y: label.position.y,
+        color: label.color,
+        rotation: 0,
+        width: undefined,
+        height: undefined,
+      })),
+    };
+
+    restoreState(restoredState);
+    setSelectedDiagramId(null);
+  }
+
+  const handleExport = () => {
+    alert('PNG export functionality requires html2canvas library. Please use browser screenshot tools or add html2canvas to package.json.');
   };
 
   const handleSelectElement = (id: string | null, type: 'icon' | 'text' | null) => {
@@ -66,191 +172,125 @@ export default function AttackPathPage() {
     setSelectedElementType(type);
   };
 
-  const handleSaveClick = () => {
-    setSaveDialogOpen(true);
-  };
-
-  const handleSave = async (name: string) => {
-    try {
-      const icons: Icon[] = placedIcons.map((icon) => ({
-        id: icon.id,
-        iconType: icon.type,
-        position: { x: icon.x, y: icon.y },
-        name: icon.type,
-      }));
-
-      const backendConnections: BackendConnection[] = connections.map((conn) => ({
-        sourceId: conn.sourceId,
-        targetId: conn.targetId,
-        connectionType: 'solid',
-        color: '#000000',
-      }));
-
-      const freehandDrawings: FreehandDrawing[] = drawings
-        .filter((d) => d.type === 'freehand')
-        .map((drawing) => ({
-          points: drawing.points,
-          color: '#000000',
-          strokeWidth: 2,
-        }));
-
-      const lines: Line[] = drawings
-        .filter((d) => d.type === 'line' || d.type === 'arrow')
-        .map((drawing) => ({
-          startPosition: drawing.points[0],
-          endPosition: drawing.points[1],
-          color: '#000000',
-          strokeWidth: 2,
-          isArrow: drawing.type === 'arrow',
-        }));
-
-      const backendTextLabels: BackendTextLabel[] = textLabels.map((label) => ({
-        content: label.text,
-        position: { x: label.x, y: label.y },
-        fontSize: 16,
-        color: label.color,
-        fontWeight: 'bold',
-      }));
-
-      const diagramState: DiagramState = {
-        icons,
-        connections: backendConnections,
-        freehandDrawings,
-        lines,
-        textLabels: backendTextLabels,
-        lastModified: BigInt(Date.now()),
-      };
-
-      await saveDiagramMutation.mutateAsync({ name, state: diagramState });
-      setSaveDialogOpen(false);
-      toast.success('Diagram saved successfully!');
-    } catch (error) {
-      console.error('Failed to save diagram:', error);
-      toast.error('Failed to save diagram');
-    }
-  };
-
-  const handleLoad = () => {
-    setLoadDialogOpen(true);
-  };
-
-  const handleLoadComplete = (state: {
-    placedIcons: typeof placedIcons;
-    connections: typeof connections;
-    drawings: typeof drawings;
-    textLabels: typeof textLabels;
-  }) => {
-    restoreState(state);
-    setLoadDialogOpen(false);
-    toast.success('Diagram loaded successfully!');
-  };
-
-  const handleClear = () => {
-    if (placedIcons.length > 0 || connections.length > 0 || drawings.length > 0 || textLabels.length > 0) {
-      if (window.confirm('Are you sure you want to clear the entire diagram? This action cannot be undone.')) {
-        clearAll();
-        toast.success('Diagram cleared');
-      }
-    }
-  };
-
-  const handleExportPNG = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      toast.error('Canvas not found');
-      return;
-    }
-
-    // Fallback message for PNG export
-    toast.info('To export as PNG, use your browser\'s screenshot tool (e.g., Ctrl+Shift+S in Firefox, Cmd+Shift+4 on Mac, or browser extensions like Awesome Screenshot)');
-  };
-
   return (
-    <div className="flex h-[calc(100vh-200px)] gap-4">
-      {/* Sidebar */}
-      <div className="w-64 bg-card border border-border rounded-lg p-4 overflow-y-auto">
+    <div className="flex h-[calc(100vh-4rem)]">
+      <div className="w-64 border-r bg-background p-4 overflow-y-auto">
         <AttackPathToolbar
           activeDrawingTool={activeDrawingTool}
-          onDrawingToolChange={handleDrawingToolChange}
+          onDrawingToolChange={setActiveDrawingTool}
           onUndo={undo}
           canUndo={canUndo}
-          onSave={handleSaveClick}
-          onLoad={handleLoad}
-          onExport={handleExportPNG}
-          onClear={handleClear}
-          isSaving={saveDiagramMutation.isPending}
+          onSave={() => setSaveDialogOpen(true)}
+          onLoad={() => setLoadDialogOpen(true)}
+          onExport={handleExport}
+          onClear={() => setClearDialogOpen(true)}
+          isSaving={saveMutation.isPending}
           textColor={textColor}
           onTextColorChange={setTextColor}
         />
       </div>
 
-      {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col gap-4">
-        {/* Mode Selector */}
-        <div className="flex gap-2">
-          <Button
-            variant={mode === 'place' ? 'default' : 'outline'}
-            onClick={() => handleModeChange('place')}
-          >
-            Place & Move Icons
-          </Button>
-          <Button
-            variant={mode === 'connect' ? 'default' : 'outline'}
-            onClick={() => handleModeChange('connect')}
-          >
-            Connect Icons
-          </Button>
-          <Button
-            variant={mode === 'draw' ? 'default' : 'outline'}
-            onClick={() => handleModeChange('draw')}
-          >
-            Draw & Annotate
-          </Button>
+      <div className="flex-1 flex flex-col">
+        <div className="bg-background border-b p-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleModeChange('place')}
+                className={`px-4 py-2 rounded ${
+                  mode === 'place' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                }`}
+              >
+                Place
+              </button>
+              <button
+                onClick={() => handleModeChange('connect')}
+                className={`px-4 py-2 rounded ${
+                  mode === 'connect' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                }`}
+              >
+                Connect
+              </button>
+              <button
+                onClick={() => handleModeChange('draw')}
+                className={`px-4 py-2 rounded ${
+                  mode === 'draw' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                }`}
+              >
+                Draw
+              </button>
+            </div>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Mode: <span className="font-semibold capitalize">{mode}</span>
+            {activeDrawingTool && (
+              <>
+                {' '}
+                | Tool: <span className="font-semibold capitalize">{activeDrawingTool}</span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Canvas */}
-        <div className="flex-1" ref={canvasRef}>
-          <AttackPathCanvas
-            placedIcons={placedIcons}
-            connections={connections}
-            drawings={drawings}
-            textLabels={textLabels}
-            mode={mode}
-            activeDrawingTool={activeDrawingTool}
-            textColor={textColor}
-            selectedElementId={selectedElementId}
-            selectedElementType={selectedElementType}
-            onAddIcon={addIcon}
-            onMoveIcon={moveIcon}
-            onResizeIcon={resizeIcon}
-            onRemoveIcon={removeIcon}
-            onAddConnection={addConnection}
-            onRemoveConnection={removeConnection}
-            onAddDrawing={addDrawing}
-            onRemoveDrawing={removeDrawing}
-            onMoveDrawing={moveDrawing}
-            onAddTextLabel={addTextLabel}
-            onRemoveTextLabel={removeTextLabel}
-            onUpdateTextLabel={updateTextLabel}
-            onSelectElement={handleSelectElement}
-          />
-        </div>
+        <AttackPathCanvas
+          placedIcons={placedIcons}
+          connections={connections}
+          drawings={drawings}
+          textLabels={textLabels}
+          mode={mode}
+          activeDrawingTool={activeDrawingTool}
+          textColor={textColor}
+          selectedElementId={selectedElementId}
+          selectedElementType={selectedElementType}
+          onAddIcon={addIcon}
+          onMoveIcon={moveIcon}
+          onResizeIcon={resizeIcon}
+          onRemoveIcon={removeIcon}
+          onAddConnection={addConnection}
+          onRemoveConnection={removeConnection}
+          onAddDrawing={addDrawing}
+          onRemoveDrawing={removeDrawing}
+          onMoveDrawing={moveDrawing}
+          onAddTextLabel={addTextLabel}
+          onRemoveTextLabel={removeTextLabel}
+          onUpdateTextLabel={updateTextLabel}
+          onSelectElement={handleSelectElement}
+        />
       </div>
 
-      {/* Load Dialog */}
-      <LoadDiagramDialog
-        open={loadDialogOpen}
-        onOpenChange={setLoadDialogOpen}
-        onLoad={handleLoadComplete}
-      />
-
-      {/* Save Dialog */}
       <SaveDiagramDialog
         open={saveDialogOpen}
         onOpenChange={setSaveDialogOpen}
         onSave={handleSave}
-        isSaving={saveDiagramMutation.isPending}
+        isSaving={saveMutation.isPending}
       />
+
+      <LoadDiagramDialog
+        open={loadDialogOpen}
+        onOpenChange={setLoadDialogOpen}
+        onLoadDiagram={handleLoad}
+      />
+
+      <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Canvas</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to clear the entire canvas? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                clearAll();
+                setClearDialogOpen(false);
+              }}
+            >
+              Clear
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

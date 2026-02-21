@@ -164,6 +164,7 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    deleteDiagramState(diagramId: bigint): Promise<void>;
     getAllConnections(diagramId: bigint): Promise<Array<Connection> | null>;
     getAllDiagrams(): Promise<Array<NamedDiagram>>;
     getAllIconPositions(diagramId: bigint): Promise<Array<Icon> | null>;
@@ -288,6 +289,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async deleteDiagramState(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteDiagramState(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteDiagramState(arg0);
             return result;
         }
     }

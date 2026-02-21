@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Download, Move, Trash2 } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 
-export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script';
+export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user';
 
 const iconTypes: { type: IconType; label: string }[] = [
+  { type: 'user', label: 'User' },
   { type: 'email', label: 'Email' },
   { type: 'attacker', label: 'Attacker' },
   { type: 'computer', label: 'Computer' },
@@ -65,7 +66,7 @@ export default function AttackPathToolbar({
       <div className="space-y-3">
         {iconTypes.map((icon) => (
           <div key={icon.type} className="flex items-center gap-3">
-            <AttackPathIcon type={icon.type} isDraggable />
+            <AttackPathIcon type={icon.type} />
             <span className="text-sm font-medium">{icon.label}</span>
           </div>
         ))}

@@ -64,6 +64,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    deleteDiagramState(diagramId: bigint): Promise<void>;
     getAllConnections(diagramId: bigint): Promise<Array<Connection> | null>;
     getAllDiagrams(): Promise<Array<NamedDiagram>>;
     getAllIconPositions(diagramId: bigint): Promise<Array<Icon> | null>;

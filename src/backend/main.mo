@@ -3,14 +3,14 @@ import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
-import Migration "migration";
+
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 
 // Apply migration on upgrade.
-(with migration = Migration.run)
+
 actor {
   include MixinStorage();
 
@@ -126,6 +126,26 @@ actor {
 
     diagramStore.add(caller, userDiagrams);
     id;
+  };
+
+  // Delete saved diagram state
+  public shared ({ caller }) func deleteDiagramState(diagramId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can perform this action");
+    };
+    switch (diagramStore.get(caller)) {
+      case (?userDiagrams) {
+        if (not userDiagrams.containsKey(diagramId)) {
+          Runtime.trap("No diagram with id " # diagramId.toText() # " found");
+        };
+        userDiagrams.remove(diagramId);
+        diagramStore.add(caller, userDiagrams);
+        ();
+      };
+      case (null) {
+        Runtime.trap("No diagrams found for user");
+      };
+    };
   };
 
   // Retrieve a specific diagram state by ID

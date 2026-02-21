@@ -2,102 +2,58 @@ import { IconType } from './AttackPathToolbar';
 
 interface AttackPathIconProps {
   type: IconType;
-  isDraggable?: boolean;
-  onDragStart?: (e: React.DragEvent) => void;
-  style?: React.CSSProperties;
-  className?: string;
   width?: number;
   height?: number;
 }
 
-const iconPaths: Record<IconType, string> = {
-  email: '/assets/generated/icon-email.dim_64x64.png',
-  attacker: '/assets/generated/icon-attacker.dim_64x64.png',
-  computer: '/assets/generated/icon-computer.dim_64x64.png',
-  server: '/assets/generated/icon-server.dim_64x64.png',
-  domain: '/assets/generated/icon-domain.dim_64x64.png',
-  fileFolder: '/assets/generated/icon-file.dim_64x64.png',
-  exe: '', // Text-based
-  dll: '/assets/generated/dll-icon.dim_64x64.png',
-  script: '/assets/generated/script-icon.dim_64x64.png',
-  pdf: '/assets/generated/pdf-icon.dim_128x128.png',
-  ppt: '/assets/generated/ppt-icon.dim_128x128.png',
-  csv: '', // Text-based
-  zip: '/assets/generated/zip-icon.dim_128x128.png',
-  doc: '', // Text-based
-  c2: '/assets/generated/c2-icon.dim_128x128.png',
-};
+export default function AttackPathIcon({ type, width = 48, height = 48 }: AttackPathIconProps) {
+  const iconMap: Record<IconType, string> = {
+    user: '/assets/generated/user-icon.dim_128x128.png',
+    attacker: '/assets/generated/icon-attacker.dim_64x64.png',
+    computer: '/assets/generated/computer-icon.dim_128x128.png',
+    server: '/assets/generated/icon-server.dim_64x64.png',
+    domain: '/assets/generated/icon-domain.dim_64x64.png',
+    email: '/assets/generated/icon-email.dim_64x64.png',
+    fileFolder: '/assets/generated/icon-file.dim_64x64.png',
+    exe: '/assets/generated/exe-icon.dim_64x64.png',
+    dll: '/assets/generated/dll-icon.dim_64x64.png',
+    script: '/assets/generated/script-icon.dim_64x64.png',
+    doc: '/assets/generated/word-icon.dim_64x64.png',
+    csv: '/assets/generated/excel-icon.dim_64x64.png',
+    pdf: '/assets/generated/pdf-icon.dim_128x128.png',
+    ppt: '/assets/generated/ppt-icon.dim_128x128.png',
+    zip: '/assets/generated/zip-icon.dim_128x128.png',
+    c2: '/assets/generated/c2-icon.dim_128x128.png',
+  };
 
-export default function AttackPathIcon({ 
-  type, 
-  isDraggable = false, 
-  onDragStart, 
-  style, 
-  className = '',
-  width,
-  height,
-}: AttackPathIconProps) {
+  const iconSrc = iconMap[type];
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('iconType', type);
     e.dataTransfer.effectAllowed = 'copy';
-    if (onDragStart) {
-      onDragStart(e);
-    }
   };
 
-  const displayWidth = width || 48;
-  const displayHeight = height || 48;
-
-  // Text-based .exe icon
-  if (type === 'exe') {
+  if (!iconSrc) {
     return (
       <div
-        draggable={isDraggable}
+        className="flex items-center justify-center bg-gray-200 rounded text-xs font-bold text-gray-600"
+        style={{ width, height }}
+        draggable
         onDragStart={handleDragStart}
-        style={{ width: displayWidth, height: displayHeight, ...style }}
-        className={`flex items-center justify-center text-sm font-bold text-foreground bg-background border-2 border-border rounded ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
       >
-        <span className="text-center">.exe</span>
-      </div>
-    );
-  }
-
-  // Text-based Microsoft Excel icon
-  if (type === 'csv') {
-    return (
-      <div
-        draggable={isDraggable}
-        onDragStart={handleDragStart}
-        style={{ width: displayWidth, height: displayHeight, ...style }}
-        className={`flex items-center justify-center text-[9px] font-bold text-foreground bg-background border-2 border-border rounded ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
-      >
-        <span className="text-center leading-tight">Microsoft Excel</span>
-      </div>
-    );
-  }
-
-  // Text-based Microsoft Word icon
-  if (type === 'doc') {
-    return (
-      <div
-        draggable={isDraggable}
-        onDragStart={handleDragStart}
-        style={{ width: displayWidth, height: displayHeight, ...style }}
-        className={`flex items-center justify-center text-[9px] font-bold text-foreground bg-background border-2 border-border rounded ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
-      >
-        <span className="text-center leading-tight">Microsoft Word</span>
+        {type.toUpperCase()}
       </div>
     );
   }
 
   return (
     <img
-      src={iconPaths[type]}
+      src={iconSrc}
       alt={type}
-      draggable={isDraggable}
+      className="w-full h-full object-contain"
+      style={{ width, height }}
+      draggable
       onDragStart={handleDragStart}
-      style={{ width: displayWidth, height: displayHeight, ...style }}
-      className={`object-contain ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-move'} ${className}`}
     />
   );
 }
