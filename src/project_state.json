@@ -1,14 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 29,
+  "projectStateVersion": 33,
   "summary": "Threat hunting report portal based on MITRE ATT&CK framework with PDF generation capability",
   "architectural_notes": [],
   "known_issues": [
     "Free transform tool not properly resizing icons and text labels",
-    "Load diagram functionality has issues with date/time display"
+    "Load diagram functionality has issues with date/time display",
+    "Deployment to Internet Computer network failing due to configuration or build issues"
   ],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Simple user profile icon illustration in black and white, showing a person silhouette (user-icon.dim_128x128.png)\n- Single desktop computer icon illustration in black and white, showing one computer monitor and base unit (computer-icon.dim_128x128.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-threat-hunting-report-form-interface-where-users-can-input-threat-hunting-details-including-report-title-date-executive-summary-threat-actors-techniques-observed-indicators-of-compromise-iocs-and-findings",
@@ -505,6 +505,22 @@
         "REQ-68"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-any-typescript-compilation-errors-missing-dependencies-or-module-resolution-issues-in-the-frontend-code-that-could-prevent-successful-build-or-deployment",
+      "title": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-frontend-asset-paths-and-imports-reference-valid-files-and-that-no-broken-imports-or-missing-asset-references-exist-that-could-cause-deployment-failures",
+      "title": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -788,6 +804,44 @@
       "id": "AR-68",
       "summary": "Update the computer icon in attack path visualizer to display as a single computer icon image",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-69",
+      "summary": "Add html2canvas package as a dependency in package.json to enable canvas-to-image export functionality in the attack path visualizer",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-70",
+      "summary": "Fix deployment configuration in dfx.json and resolve build/code issues preventing deployment to Internet Computer network",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-71",
+      "summary": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment, including correct canister types, build commands, and dependency declarations",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-73",
+      "summary": "Ensure html2canvas dependency is properly declared in package.json with correct version specification to support PNG export functionality",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-74",
+      "summary": "Verify backend Motoko code compiles successfully and fix any syntax errors, type mismatches, or compilation issues in main.mo that could block deployment",
+      "reqIds": [
+        "REQ-73"
+      ],
       "status": "pending"
     }
   ],

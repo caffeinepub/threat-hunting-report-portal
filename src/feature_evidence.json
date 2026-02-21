@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-user-icon-to-the-attack-path-visualizer-toolbar-as-a-draggable-element-that-can-be-placed-on-the-canvas",
-      "featureTitle": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
+      "featureId": "feature-fix-any-typescript-compilation-errors-missing-dependencies-or-module-resolution-issues-in-the-frontend-code-that-could-prevent-successful-build-or-deployment",
+      "featureTitle": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
+        "frontend/src/pages/AttackPathPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,16 +17,16 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-67"
+        "REQ-71"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-current-computer-icon-in-the-attack-path-visualizer-with-a-single-computer-icon-image",
-      "featureTitle": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "featureId": "feature-ensure-all-frontend-asset-paths-and-imports-reference-valid-files-and-that-no-broken-imports-or-missing-asset-references-exist-that-could-cause-deployment-failures",
+      "featureTitle": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
+        "frontend/index.html",
+        "frontend/vite.config.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -39,7 +38,7 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-68"
+        "REQ-74"
       ],
       "confidence": "high"
     }

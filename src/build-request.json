@@ -1,65 +1,114 @@
 {
   "kind": "build_request",
-  "title": "Add user icon and replace computer icon in attack path visualizer",
-  "projectName": "Threat Hunt Portal",
-  "priority": "normal",
+  "title": "Fix deployment configuration and build issues for Internet Computer network",
+  "projectName": "Threat Hunting Portal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-67",
-      "text": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
-      "target": "frontend",
+      "id": "REQ-70",
+      "text": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment, including correct canister types, build commands, and dependency declarations",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-deployment-request"
         ],
         "quotes": [
-          "In attackpath visualizer, put a user icon"
+          "Update deployment configuration: modify thhe dfx.json or deployment settings if there are configuration issues"
         ]
       },
       "acceptanceCriteria": [
-        "A user icon appears in the attack path visualizer toolbar alongside existing icons",
-        "The user icon can be dragged from the toolbar and placed on the canvas",
-        "Placed user icons can be moved, resized, and deleted like other icons",
-        "The user icon is included in save/load operations and PNG export"
+        "dfx.json contains valid canister configurations for both frontend and backend",
+        "All canister type declarations are correct for Internet Computer deployment",
+        "Build commands and dependencies are properly specified",
+        "Configuration passes dfx validation without errors"
       ]
     },
     {
-      "id": "REQ-68",
-      "text": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "id": "REQ-71",
+      "text": "Fix any TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code that could prevent successful build or deployment",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-deployment-request"
         ],
         "quotes": [
-          "Change the Computer Icon into a one computer icon image"
+          "Fix code that prevents deployment: If there are build errors or code issues blocking deployment, address those"
         ]
       },
       "acceptanceCriteria": [
-        "The computer icon in the toolbar displays as a single computer icon image",
-        "The visual representation clearly depicts one computer",
-        "Existing diagrams with computer icons continue to render correctly",
-        "The computer icon maintains consistent styling with other attack path icons"
+        "TypeScript compilation completes without errors",
+        "All imported modules resolve correctly",
+        "No missing dependencies in package.json",
+        "Frontend build process completes successfully"
+      ]
+    },
+    {
+      "id": "REQ-72",
+      "text": "Ensure html2canvas dependency is properly declared in package.json with correct version specification to support PNG export functionality",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-deployment-request"
+        ]
+      },
+      "acceptanceCriteria": [
+        "html2canvas is listed in package.json dependencies",
+        "Package version is compatible with the project",
+        "Dependency installs without errors during npm install"
+      ]
+    },
+    {
+      "id": "REQ-73",
+      "text": "Verify backend Motoko code compiles successfully and fix any syntax errors, type mismatches, or compilation issues in main.mo that could block deployment",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-deployment-request"
+        ],
+        "quotes": [
+          "Fix code that prevents deployment: If there are build errors or code issues blocking deployment, address those"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend Motoko code compiles without errors",
+        "All type declarations are valid",
+        "No syntax errors in main.mo",
+        "Backend canister builds successfully"
+      ]
+    },
+    {
+      "id": "REQ-74",
+      "text": "Ensure all frontend asset paths and imports reference valid files and that no broken imports or missing asset references exist that could cause deployment failures",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-deployment-request"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All import statements reference existing files",
+        "Asset paths in components point to valid resources",
+        "No 404 errors for missing resources during build",
+        "Static assets are properly included in build output"
       ]
     }
   ],
   "constraints": [
-    "Do not modify frontend/src/hooks/useInternetIdentity.ts",
-    "Do not modify frontend/src/hooks/useInternetIdentity.tsx",
-    "Do not modify frontend/src/hooks/useActor.ts",
-    "Do not modify frontend/src/main.tsx",
-    "Do not modify frontend/src/components/ui directory"
+    "Maintain single-actor Motoko architecture in backend/main.mo",
+    "Do not modify immutable frontend paths: useInternetIdentity.ts, useInternetIdentity.tsx, useActor.ts, main.tsx, components/ui/*",
+    "Preserve existing Internet Identity authentication implementation",
+    "Keep all existing attack path visualizer functionality intact",
+    "Do not change the backend schema or data structures for diagram storage"
   ],
   "nonGoals": [
-    "Changes to other attack path icons beyond user and computer",
-    "Modifications to backend diagram storage schema",
-    "Changes to authentication or user profile functionality"
+    "Adding new features or functionality beyond deployment fixes",
+    "Redesigning the application architecture",
+    "Modifying existing UI components or visual styling",
+    "Changing authentication mechanisms",
+    "Migrating to different frameworks or technologies"
   ],
   "imageRequirements": {
-    "required": [
-      "Simple user profile icon illustration in black and white, showing a person silhouette (user-icon.dim_128x128.png)",
-      "Single desktop computer icon illustration in black and white, showing one computer monitor and base unit (computer-icon.dim_128x128.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

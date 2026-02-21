@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 export default function AttackPathPage() {
   const {
@@ -106,8 +107,14 @@ export default function AttackPathPage() {
       lastModified: BigInt(Date.now() * 1000000),
     };
 
-    await saveMutation.mutateAsync({ name, state: diagramState });
-    setSaveDialogOpen(false);
+    try {
+      await saveMutation.mutateAsync({ name, state: diagramState });
+      setSaveDialogOpen(false);
+      toast.success('Diagram saved successfully');
+    } catch (error) {
+      toast.error('Failed to save diagram');
+      console.error('Save error:', error);
+    }
   };
 
   const handleLoad = (diagramId: bigint) => {
@@ -161,10 +168,13 @@ export default function AttackPathPage() {
 
     restoreState(restoredState);
     setSelectedDiagramId(null);
+    toast.success('Diagram loaded successfully');
   }
 
   const handleExport = () => {
-    alert('PNG export functionality requires html2canvas library. Please use browser screenshot tools or add html2canvas to package.json.');
+    toast.info('To export this diagram as PNG, please use your browser\'s screenshot tool or print to PDF feature.', {
+      duration: 5000,
+    });
   };
 
   const handleSelectElement = (id: string | null, type: 'icon' | 'text' | null) => {

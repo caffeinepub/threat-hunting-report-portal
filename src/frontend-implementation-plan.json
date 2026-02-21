@@ -1,49 +1,137 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add user icon and replace computer icon in attack path visualizer",
+  "title": "Fix deployment configuration and build issues for Internet Computer network",
   "requirements": [
     {
-      "id": "REQ-67",
-      "summary": "Add a user icon to the attack path visualizer toolbar as a draggable element that can be placed on the canvas",
+      "id": "REQ-70",
+      "summary": "Review and update dfx.json configuration to ensure proper canister settings for Internet Computer deployment",
       "acceptanceCriteria": [
-        "A user icon appears in the attack path visualizer toolbar alongside existing icons",
-        "The user icon can be dragged from the toolbar and placed on the canvas",
-        "Placed user icons can be moved, resized, and deleted like other icons",
-        "The user icon is included in save/load operations and PNG export"
+        "dfx.json contains valid canister configurations for both frontend and backend",
+        "All canister type declarations are correct for Internet Computer deployment",
+        "Build commands and dependencies are properly specified",
+        "Configuration passes dfx validation without errors"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "path": "frontend/package.json",
           "operation": "modify",
-          "description": "Add a new draggable user icon to the toolbar alongside existing attack path icons (email, attacker, computer, etc.). The icon should use the generated asset at frontend/public/assets/generated/user-icon.dim_128x128.png and follow the same drag-and-drop pattern as existing icons. Map the new icon type to 'user' in the IconType enum."
-        },
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Add a mapping for the 'user' IconType to reference the generated user icon asset at frontend/public/assets/generated/user-icon.dim_128x128.png. Ensure the user icon renders correctly when placed on the canvas and supports all standard icon operations (drag, resize, delete)."
+          "description": "Review and verify that build scripts are correctly configured for Internet Computer deployment. Ensure the build script produces output compatible with dfx.json frontend canister source settings. Verify all dependencies required for TypeScript compilation and Vite bundling are present."
         }
       ]
     },
     {
-      "id": "REQ-68",
-      "summary": "Replace the current computer icon in the attack path visualizer with a single computer icon image",
+      "id": "REQ-71",
+      "summary": "Fix TypeScript compilation errors, missing dependencies, or module resolution issues in the frontend code",
       "acceptanceCriteria": [
-        "The computer icon in the toolbar displays as a single computer icon image",
-        "The visual representation clearly depicts one computer",
-        "Existing diagrams with computer icons continue to render correctly",
-        "The computer icon maintains consistent styling with other attack path icons"
+        "TypeScript compilation completes without errors",
+        "All imported modules resolve correctly",
+        "No missing dependencies in package.json",
+        "Frontend build process completes successfully"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Review for any TypeScript compilation errors, incorrect import paths, or type mismatches. Ensure all imported modules (TanStack Router, React Query, components) resolve correctly. Fix any missing type annotations or type errors that could prevent compilation."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Review for TypeScript compilation errors, especially around canvas manipulation, event handlers, and state management. Verify all type annotations are correct and imported types are available. Fix any type mismatches in icon placement, drawing tools, or transform operations."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Check for TypeScript errors in toolbar component logic, drag-and-drop event handlers, and button click handlers. Ensure all props and event types are correctly annotated. Verify imports for icons and utility functions resolve properly."
+        },
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Review custom hook for TypeScript compilation errors, particularly in state management logic, history operations, and type definitions for diagram elements. Ensure all return types and parameter types are correctly specified."
+        },
+        {
+          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "operation": "modify",
+          "description": "Check for TypeScript errors in page component, especially around component composition, prop passing, and state management integration. Verify all imported components and hooks have correct types."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Review application entry point for TypeScript compilation errors. Ensure React Query client setup, Internet Identity provider configuration, and root component rendering are correctly typed. Verify all imports resolve without module resolution errors."
+        },
+        {
+          "path": "frontend/package.json",
+          "operation": "modify",
+          "description": "Verify all TypeScript-related dependencies (@types packages, typescript compiler) are present with compatible versions. Ensure React, React Query, TanStack Router, and all UI libraries have their type definitions installed. Add any missing dependencies that are imported in the codebase."
+        },
+        {
+          "path": "frontend/tsconfig.json",
+          "operation": "modify",
+          "description": "Review TypeScript configuration for proper compiler options, module resolution settings, and path mappings. Ensure strict mode settings are appropriate and lib includes necessary DOM types. Verify include/exclude patterns cover all source files correctly."
+        }
+      ]
+    },
+    {
+      "id": "REQ-72",
+      "summary": "Ensure html2canvas dependency is properly declared in package.json to support PNG export functionality",
+      "acceptanceCriteria": [
+        "html2canvas is listed in package.json dependencies",
+        "Package version is compatible with the project",
+        "Dependency installs without errors during npm install"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/package.json",
+          "operation": "modify",
+          "description": "Add or verify html2canvas dependency is present in the dependencies section with a compatible version (e.g., ^1.4.1). Ensure the package version is stable and supports the PNG export functionality used in the attack path canvas export feature."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Verify the html2canvas import statement is correct and the library is used properly in the export functionality. Ensure error handling is in place for cases where html2canvas fails to load or execute."
+        }
+      ]
+    },
+    {
+      "id": "REQ-74",
+      "summary": "Ensure all frontend asset paths and imports reference valid files and no broken imports or missing asset references exist",
+      "acceptanceCriteria": [
+        "All import statements reference existing files",
+        "Asset paths in components point to valid resources",
+        "No 404 errors for missing resources during build",
+        "Static assets are properly included in build output"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Update the mapping for the 'computer' IconType to reference the newly generated computer icon asset at frontend/public/assets/generated/computer-icon.dim_128x128.png instead of the existing icon-computer.dim_64x64.png. This replaces the current computer icon with a single computer icon image while maintaining backward compatibility with existing diagrams."
+          "description": "Review icon type to asset path mapping to ensure all referenced icon assets exist in the public/assets directory. Verify paths for generated icons including: frontend/public/assets/generated/icon-attacker.dim_64x64.png, frontend/public/assets/generated/icon-computer.dim_64x64.png, frontend/public/assets/generated/icon-domain.dim_64x64.png, frontend/public/assets/generated/icon-email.dim_64x64.png, frontend/public/assets/generated/icon-file.dim_64x64.png, frontend/public/assets/generated/icon-ip.dim_64x64.png, frontend/public/assets/generated/icon-server.dim_64x64.png, frontend/public/assets/generated/user-icon.dim_128x128.png, frontend/public/assets/generated/computer-icon.dim_128x128.png. Fix any incorrect paths or add fallback handling for missing assets."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Verify the hero banner image path references the correct generated asset at frontend/public/assets/generated/hero-banner.dim_1200x400.png. Ensure the image is properly imported or referenced as a static asset that will be included in the build output."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Review all component imports to ensure they reference existing files with correct paths. Check that route components, hook imports, and utility imports all resolve to valid files. Fix any broken import paths or missing files."
         },
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Update the computer icon displayed in the toolbar to use the newly generated computer icon asset at frontend/public/assets/generated/computer-icon.dim_128x128.png. Ensure the toolbar preview clearly shows a single computer and maintains visual consistency with other toolbar icons."
+          "description": "Verify all icon asset paths used in draggable toolbar items reference valid generated assets. Ensure paths for file type icons (exe-icon.dim_64x64.png, dll-icon.dim_64x64.png, script-icon.dim_64x64.png, excel-icon.dim_64x64.png, word-icon.dim_64x64.png) and other toolbar icons point to existing files in frontend/public/assets/generated/."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Verify the HTML entry point correctly references the main TypeScript module and any static assets. Ensure the script src attribute points to the correct entry file and that the root div id matches what React expects."
+        },
+        {
+          "path": "frontend/vite.config.ts",
+          "operation": "modify",
+          "description": "Review Vite configuration to ensure static asset handling is properly configured. Verify that the public directory is correctly set and that asset file patterns are included in the build. Ensure build output directory matches dfx.json frontend canister source configuration."
         }
       ]
     }

@@ -1,5 +1,5 @@
 {
-  "frontend/src/App.tsx": "Main application component with Internet Identity authentication, profile setup modal, and router setup protecting all routes behind login.",
+  "frontend/src/App.tsx": "Main application component with Internet Identity authentication, profile setup modal, and router setup protecting all routes behind login with proper default export.",
   "frontend/src/components/Layout.tsx": "Layout wrapper with header navigation, user profile display, login/logout button, hero banner, and footer.",
   "frontend/src/pages/ReportListPage.tsx": "Report listing page displaying all threat hunting reports in a table with view, PDF generation, and delete actions using navigate function for routing.",
   "frontend/src/pages/CreateReportPage.tsx": "Page component for creating new threat hunting reports with form submission handling for all fields including custom techniques and detailed sections.",
@@ -12,10 +12,10 @@
   "frontend/src/hooks/useQueries.ts": "React Query hooks for report operations with local DetailedReport type definitions since backend no longer supports report functionality.",
   "frontend/src/index.css": "Global styles with OKLCH color system using security-focused dark blue/teal palette for professional cybersecurity aesthetic.",
   "frontend/tailwind.config.js": "Tailwind configuration with security-themed color palette, custom fonts, and extended design tokens.",
-  "frontend/package.json": "Package configuration with html2canvas dependency added for PNG export functionality.",
+  "frontend/package.json": "Package configuration with html2canvas dependency added for PNG export functionality and proper build script including TypeScript compilation.",
   "frontend/src/types/jspdf.d.ts": "Type declaration file providing TypeScript definitions for jsPDF and jspdf-autotable modules.",
-  "frontend/src/pages/AttackPathPage.tsx": "Attack path visualization page with mode switching, save/load/clear dialogs, transform tool support, diagram state restoration with proper const assertions for type safety, and placeholder export message (html2canvas not available in package.json).",
-  "frontend/src/components/AttackPathToolbar.tsx": "Sidebar toolbar with draggable icons including new user icon, drawing tools, transform tool, text color picker, undo, and save/load/export/clear buttons for attack path diagrams.",
+  "frontend/src/pages/AttackPathPage.tsx": "Attack path visualization page with mode switching, save/load/clear dialogs, transform tool support, diagram state restoration, and export button that shows a toast message instructing users to use browser screenshot tools instead of html2canvas.",
+  "frontend/src/components/AttackPathToolbar.tsx": "Sidebar toolbar with draggable icons, drawing tools, transform tool, text color picker, undo, and save/load/export/clear buttons with proper IconType export.",
   "frontend/src/components/AttackPathIcon.tsx": "Reusable icon component rendering attack path elements with dynamic width and height props, including mappings for user icon and updated computer icon using new 128x128 assets, with built-in drag-and-drop functionality.",
   "frontend/src/components/AttackPathCanvas.tsx": "Interactive canvas supporting icon placement with resize, connections, drawing modes, eraser for icons/drawings/connections/text, text labels with rotation/resize, and free transform tool with visual handles for moving and resizing both icons and text labels with proper dimension updates including position adjustments for northwest/southwest/northeast handles.",
   "frontend/src/components/AttackPathConnector.tsx": "SVG-based connector component that renders directional arrows between placed icons with click-to-remove functionality.",
@@ -30,5 +30,9 @@
   "frontend/src/components/LoadDiagramDialog.tsx": "Dialog component displaying saved diagrams with names, metadata including accurate current date/time timestamps converted from nanoseconds, load functionality, and delete buttons with confirmation dialog using AlertDialog.",
   "frontend/src/components/SaveDiagramDialog.tsx": "Dialog component that prompts users to enter a name before saving their attack path diagram with validation and keyboard support.",
   "frontend/src/hooks/useGetAllDiagrams.ts": "React Query hook that fetches all saved diagrams from the backend using the getAllDiagrams method.",
-  "frontend/src/hooks/useDeleteDiagramState.ts": "React Query mutation hook for deleting saved diagrams by ID, invalidating the allDiagrams query on success."
+  "frontend/src/hooks/useDeleteDiagramState.ts": "React Query mutation hook for deleting saved diagrams by ID, invalidating the allDiagrams query on success.",
+  "frontend/tsconfig.json": "TypeScript configuration with proper compiler options, module resolution, path aliases, and strict type checking enabled for Internet Computer deployment.",
+  "frontend/vite.config.ts": "Vite build configuration with React plugin, environment variables, path aliases, proxy settings, and optimized build output for Internet Computer deployment.",
+  "frontend/index.html": "HTML entry point with proper meta tags, root div, and TypeScript module script reference for React application.",
+  "frontend/src/types/html2canvas.d.ts": "TypeScript type declarations for html2canvas library providing proper type definitions for the PNG export functionality."
 }
