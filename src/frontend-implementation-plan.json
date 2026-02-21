@@ -1,88 +1,111 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix load diagram interface and add text customization features",
+  "title": "Update attack path visualizer icons and arrow rotation",
   "requirements": [
     {
-      "id": "REQ-75",
-      "summary": "Fix the load diagram selection interface to accurately display saved diagrams and ensure correct diagram state loads when selected",
+      "id": "REQ-1",
+      "summary": "Replace the existing user icon with a man icon in the attack path elements section",
       "acceptanceCriteria": [
-        "The load diagram dialog displays all saved diagrams with accurate metadata",
-        "When a user clicks on a diagram in the selection interface, the correct diagram state loads onto the canvas",
-        "All diagram elements (icons, connections, drawings, text labels) restore accurately from the saved state",
-        "The selection interface provides clear visual feedback when a diagram is selected"
+        "The user icon in AttackPathToolbar is replaced with a man icon",
+        "The icon maintains consistent sizing with other attack path icons",
+        "The icon is accessible via the attack path elements toolbar"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Fix the diagram selection and loading logic to ensure accurate display of saved diagrams in the list. Update the click handler to properly load the selected diagram state including all icons, connections, freehand drawings, and text labels. Ensure metadata (icon count, connection count, last modified) displays correctly for each diagram. Add visual feedback (hover states, selection highlight) to improve user experience when selecting a diagram."
+          "description": "Update the icon type mapping to replace 'user' icon with the new man icon. Change the mapping from 'user-icon.dim_128x128.png' to 'man-icon.dim_128x128.png' while maintaining the same iconType identifier used in AttackPathToolbar."
         },
         {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Verify and fix the integration between LoadDiagramDialog and the canvas state restoration. Ensure that when a diagram is loaded via the dialog, the complete DiagramState (including textLabels array with fontSize property) is correctly passed to useAttackPathState and all elements render on the canvas. Test that the dialog's onLoad callback properly updates the canvas with icons, connections, drawings, and text labels from the selected diagram."
+          "description": "Update the draggable user icon element to reference the new man icon asset at frontend/public/assets/generated/man-icon.dim_128x128.png. Ensure the icon maintains the same draggable behavior and styling as other attack path element icons."
         }
       ]
     },
     {
-      "id": "REQ-76",
-      "summary": "Add font size control to the text tool that allows users to select a font size before placing text labels",
+      "id": "REQ-2",
+      "summary": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar",
       "acceptanceCriteria": [
-        "A font size selector is visible in the toolbar when the text tool is active",
-        "Users can choose from predefined font sizes (e.g., 12, 14, 16, 18, 20, 24, 28, 32, 36, 48)",
-        "The selected font size applies to text labels when placed on the canvas",
-        "The font size control is intuitive and clearly labeled"
+        "A new Multiple Users icon appears in the attack path elements toolbar",
+        "The icon can be dragged onto the canvas",
+        "The icon is stored and rendered correctly in the diagram state"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Add a new icon type mapping for 'multipleUsers' that points to frontend/public/assets/generated/multiple-users-icon.dim_128x128.png. Follow the same pattern as existing icon type mappings (e.g., 'user', 'computer', 'server')."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Add a new draggable Multiple Users icon element to the attack path elements section. The icon should use the 'multipleUsers' iconType identifier and reference the asset at frontend/public/assets/generated/multiple-users-icon.dim_128x128.png. Place it in the toolbar alongside other user-related icons following the existing drag-and-drop pattern."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar",
+      "acceptanceCriteria": [
+        "A new Multiple Computers icon appears in the attack path elements toolbar",
+        "The icon can be dragged onto the canvas",
+        "The icon is stored and rendered correctly in the diagram state"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Add a new icon type mapping for 'multipleComputers' that points to frontend/public/assets/generated/multiple-computers-icon.dim_128x128.png. Follow the same pattern as existing icon type mappings."
+        },
+        {
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "operation": "modify",
+          "description": "Add a new draggable Multiple Computers icon element to the attack path elements section. The icon should use the 'multipleComputers' iconType identifier and reference the asset at frontend/public/assets/generated/multiple-computers-icon.dim_128x128.png. Place it in the toolbar alongside other computer-related icons following the existing drag-and-drop pattern."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Enable click-and-drag rotation for arrows in the attack path visualizer",
+      "acceptanceCriteria": [
+        "Arrows can be selected by clicking on them",
+        "Selected arrows can be rotated by dragging",
+        "Arrow rotation state is preserved in the diagram state",
+        "Rotation feels natural and responsive during interaction"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Add rotation state tracking for connections/arrows in the diagram state. Include a rotation angle property (in degrees) for each connection. Add handlers for arrow selection (setSelectedArrow) and rotation updates (updateArrowRotation). Ensure rotation state is included in save/load operations and undo/redo history."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Add click detection for arrows to enable selection. Implement drag handlers that calculate rotation angle based on mouse position relative to the arrow's center point. Apply rotation transformations to the selected arrow during drag operations. Update the arrow's rotation state via useAttackPathState hooks on drag end. Provide visual feedback for selected arrows (e.g., highlight or control handles)."
+        },
+        {
+          "path": "frontend/src/components/AttackPathConnector.tsx",
+          "operation": "modify",
+          "description": "Add support for rendering arrows with rotation angles. Accept a rotation prop and apply SVG transform to rotate the arrow around its center point. Include visual selection state styling (e.g., thicker stroke, different color) when the arrow is selected. Ensure click events propagate to enable arrow selection in the canvas component."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Remove the 'Export as PNG' functionality from the attack path visualizer",
+      "acceptanceCriteria": [
+        "The 'Export as PNG' button is no longer visible in the toolbar",
+        "All related export functionality and dependencies are removed",
+        "No console errors or broken references remain"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Add a font size selector control to the toolbar that appears when the text tool is active. Implement a dropdown or button group displaying predefined font sizes (12, 14, 16, 18, 20, 24, 28, 32, 36, 48 pixels). Add state management for the currently selected font size and pass this value to the parent component via a new prop callback (e.g., onFontSizeChange). Position the font size selector near the text color picker for logical grouping. Use shadcn/ui Select component for the dropdown if appropriate."
-        },
-        {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
-          "operation": "modify",
-          "description": "Wire the font size selection from AttackPathToolbar to the useAttackPathState hook. Add state to track the selected font size and pass it down to AttackPathToolbar as a prop along with the change handler. Ensure the selected font size is passed to AttackPathCanvas so new text labels use the correct font size."
-        }
-      ]
-    },
-    {
-      "id": "REQ-77",
-      "summary": "Enable manual line breaks in text labels by allowing users to press Enter key to create new lines within text input",
-      "acceptanceCriteria": [
-        "When entering text for a label, pressing Enter creates a new line instead of submitting the text",
-        "Multi-line text labels display correctly on the canvas with proper line spacing",
-        "Line breaks are preserved when saving and loading diagrams",
-        "The text input interface provides clear visual indication of multi-line support"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Update the text input mechanism to support multi-line text entry. Change the text input from a single-line input element to a textarea that allows Enter key to create new lines. Implement a different submission mechanism (e.g., Shift+Enter, separate submit button, or click outside to finish). Update the text rendering logic to properly display multi-line text with correct line breaks and spacing using SVG text or HTML foreignObject. Ensure line breaks (\\n characters) are preserved in the textLabel content string. Add visual indication that multi-line entry is supported (e.g., placeholder text or helper text)."
-        },
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Verify that the TextLabel type and state management properly handle multi-line text content with newline characters. Ensure that when text labels are saved and loaded from the backend, newline characters are preserved. Update any text label creation or modification logic to correctly store the content field with line breaks intact."
-        }
-      ]
-    },
-    {
-      "id": "REQ-78",
-      "summary": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
-      "acceptanceCriteria": [
-        "The hook tracks the currently selected font size for the text tool",
-        "Newly placed text labels use the selected font size",
-        "Font size state persists while the text tool is active",
-        "The hook provides methods to update the font size selection"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Add state management for the currently selected font size (default to 16 pixels). Implement a setter function (e.g., setSelectedFontSize) that can be called from the parent component. Update the text label creation logic to use the selected font size when creating new TextLabel objects. Ensure the fontSize property on TextLabel matches the backend DiagramState interface (DiagramState.textLabels contains TextLabel with fontSize: number). Export the selected font size state and setter function so they can be used in AttackPathPage and passed to the toolbar."
+          "description": "Remove the 'Export as PNG' button from the toolbar. Remove any associated state, handlers, or event listeners related to PNG export functionality. Clean up any imports or references to html2canvas or related export libraries if they are no longer used elsewhere."
         }
       ]
     }

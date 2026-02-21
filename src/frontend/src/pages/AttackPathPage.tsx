@@ -34,12 +34,15 @@ export default function AttackPathPage() {
     setSelectedElementId,
     selectedElementType,
     setSelectedElementType,
+    selectedArrowId,
+    setSelectedArrowId,
     addIcon,
     moveIcon,
     resizeIcon,
     removeIcon,
     addConnection,
     removeConnection,
+    updateArrowRotation,
     addDrawing,
     removeDrawing,
     moveDrawing,
@@ -131,6 +134,7 @@ export default function AttackPathPage() {
         id: `conn-${Date.now()}-${Math.random()}`,
         sourceId: conn.sourceId,
         targetId: conn.targetId,
+        rotation: 0,
       })),
       drawings: [
         ...state.freehandDrawings.map((drawing) => ({
@@ -164,15 +168,13 @@ export default function AttackPathPage() {
     toast.success(`Diagram "${diagram.name}" loaded successfully`);
   };
 
-  const handleExport = () => {
-    toast.info('To export this diagram as PNG, please use your browser\'s screenshot tool or print to PDF feature.', {
-      duration: 5000,
-    });
-  };
-
-  const handleSelectElement = (id: string | null, type: 'icon' | 'text' | null) => {
+  const handleSelectElement = (id: string | null, type: 'icon' | 'text' | 'arrow' | null) => {
     setSelectedElementId(id);
     setSelectedElementType(type);
+  };
+
+  const handleSelectArrow = (id: string | null) => {
+    setSelectedArrowId(id);
   };
 
   return (
@@ -185,7 +187,6 @@ export default function AttackPathPage() {
           canUndo={canUndo}
           onSave={() => setSaveDialogOpen(true)}
           onLoad={() => setLoadDialogOpen(true)}
-          onExport={handleExport}
           onClear={() => setClearDialogOpen(true)}
           isSaving={saveMutation.isPending}
           textColor={textColor}
@@ -247,12 +248,14 @@ export default function AttackPathPage() {
           fontSize={fontSize}
           selectedElementId={selectedElementId}
           selectedElementType={selectedElementType}
+          selectedArrowId={selectedArrowId}
           onAddIcon={addIcon}
           onMoveIcon={moveIcon}
           onResizeIcon={resizeIcon}
           onRemoveIcon={removeIcon}
           onAddConnection={addConnection}
           onRemoveConnection={removeConnection}
+          onUpdateArrowRotation={updateArrowRotation}
           onAddDrawing={addDrawing}
           onRemoveDrawing={removeDrawing}
           onMoveDrawing={moveDrawing}
@@ -260,6 +263,7 @@ export default function AttackPathPage() {
           onRemoveTextLabel={removeTextLabel}
           onUpdateTextLabel={updateTextLabel}
           onSelectElement={handleSelectElement}
+          onSelectArrow={handleSelectArrow}
         />
       </div>
 

@@ -1,63 +1,78 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T01:08:46.414Z",
+  "generatedAt": "2026-02-21T02:18:40.531Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
-        "id": "REQ-75",
-        "summary": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
+        "id": "REQ-1",
+        "summary": "Replace the existing user icon with a man icon in the attack path elements section. The icon should follow the same dimension pattern as existing icons (64x64 or 128x128 PNG) and be placed in frontend/public/assets/.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/LoadDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/LoadDiagramDialog.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       },
       {
-        "id": "REQ-76",
-        "summary": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
+        "id": "REQ-2",
+        "summary": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       },
       {
-        "id": "REQ-77",
-        "summary": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
+        "id": "REQ-3",
+        "summary": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/components/AttackPathConnector.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/components/AttackPathConnector.tsx"
         ]
       },
       {
-        "id": "REQ-78",
-        "summary": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+        "id": "REQ-5",
+        "summary": "Remove the 'Export as PNG' functionality from the attack path visualizer. This includes removing the export button from AttackPathToolbar and any associated export logic.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       }
     ]
@@ -67,9 +82,13 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/public/assets/generated/man-icon.dim_128x128.png",
+    "frontend/public/assets/generated/multiple-computers-icon.dim_128x128.png",
+    "frontend/public/assets/generated/multiple-users-icon.dim_128x128.png",
     "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/components/AttackPathConnector.tsx",
+    "frontend/src/components/AttackPathIcon.tsx",
     "frontend/src/components/AttackPathToolbar.tsx",
-    "frontend/src/components/LoadDiagramDialog.tsx",
     "frontend/src/hooks/useAttackPathState.ts",
     "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json",

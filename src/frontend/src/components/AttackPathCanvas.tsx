@@ -19,20 +19,23 @@ interface AttackPathCanvasProps {
   textColor: string;
   fontSize: number;
   selectedElementId: string | null;
-  selectedElementType: 'icon' | 'text' | null;
+  selectedElementType: 'icon' | 'text' | 'arrow' | null;
+  selectedArrowId: string | null;
   onAddIcon: (type: IconType, x: number, y: number) => void;
   onMoveIcon: (id: string, x: number, y: number) => void;
   onResizeIcon: (id: string, width: number, height: number) => void;
   onRemoveIcon: (id: string) => void;
   onAddConnection: (sourceId: string, targetId: string) => void;
   onRemoveConnection: (id: string) => void;
+  onUpdateArrowRotation: (id: string, rotation: number) => void;
   onAddDrawing: (type: 'freehand' | 'line' | 'arrow', points: { x: number; y: number }[]) => void;
   onRemoveDrawing: (id: string) => void;
   onMoveDrawing: (id: string, offsetX: number, offsetY: number) => void;
   onAddTextLabel: (text: string, x: number, y: number, color: string, fontSize: number) => void;
   onRemoveTextLabel: (id: string) => void;
   onUpdateTextLabel: (id: string, updates: Partial<TextLabel>) => void;
-  onSelectElement: (id: string | null, type: 'icon' | 'text' | null) => void;
+  onSelectElement: (id: string | null, type: 'icon' | 'text' | 'arrow' | null) => void;
+  onSelectArrow: (id: string | null) => void;
 }
 
 export default function AttackPathCanvas({
@@ -46,12 +49,14 @@ export default function AttackPathCanvas({
   fontSize,
   selectedElementId,
   selectedElementType,
+  selectedArrowId,
   onAddIcon,
   onMoveIcon,
   onResizeIcon,
   onRemoveIcon,
   onAddConnection,
   onRemoveConnection,
+  onUpdateArrowRotation,
   onAddDrawing,
   onRemoveDrawing,
   onMoveDrawing,
@@ -59,6 +64,7 @@ export default function AttackPathCanvas({
   onRemoveTextLabel,
   onUpdateTextLabel,
   onSelectElement,
+  onSelectArrow,
 }: AttackPathCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [draggedIconId, setDraggedIconId] = useState<string | null>(null);
@@ -79,6 +85,8 @@ export default function AttackPathCanvas({
   const [rotationStart, setRotationStart] = useState({ x: 0, y: 0, rotation: 0 });
   const [transformTarget, setTransformTarget] = useState<{ id: string; type: 'icon' | 'text' } | null>(null);
   const [transformDragStart, setTransformDragStart] = useState({ x: 0, y: 0, elementX: 0, elementY: 0 });
+  const [isRotatingArrow, setIsRotatingArrow] = useState(false);
+  const [arrowRotationStart, setArrowRotationStart] = useState({ x: 0, y: 0, rotation: 0, centerX: 0, centerY: 0 });
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -172,6 +180,43 @@ export default function AttackPathCanvas({
     }
   };
 
+  const handleArrowClick = (arrowId: string) => {
+    if (activeDrawingTool === 'eraser') {
+      onRemoveConnection(arrowId);
+      return;
+    }
+
+    // Select arrow for rotation
+    onSelectArrow(arrowId);
+    onSelectElement(arrowId, 'arrow');
+  };
+
+  const handleArrowMouseDown = (e: React.MouseEvent, arrowId: string) => {
+    if (selectedArrowId === arrowId && !activeDrawingTool) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const connection = connections.find((c) => c.id === arrowId);
+      if (!connection) return;
+
+      const sourceIcon = placedIcons.find((i) => i.id === connection.sourceId);
+      const targetIcon = placedIcons.find((i) => i.id === connection.targetId);
+      if (!sourceIcon || !targetIcon) return;
+
+      const centerX = (sourceIcon.x + (sourceIcon.width || 48) / 2 + targetIcon.x + (targetIcon.width || 48) / 2) / 2;
+      const centerY = (sourceIcon.y + (sourceIcon.height || 48) / 2 + targetIcon.y + (targetIcon.height || 48) / 2) / 2;
+
+      setIsRotatingArrow(true);
+      setArrowRotationStart({
+        x: e.clientX,
+        y: e.clientY,
+        rotation: connection.rotation || 0,
+        centerX,
+        centerY,
+      });
+    }
+  };
+
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
     if (!canvasRef.current) return;
 
@@ -194,6 +239,21 @@ export default function AttackPathCanvas({
       } else if (transformTarget.type === 'text') {
         onUpdateTextLabel(transformTarget.id, { x: newX, y: newY });
       }
+    }
+
+    if (isRotatingArrow && selectedArrowId) {
+      const deltaX = e.clientX - arrowRotationStart.centerX;
+      const deltaY = e.clientY - arrowRotationStart.centerY;
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      
+      const startDeltaX = arrowRotationStart.x - arrowRotationStart.centerX;
+      const startDeltaY = arrowRotationStart.y - arrowRotationStart.centerY;
+      const startAngle = Math.atan2(startDeltaY, startDeltaX) * (180 / Math.PI);
+      
+      const rotationDelta = angle - startAngle;
+      const newRotation = arrowRotationStart.rotation + rotationDelta;
+      
+      onUpdateArrowRotation(selectedArrowId, newRotation);
     }
 
     if (resizeHandle) {
@@ -225,28 +285,6 @@ export default function AttackPathCanvas({
         if (newX !== resizeStart.elementX || newY !== resizeStart.elementY) {
           onMoveIcon(selectedElementId, newX, newY);
         }
-      } else if (selectedElementType === 'text' && selectedElementId) {
-        let newWidth = resizeStart.width;
-        let newHeight = resizeStart.height;
-        let newX = resizeStart.elementX;
-        let newY = resizeStart.elementY;
-
-        if (resizeHandle.includes('e')) {
-          newWidth = Math.max(50, resizeStart.width + deltaX);
-        }
-        if (resizeHandle.includes('w')) {
-          newWidth = Math.max(50, resizeStart.width - deltaX);
-          newX = resizeStart.elementX + deltaX;
-        }
-        if (resizeHandle.includes('s')) {
-          newHeight = Math.max(20, resizeStart.height + deltaY);
-        }
-        if (resizeHandle.includes('n')) {
-          newHeight = Math.max(20, resizeStart.height - deltaY);
-          newY = resizeStart.elementY + deltaY;
-        }
-
-        onUpdateTextLabel(selectedElementId, { width: newWidth, height: newHeight, x: newX, y: newY });
       }
     }
 
@@ -254,55 +292,51 @@ export default function AttackPathCanvas({
       const label = textLabels.find((l) => l.id === selectedElementId);
       if (!label) return;
 
-      const centerX = label.x + (label.width || 100) / 2;
-      const centerY = label.y + (label.height || 30) / 2;
+      const centerX = label.x;
+      const centerY = label.y;
 
-      const angle = Math.atan2(y - centerY, x - centerX);
-      const degrees = (angle * 180) / Math.PI;
+      const deltaX = e.clientX - rect.left - centerX;
+      const deltaY = e.clientY - rect.top - centerY;
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
 
-      onUpdateTextLabel(selectedElementId, { rotation: degrees });
+      const startDeltaX = rotationStart.x - centerX;
+      const startDeltaY = rotationStart.y - centerY;
+      const startAngle = Math.atan2(startDeltaY, startDeltaX) * (180 / Math.PI);
+
+      const rotationDelta = angle - startAngle;
+      const newRotation = rotationStart.rotation + rotationDelta;
+
+      onUpdateTextLabel(selectedElementId, { rotation: newRotation });
     }
 
     if (isDrawing && (activeDrawingTool === 'freehand' || activeDrawingTool === 'line' || activeDrawingTool === 'arrow')) {
-      setCurrentDrawingPoints((prev) => [...prev, { x, y }]);
+      if (activeDrawingTool === 'freehand') {
+        setCurrentDrawingPoints((prev) => [...prev, { x, y }]);
+      } else {
+        setCurrentDrawingPoints([currentDrawingPoints[0], { x, y }]);
+      }
     }
 
     if (isDraggingDrawing && selectedDrawingId) {
-      const deltaX = x - drawingDragStart.x;
-      const deltaY = y - drawingDragStart.y;
-      onMoveDrawing(selectedDrawingId, deltaX, deltaY);
-      setDrawingDragStart({ x, y });
+      const offsetX = e.clientX - drawingDragStart.x;
+      const offsetY = e.clientY - drawingDragStart.y;
+      onMoveDrawing(selectedDrawingId, offsetX, offsetY);
+      setDrawingDragStart({ x: e.clientX, y: e.clientY });
     }
   };
 
   const handleCanvasMouseUp = () => {
-    if (draggedIconId) {
-      setDraggedIconId(null);
-    }
-
-    if (transformTarget) {
-      setTransformTarget(null);
-    }
-
-    if (resizeHandle) {
-      setResizeHandle(null);
-    }
-
-    if (rotationHandle) {
-      setRotationHandle(null);
-    }
+    setDraggedIconId(null);
+    setTransformTarget(null);
+    setResizeHandle(null);
+    setRotationHandle(null);
+    setIsRotatingArrow(false);
 
     if (isDrawing && currentDrawingPoints.length > 0) {
-      if (activeDrawingTool === 'freehand') {
+      if (activeDrawingTool === 'freehand' && currentDrawingPoints.length > 1) {
         onAddDrawing('freehand', currentDrawingPoints);
-      } else if (activeDrawingTool === 'line' && currentDrawingPoints.length >= 2) {
-        const start = currentDrawingPoints[0];
-        const end = currentDrawingPoints[currentDrawingPoints.length - 1];
-        onAddDrawing('line', [start, end]);
-      } else if (activeDrawingTool === 'arrow' && currentDrawingPoints.length >= 2) {
-        const start = currentDrawingPoints[0];
-        const end = currentDrawingPoints[currentDrawingPoints.length - 1];
-        onAddDrawing('arrow', [start, end]);
+      } else if ((activeDrawingTool === 'line' || activeDrawingTool === 'arrow') && currentDrawingPoints.length === 2) {
+        onAddDrawing(activeDrawingTool, currentDrawingPoints);
       }
       setIsDrawing(false);
       setCurrentDrawingPoints([]);
@@ -321,6 +355,12 @@ export default function AttackPathCanvas({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    // Deselect arrow if clicking on canvas
+    if (selectedArrowId && !isRotatingArrow) {
+      onSelectArrow(null);
+      onSelectElement(null, null);
+    }
+
     if (activeDrawingTool === 'text') {
       setTextDialogPosition({ x, y });
       setTextDialogOpen(true);
@@ -332,39 +372,34 @@ export default function AttackPathCanvas({
       setCurrentDrawingPoints([{ x, y }]);
     }
 
-    if (activeDrawingTool === 'transform') {
-      onSelectElement(null, null);
-    }
-  };
-
-  const handleDrawingMouseDown = (e: React.MouseEvent, drawingId: string) => {
     if (activeDrawingTool === 'eraser') {
-      e.preventDefault();
-      e.stopPropagation();
-      onRemoveDrawing(drawingId);
-      return;
+      // Check if clicking on a drawing
+      const clickedDrawing = drawings.find((drawing) => {
+        return drawing.points.some((point) => {
+          const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+          return distance < 10;
+        });
+      });
+
+      if (clickedDrawing) {
+        onRemoveDrawing(clickedDrawing.id);
+      }
     }
 
     if (activeDrawingTool === 'transform') {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!canvasRef.current) return;
+      // Check if clicking on a drawing
+      const clickedDrawing = drawings.find((drawing) => {
+        return drawing.points.some((point) => {
+          const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+          return distance < 10;
+        });
+      });
 
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      setSelectedDrawingId(drawingId);
-      setIsDraggingDrawing(true);
-      setDrawingDragStart({ x, y });
-    }
-  };
-
-  const handleTextSubmit = () => {
-    if (textInput.trim()) {
-      onAddTextLabel(textInput, textDialogPosition.x, textDialogPosition.y, textColor, fontSize);
-      setTextInput('');
-      setTextDialogOpen(false);
+      if (clickedDrawing) {
+        setSelectedDrawingId(clickedDrawing.id);
+        setIsDraggingDrawing(true);
+        setDrawingDragStart({ x: e.clientX, y: e.clientY });
+      }
     }
   };
 
@@ -385,19 +420,6 @@ export default function AttackPathCanvas({
         elementX: icon.x,
         elementY: icon.y,
       });
-    } else if (selectedElementType === 'text' && selectedElementId) {
-      const label = textLabels.find((l) => l.id === selectedElementId);
-      if (!label) return;
-
-      setResizeHandle(handle);
-      setResizeStart({
-        x: e.clientX,
-        y: e.clientY,
-        width: label.width || 100,
-        height: label.height || 30,
-        elementX: label.x,
-        elementY: label.y,
-      });
     }
   };
 
@@ -407,19 +429,28 @@ export default function AttackPathCanvas({
 
     if (selectedElementType === 'text' && selectedElementId) {
       const label = textLabels.find((l) => l.id === selectedElementId);
-      if (!label) return;
+      if (!label || !canvasRef.current) return;
 
-      setRotationHandle(selectedElementId);
+      const rect = canvasRef.current.getBoundingClientRect();
+      setRotationHandle('rotate');
       setRotationStart({
-        x: e.clientX,
-        y: e.clientY,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
         rotation: label.rotation || 0,
       });
     }
   };
 
+  const handleTextSubmit = () => {
+    if (textInput.trim()) {
+      onAddTextLabel(textInput, textDialogPosition.x, textDialogPosition.y, textColor, fontSize);
+      setTextInput('');
+      setTextDialogOpen(false);
+    }
+  };
+
   const renderTransformHandles = () => {
-    if (!selectedElementId || !selectedElementType || activeDrawingTool !== 'transform') return null;
+    if (!selectedElementId || activeDrawingTool !== 'transform') return null;
 
     if (selectedElementType === 'icon') {
       const icon = placedIcons.find((i) => i.id === selectedElementId);
@@ -427,102 +458,79 @@ export default function AttackPathCanvas({
 
       const width = icon.width || 48;
       const height = icon.height || 48;
+      const handleSize = 8;
 
       return (
         <div
+          className="absolute border-2 border-blue-500 pointer-events-none"
           style={{
-            position: 'absolute',
             left: icon.x,
             top: icon.y,
             width,
             height,
-            border: '2px solid #3B82F6',
-            pointerEvents: 'none',
           }}
         >
-          {['nw', 'ne', 'sw', 'se'].map((handle) => (
-            <div
-              key={handle}
-              onMouseDown={(e) => handleResizeHandleMouseDown(e, handle)}
-              style={{
-                position: 'absolute',
-                width: 10,
-                height: 10,
-                backgroundColor: '#3B82F6',
-                border: '2px solid white',
-                borderRadius: '50%',
-                pointerEvents: 'auto',
-                cursor: `${handle}-resize`,
-                ...(handle === 'nw' && { top: -5, left: -5 }),
-                ...(handle === 'ne' && { top: -5, right: -5 }),
-                ...(handle === 'sw' && { bottom: -5, left: -5 }),
-                ...(handle === 'se' && { bottom: -5, right: -5 }),
-              }}
-            />
-          ))}
+          {/* Resize handles */}
+          {['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((handle) => {
+            let style: React.CSSProperties = {
+              position: 'absolute',
+              width: handleSize,
+              height: handleSize,
+              backgroundColor: 'white',
+              border: '2px solid #3b82f6',
+              cursor: `${handle}-resize`,
+              pointerEvents: 'all',
+            };
+
+            if (handle.includes('n')) style.top = -handleSize / 2;
+            if (handle.includes('s')) style.bottom = -handleSize / 2;
+            if (handle.includes('w')) style.left = -handleSize / 2;
+            if (handle.includes('e')) style.right = -handleSize / 2;
+            if (handle === 'n' || handle === 's') style.left = `calc(50% - ${handleSize / 2}px)`;
+            if (handle === 'w' || handle === 'e') style.top = `calc(50% - ${handleSize / 2}px)`;
+
+            return (
+              <div
+                key={handle}
+                style={style}
+                onMouseDown={(e) => handleResizeHandleMouseDown(e, handle)}
+              />
+            );
+          })}
         </div>
       );
-    } else if (selectedElementType === 'text') {
+    }
+
+    if (selectedElementType === 'text') {
       const label = textLabels.find((l) => l.id === selectedElementId);
       if (!label) return null;
 
-      const width = label.width || 100;
-      const height = label.height || 30;
+      const handleSize = 8;
+      const rotationHandleDistance = 30;
 
       return (
         <div
+          className="absolute pointer-events-none"
           style={{
-            position: 'absolute',
-            left: label.x,
-            top: label.y,
-            width,
-            height,
-            border: '2px solid #3B82F6',
-            pointerEvents: 'none',
-            transform: `rotate(${label.rotation || 0}deg)`,
-            transformOrigin: 'center',
+            left: label.x - 20,
+            top: label.y - 20,
+            width: 40,
+            height: 40,
           }}
         >
-          {['nw', 'ne', 'sw', 'se'].map((handle) => (
-            <div
-              key={handle}
-              onMouseDown={(e) => handleResizeHandleMouseDown(e, handle)}
-              style={{
-                position: 'absolute',
-                width: 10,
-                height: 10,
-                backgroundColor: '#3B82F6',
-                border: '2px solid white',
-                borderRadius: '50%',
-                pointerEvents: 'auto',
-                cursor: `${handle}-resize`,
-                ...(handle === 'nw' && { top: -5, left: -5 }),
-                ...(handle === 'ne' && { top: -5, right: -5 }),
-                ...(handle === 'sw' && { bottom: -5, left: -5 }),
-                ...(handle === 'se' && { bottom: -5, right: -5 }),
-              }}
-            />
-          ))}
+          {/* Rotation handle */}
           <div
-            onMouseDown={handleRotationHandleMouseDown}
+            className="absolute bg-green-500 rounded-full cursor-pointer pointer-events-all"
             style={{
-              position: 'absolute',
-              top: -30,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 20,
-              height: 20,
-              backgroundColor: '#10B981',
-              border: '2px solid white',
-              borderRadius: '50%',
-              pointerEvents: 'auto',
-              cursor: 'grab',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: handleSize,
+              height: handleSize,
+              left: `calc(50% - ${handleSize / 2}px)`,
+              top: -rotationHandleDistance,
             }}
+            onMouseDown={handleRotationHandleMouseDown}
+            title="Rotate"
           >
-            <RotateCw className="h-3 w-3 text-white" />
+            <RotateCw className="w-3 h-3 text-white" style={{ marginLeft: '-2px', marginTop: '-2px' }} />
           </div>
         </div>
       );
@@ -532,190 +540,237 @@ export default function AttackPathCanvas({
   };
 
   return (
-    <>
-      <div
-        ref={canvasRef}
-        className="flex-1 bg-muted/20 relative overflow-hidden"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onMouseMove={handleCanvasMouseMove}
-        onMouseUp={handleCanvasMouseUp}
-        onMouseDown={handleCanvasMouseDown}
-        style={{ cursor: activeDrawingTool === 'text' ? 'text' : activeDrawingTool ? 'crosshair' : 'default' }}
-      >
-        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-          {connections.map((conn) => {
-            const source = placedIcons.find((icon) => icon.id === conn.sourceId);
-            const target = placedIcons.find((icon) => icon.id === conn.targetId);
-            if (!source || !target) return null;
-
-            return (
-              <AttackPathConnector
-                key={conn.id}
-                id={conn.id}
-                sourceX={source.x + (source.width || 48) / 2}
-                sourceY={source.y + (source.height || 48) / 2}
-                targetX={target.x + (target.width || 48) / 2}
-                targetY={target.y + (target.height || 48) / 2}
-                onClick={onRemoveConnection}
-              />
-            );
-          })}
-
-          {drawings.map((drawing) => {
-            if (drawing.type === 'freehand') {
-              const pathData = drawing.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-              return (
-                <path
-                  key={drawing.id}
-                  d={pathData}
-                  stroke="#000000"
-                  strokeWidth={2}
-                  fill="none"
-                  style={{ pointerEvents: 'stroke', cursor: activeDrawingTool === 'eraser' ? 'pointer' : 'default' }}
-                  onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)}
-                />
-              );
-            } else if (drawing.type === 'line' && drawing.points.length >= 2) {
-              const start = drawing.points[0];
-              const end = drawing.points[1];
-              return (
-                <line
-                  key={drawing.id}
-                  x1={start.x}
-                  y1={start.y}
-                  x2={end.x}
-                  y2={end.y}
-                  stroke="#000000"
-                  strokeWidth={2}
-                  style={{ pointerEvents: 'stroke', cursor: activeDrawingTool === 'eraser' ? 'pointer' : 'default' }}
-                  onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)}
-                />
-              );
-            } else if (drawing.type === 'arrow' && drawing.points.length >= 2) {
-              const start = drawing.points[0];
-              const end = drawing.points[1];
-              const angle = Math.atan2(end.y - start.y, end.x - start.x);
-              const arrowSize = 10;
-
-              return (
-                <g key={drawing.id}>
-                  <line
-                    x1={start.x}
-                    y1={start.y}
-                    x2={end.x}
-                    y2={end.y}
-                    stroke="#000000"
-                    strokeWidth={2}
-                    style={{ pointerEvents: 'stroke', cursor: activeDrawingTool === 'eraser' ? 'pointer' : 'default' }}
-                    onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)}
-                  />
-                  <polygon
-                    points={`0,-${arrowSize / 2} ${arrowSize},0 0,${arrowSize / 2}`}
-                    fill="#000000"
-                    transform={`translate(${end.x}, ${end.y}) rotate(${(angle * 180) / Math.PI})`}
-                    style={{ pointerEvents: 'auto', cursor: activeDrawingTool === 'eraser' ? 'pointer' : 'default' }}
-                    onMouseDown={(e) => handleDrawingMouseDown(e, drawing.id)}
-                  />
-                </g>
-              );
-            }
-            return null;
-          })}
-
-          {isDrawing && currentDrawingPoints.length > 0 && (
-            <>
-              {activeDrawingTool === 'freehand' && (
-                <path
-                  d={currentDrawingPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')}
-                  stroke="#000000"
-                  strokeWidth={2}
-                  fill="none"
-                  opacity={0.5}
-                />
-              )}
-              {(activeDrawingTool === 'line' || activeDrawingTool === 'arrow') && currentDrawingPoints.length >= 2 && (
-                <>
-                  <line
-                    x1={currentDrawingPoints[0].x}
-                    y1={currentDrawingPoints[0].y}
-                    x2={currentDrawingPoints[currentDrawingPoints.length - 1].x}
-                    y2={currentDrawingPoints[currentDrawingPoints.length - 1].y}
-                    stroke="#000000"
-                    strokeWidth={2}
-                    opacity={0.5}
-                  />
-                  {activeDrawingTool === 'arrow' && (
-                    <polygon
-                      points={`0,-5 10,0 0,5`}
-                      fill="#000000"
-                      opacity={0.5}
-                      transform={`translate(${currentDrawingPoints[currentDrawingPoints.length - 1].x}, ${
-                        currentDrawingPoints[currentDrawingPoints.length - 1].y
-                      }) rotate(${
-                        (Math.atan2(
-                          currentDrawingPoints[currentDrawingPoints.length - 1].y - currentDrawingPoints[0].y,
-                          currentDrawingPoints[currentDrawingPoints.length - 1].x - currentDrawingPoints[0].x
-                        ) *
-                          180) /
-                        Math.PI
-                      })`}
-                    />
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </svg>
-
-        {placedIcons.map((icon) => (
-          <div
-            key={icon.id}
-            style={{
-              position: 'absolute',
-              left: icon.x,
-              top: icon.y,
-              cursor: mode === 'place' ? 'move' : mode === 'connect' ? 'pointer' : 'default',
-            }}
-            onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
+    <div
+      ref={canvasRef}
+      className="flex-1 relative bg-white overflow-hidden"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onMouseDown={handleCanvasMouseDown}
+      onMouseMove={handleCanvasMouseMove}
+      onMouseUp={handleCanvasMouseUp}
+      onMouseLeave={handleCanvasMouseUp}
+    >
+      {/* SVG Layer for connections and drawings */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+        <defs>
+          <marker
+            id="arrowhead"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
           >
-            <AttackPathIcon type={icon.type} width={icon.width} height={icon.height} />
-          </div>
-        ))}
+            <polygon points="0 0, 10 3, 0 6" fill="oklch(0.65 0.18 150)" />
+          </marker>
+        </defs>
 
-        {textLabels.map((label) => {
-          const lines = label.text.split('\n');
+        {/* Render connections */}
+        {connections.map((connection) => {
+          const sourceIcon = placedIcons.find((icon) => icon.id === connection.sourceId);
+          const targetIcon = placedIcons.find((icon) => icon.id === connection.targetId);
+
+          if (!sourceIcon || !targetIcon) return null;
+
+          const sourceX = sourceIcon.x + (sourceIcon.width || 48) / 2;
+          const sourceY = sourceIcon.y + (sourceIcon.height || 48) / 2;
+          const targetX = targetIcon.x + (targetIcon.width || 48) / 2;
+          const targetY = targetIcon.y + (targetIcon.height || 48) / 2;
+
           return (
-            <div
-              key={label.id}
-              style={{
-                position: 'absolute',
-                left: label.x,
-                top: label.y,
-                color: label.color,
-                fontSize: label.fontSize || 16,
-                fontWeight: 'bold',
-                cursor: activeDrawingTool === 'transform' ? 'move' : activeDrawingTool === 'eraser' ? 'pointer' : 'default',
-                userSelect: 'none',
-                whiteSpace: 'pre-wrap',
-                transform: `rotate(${label.rotation || 0}deg)`,
-                transformOrigin: 'top left',
-                width: label.width || 'auto',
-                height: label.height || 'auto',
-                overflow: 'visible',
+            <g
+              key={connection.id}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                handleArrowMouseDown(e as any, connection.id);
               }}
-              onMouseDown={(e) => handleTextLabelMouseDown(e, label.id)}
             >
-              {lines.map((line, index) => (
-                <div key={index}>{line}</div>
-              ))}
-            </div>
+              <AttackPathConnector
+                id={connection.id}
+                sourceX={sourceX}
+                sourceY={sourceY}
+                targetX={targetX}
+                targetY={targetY}
+                rotation={connection.rotation}
+                isSelected={selectedArrowId === connection.id}
+                onClick={handleArrowClick}
+              />
+            </g>
           );
         })}
 
-        {renderTransformHandles()}
-      </div>
+        {/* Render drawings */}
+        {drawings.map((drawing) => {
+          if (drawing.type === 'freehand') {
+            const pathData = drawing.points.map((point, index) => {
+              return `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`;
+            }).join(' ');
 
+            return (
+              <path
+                key={drawing.id}
+                d={pathData}
+                stroke={drawing.color || '#000000'}
+                strokeWidth={drawing.strokeWidth || 2}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            );
+          } else if (drawing.type === 'line' && drawing.points.length === 2) {
+            return (
+              <line
+                key={drawing.id}
+                x1={drawing.points[0].x}
+                y1={drawing.points[0].y}
+                x2={drawing.points[1].x}
+                y2={drawing.points[1].y}
+                stroke={drawing.color || '#000000'}
+                strokeWidth={drawing.strokeWidth || 2}
+              />
+            );
+          } else if (drawing.type === 'arrow' && drawing.points.length === 2) {
+            const angle = Math.atan2(
+              drawing.points[1].y - drawing.points[0].y,
+              drawing.points[1].x - drawing.points[0].x
+            );
+            const arrowSize = 10;
+            const arrowPoint1X = drawing.points[1].x - arrowSize * Math.cos(angle - Math.PI / 6);
+            const arrowPoint1Y = drawing.points[1].y - arrowSize * Math.sin(angle - Math.PI / 6);
+            const arrowPoint2X = drawing.points[1].x - arrowSize * Math.cos(angle + Math.PI / 6);
+            const arrowPoint2Y = drawing.points[1].y - arrowSize * Math.sin(angle + Math.PI / 6);
+
+            return (
+              <g key={drawing.id}>
+                <line
+                  x1={drawing.points[0].x}
+                  y1={drawing.points[0].y}
+                  x2={drawing.points[1].x}
+                  y2={drawing.points[1].y}
+                  stroke={drawing.color || '#000000'}
+                  strokeWidth={drawing.strokeWidth || 2}
+                />
+                <polygon
+                  points={`${drawing.points[1].x},${drawing.points[1].y} ${arrowPoint1X},${arrowPoint1Y} ${arrowPoint2X},${arrowPoint2Y}`}
+                  fill={drawing.color || '#000000'}
+                />
+              </g>
+            );
+          }
+          return null;
+        })}
+
+        {/* Render current drawing */}
+        {isDrawing && currentDrawingPoints.length > 0 && (
+          <>
+            {activeDrawingTool === 'freehand' && (
+              <path
+                d={currentDrawingPoints.map((point, index) => {
+                  return `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`;
+                }).join(' ')}
+                stroke={textColor}
+                strokeWidth={2}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+            {(activeDrawingTool === 'line' || activeDrawingTool === 'arrow') && currentDrawingPoints.length === 2 && (
+              <>
+                <line
+                  x1={currentDrawingPoints[0].x}
+                  y1={currentDrawingPoints[0].y}
+                  x2={currentDrawingPoints[1].x}
+                  y2={currentDrawingPoints[1].y}
+                  stroke={textColor}
+                  strokeWidth={2}
+                />
+                {activeDrawingTool === 'arrow' && (
+                  <>
+                    {(() => {
+                      const angle = Math.atan2(
+                        currentDrawingPoints[1].y - currentDrawingPoints[0].y,
+                        currentDrawingPoints[1].x - currentDrawingPoints[0].x
+                      );
+                      const arrowSize = 10;
+                      const arrowPoint1X = currentDrawingPoints[1].x - arrowSize * Math.cos(angle - Math.PI / 6);
+                      const arrowPoint1Y = currentDrawingPoints[1].y - arrowSize * Math.sin(angle - Math.PI / 6);
+                      const arrowPoint2X = currentDrawingPoints[1].x - arrowSize * Math.cos(angle + Math.PI / 6);
+                      const arrowPoint2Y = currentDrawingPoints[1].y - arrowSize * Math.sin(angle + Math.PI / 6);
+
+                      return (
+                        <polygon
+                          points={`${currentDrawingPoints[1].x},${currentDrawingPoints[1].y} ${arrowPoint1X},${arrowPoint1Y} ${arrowPoint2X},${arrowPoint2Y}`}
+                          fill={textColor}
+                        />
+                      );
+                    })()}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        )}
+
+        {/* Connecting line preview */}
+        {mode === 'connect' && connectingFrom && selectedIcon && (
+          <line
+            x1={placedIcons.find((i) => i.id === connectingFrom)!.x + 24}
+            y1={placedIcons.find((i) => i.id === connectingFrom)!.y + 24}
+            x2={placedIcons.find((i) => i.id === connectingFrom)!.x + 24}
+            y2={placedIcons.find((i) => i.id === connectingFrom)!.y + 24}
+            stroke="oklch(0.65 0.18 150)"
+            strokeWidth="2"
+            strokeDasharray="5,5"
+          />
+        )}
+      </svg>
+
+      {/* Icons Layer */}
+      {placedIcons.map((icon) => (
+        <div
+          key={icon.id}
+          className={`absolute cursor-move ${selectedIcon === icon.id ? 'ring-2 ring-blue-500' : ''}`}
+          style={{
+            left: icon.x,
+            top: icon.y,
+            width: icon.width || 48,
+            height: icon.height || 48,
+            zIndex: 2,
+          }}
+          onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
+        >
+          <AttackPathIcon type={icon.type} width={icon.width || 48} height={icon.height || 48} />
+        </div>
+      ))}
+
+      {/* Text Labels Layer */}
+      {textLabels.map((label) => (
+        <div
+          key={label.id}
+          className="absolute cursor-move select-none"
+          style={{
+            left: label.x,
+            top: label.y,
+            color: label.color,
+            fontSize: `${label.fontSize || 16}px`,
+            fontWeight: label.fontWeight || 'normal',
+            transform: `rotate(${label.rotation || 0}deg)`,
+            transformOrigin: 'top left',
+            zIndex: 3,
+            whiteSpace: 'pre-wrap',
+          }}
+          onMouseDown={(e) => handleTextLabelMouseDown(e, label.id)}
+        >
+          {label.text}
+        </div>
+      ))}
+
+      {/* Transform handles */}
+      {renderTransformHandles()}
+
+      {/* Text input dialog */}
       <Dialog open={textDialogOpen} onOpenChange={setTextDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -723,25 +778,19 @@ export default function AttackPathCanvas({
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="text-input">Text (Press Enter for new line, Shift+Enter to submit)</Label>
+              <Label htmlFor="text-input">Text</Label>
               <Textarea
                 id="text-input"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Enter your text here..."
+                rows={4}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.shiftKey) {
-                    e.preventDefault();
+                  if (e.key === 'Enter' && e.ctrlKey) {
                     handleTextSubmit();
                   }
                 }}
-                placeholder="Enter text here..."
-                className="mt-2"
-                rows={4}
-                autoFocus
               />
-              <p className="text-xs text-muted-foreground mt-2">
-                Press Enter to create a new line. Press Shift+Enter to submit.
-              </p>
             </div>
           </div>
           <DialogFooter>
@@ -752,6 +801,6 @@ export default function AttackPathCanvas({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

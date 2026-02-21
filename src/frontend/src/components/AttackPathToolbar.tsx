@@ -1,17 +1,19 @@
 import AttackPathIcon from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Download, Move, Trash2 } from 'lucide-react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2 } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user';
+export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user' | 'multipleUsers' | 'multipleComputers';
 
 const iconTypes: { type: IconType; label: string }[] = [
-  { type: 'user', label: 'User' },
+  { type: 'user', label: 'Man' },
+  { type: 'multipleUsers', label: 'Multiple Users' },
   { type: 'email', label: 'Email' },
   { type: 'attacker', label: 'Attacker' },
   { type: 'computer', label: 'Computer' },
+  { type: 'multipleComputers', label: 'Multiple Computers' },
   { type: 'server', label: 'Server' },
   { type: 'domain', label: 'Domain' },
   { type: 'fileFolder', label: 'File/Folder' },
@@ -33,7 +35,6 @@ interface AttackPathToolbarProps {
   canUndo: boolean;
   onSave: () => void;
   onLoad: () => void;
-  onExport: () => void;
   onClear: () => void;
   isSaving: boolean;
   textColor: string;
@@ -49,7 +50,6 @@ export default function AttackPathToolbar({
   canUndo,
   onSave,
   onLoad,
-  onExport,
   onClear,
   isSaving,
   textColor,
@@ -216,15 +216,6 @@ export default function AttackPathToolbar({
         >
           <FolderOpen className="h-4 w-4 mr-2" />
           Load Diagram
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={onExport}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export as PNG
         </Button>
         <Button
           variant="destructive"

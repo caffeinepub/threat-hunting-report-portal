@@ -8,18 +8,24 @@ export interface PlacedIcon {
   y: number;
   width?: number;
   height?: number;
+  name?: string;
 }
 
 export interface Connection {
   id: string;
   sourceId: string;
   targetId: string;
+  color?: string;
+  rotation?: number;
 }
 
 export interface DrawingPath {
   id: string;
   type: 'freehand' | 'line' | 'arrow';
   points: { x: number; y: number }[];
+  color?: string;
+  strokeWidth?: number;
+  rotation?: number;
 }
 
 export interface TextLabel {
@@ -29,6 +35,7 @@ export interface TextLabel {
   y: number;
   color: string;
   fontSize?: number;
+  fontWeight?: string;
   rotation?: number;
   width?: number;
   height?: number;
@@ -53,7 +60,8 @@ export function useAttackPathState() {
   const [fontSize, setFontSize] = useState<number>(16);
   const [history, setHistory] = useState<AttackPathState[]>([]);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
-  const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | null>(null);
+  const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | 'arrow' | null>(null);
+  const [selectedArrowId, setSelectedArrowId] = useState<string | null>(null);
   const maxHistorySize = 50;
 
   const saveToHistory = () => {
@@ -134,6 +142,8 @@ export function useAttackPathState() {
         id: `conn-${Date.now()}-${Math.random()}`,
         sourceId,
         targetId,
+        color: 'oklch(0.65 0.18 150)',
+        rotation: 0,
       };
       setConnections((prev) => [...prev, newConnection]);
     }
@@ -144,12 +154,21 @@ export function useAttackPathState() {
     setConnections((prev) => prev.filter((conn) => conn.id !== id));
   };
 
+  const updateArrowRotation = (id: string, rotation: number) => {
+    setConnections((prev) =>
+      prev.map((conn) => (conn.id === id ? { ...conn, rotation } : conn))
+    );
+  };
+
   const addDrawing = (type: 'freehand' | 'line' | 'arrow', points: { x: number; y: number }[]) => {
     saveToHistory();
     const newDrawing: DrawingPath = {
       id: `drawing-${Date.now()}-${Math.random()}`,
       type,
       points,
+      color: textColor,
+      strokeWidth: 2,
+      rotation: 0,
     };
     setDrawings((prev) => [...prev, newDrawing]);
   };
@@ -185,6 +204,7 @@ export function useAttackPathState() {
       y,
       color,
       fontSize,
+      fontWeight: 'normal',
       rotation: 0,
       width: undefined,
       height: undefined,
@@ -234,12 +254,15 @@ export function useAttackPathState() {
     setSelectedElementId,
     selectedElementType,
     setSelectedElementType,
+    selectedArrowId,
+    setSelectedArrowId,
     addIcon,
     moveIcon,
     resizeIcon,
     removeIcon,
     addConnection,
     removeConnection,
+    updateArrowRotation,
     addDrawing,
     removeDrawing,
     moveDrawing,

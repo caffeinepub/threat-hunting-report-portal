@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-load-diagram-selection-interface-in-loaddiagramdialog-tsx-to-accurately-display-saved-diagrams-and-ensure-the-correct-diagram-state-loads-when-a-user-selects-a-diagram-from-the-list",
-      "featureTitle": "Fix the load diagram selection interface in LoadDiagramDialog.tsx to accurately display saved diagrams and ensure the correct diagram state loads when a user selects a diagram from the list",
+      "featureId": "feature-replace-the-existing-user-icon-with-a-man-icon-in-the-attack-path-elements-section-the-icon-should-follow-the-same-dimension-pattern-as-existing-icons-64x64-or-128x128-png-and-be-placed-in-frontend-public-assets",
+      "featureTitle": "Replace the existing user icon with a man icon in the attack path elements section. The icon should follow the same dimension pattern as existing icons (64x64 or 128x128 PNG) and be placed in frontend/public/assets/.",
       "files": [
-        "frontend/src/components/LoadDiagramDialog.tsx",
-        "frontend/src/pages/AttackPathPage.tsx"
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,16 +18,16 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-75"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-font-size-control-to-the-text-tool-in-attackpathtoolbar-tsx-that-allows-users-to-select-a-font-size-before-placing-text-labels-on-the-canvas",
-      "featureTitle": "Add font size control to the text tool in AttackPathToolbar.tsx that allows users to select a font size before placing text labels on the canvas",
+      "featureId": "feature-add-a-multiple-users-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
+      "featureTitle": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
       "files": [
-        "frontend/src/components/AttackPathToolbar.tsx",
-        "frontend/src/pages/AttackPathPage.tsx"
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -39,15 +39,37 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-76"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-enable-manual-line-breaks-in-text-labels-in-attackpathcanvas-tsx-by-allowing-users-to-press-enter-key-to-create-new-lines-within-text-input",
-      "featureTitle": "Enable manual line breaks in text labels in AttackPathCanvas.tsx by allowing users to press Enter key to create new lines within text input",
+      "featureId": "feature-add-a-multiple-computers-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
+      "featureTitle": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
+      "files": [
+        "frontend/src/components/AttackPathIcon.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-enable-click-and-drag-rotation-for-arrows-in-the-attack-path-visualizer-users-should-be-able-to-click-on-an-arrow-and-drag-to-freely-rotate-it-around-its-connection-points",
+      "featureTitle": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
       "files": [
         "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/components/AttackPathConnector.tsx",
         "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
@@ -60,15 +82,15 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-77"
+        "REQ-4"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-useattackpathstate-hook-to-manage-font-size-state-for-text-labels-and-pass-the-selected-font-size-to-newly-created-text-elements",
-      "featureTitle": "Update the useAttackPathState hook to manage font size state for text labels and pass the selected font size to newly created text elements",
+      "featureId": "feature-remove-the-export-as-png-functionality-from-the-attack-path-visualizer-this-includes-removing-the-export-button-from-attackpathtoolbar-and-any-associated-export-logic",
+      "featureTitle": "Remove the 'Export as PNG' functionality from the attack path visualizer. This includes removing the export button from AttackPathToolbar and any associated export logic.",
       "files": [
-        "frontend/src/hooks/useAttackPathState.ts"
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -80,7 +102,7 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-78"
+        "REQ-5"
       ],
       "confidence": "high"
     }

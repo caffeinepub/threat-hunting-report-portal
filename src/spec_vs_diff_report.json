@@ -1,16 +1,26 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T01:08:46.410Z",
-  "summary": "All four requirements (REQ-75, REQ-76, REQ-77, REQ-78) appear to be implemented in the diff. The LoadDiagramDialog displays diagrams with metadata and handles selection with visual feedback. AttackPathToolbar includes a font size selector with predefined sizes. AttackPathCanvas uses a Textarea for multi-line text input (Enter creates new lines). The useAttackPathState hook manages fontSize state and passes it to new text labels.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-21T02:18:40.527Z",
+  "summary": "The diff demonstrates partial implementation of the BuildRequest. Icon replacements and additions (REQ-1, REQ-2, REQ-3) are fully implemented with proper asset paths and toolbar integration. Arrow rotation infrastructure (REQ-4) is partially implemented with state management and UI handlers, but complete rotation interaction logic is truncated and cannot be fully verified. Export as PNG removal (REQ-5) shows removal from toolbar and page components, but the diff does not confirm complete removal of all export logic and dependencies due to truncation.",
+  "missing_requirements": [
+    {
+      "id": "REQ-4",
+      "requirement": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
+      "reason": "While arrow rotation state management and onUpdateArrowRotation handler are present, the actual click-and-drag rotation interaction logic in AttackPathCanvas.tsx is truncated at line ~200, preventing verification that the complete drag-to-rotate implementation exists. The acceptance criteria require arrows to be rotatable by dragging with natural and responsive interaction, which cannot be confirmed from the truncated code.",
+      "evidence": [
+        "frontend/src/components/AttackPathCanvas.tsx"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.92,
+  "confidence": 0.75,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/components/AttackPathConnector.tsx",
+    "frontend/src/components/AttackPathIcon.tsx",
     "frontend/src/components/AttackPathToolbar.tsx",
-    "frontend/src/components/LoadDiagramDialog.tsx",
     "frontend/src/hooks/useAttackPathState.ts",
     "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json"
