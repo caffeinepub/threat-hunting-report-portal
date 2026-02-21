@@ -1,7 +1,7 @@
 import AttackPathIcon from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2, Image } from 'lucide-react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Trash2, Image } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ExternalBlob } from '@/backend';
@@ -224,15 +224,6 @@ export default function AttackPathToolbar({
             </div>
           </div>
         )}
-        <Button
-          variant={activeDrawingTool === 'transform' ? 'default' : 'outline'}
-          size="sm"
-          className="w-full justify-start"
-          onClick={() => onDrawingToolChange(activeDrawingTool === 'transform' ? null : 'transform')}
-        >
-          <Move className="h-4 w-4 mr-2" />
-          Free Transform
-        </Button>
         <Button
           variant={activeDrawingTool === 'eraser' ? 'destructive' : 'outline'}
           size="sm"

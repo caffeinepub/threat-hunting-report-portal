@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the free transform tool to prevent unwanted node duplication when clicking on diagram elements.
+**Goal:** Add a free transform tool to the AttackPathCanvas that allows users to move and resize diagram icons and their text labels together.
 
 **Planned changes:**
-- Remove copy/paste behavior triggered by clicking nodes in the diagram canvas
-- Ensure the free transform tool only allows moving, rotating, and scaling operations
-- Apply the fix consistently to all node types (icons, text labels, images, connections)
+- Implement selection functionality that groups icons with their text labels as a single unit
+- Add drag functionality to move selected icon-label pairs together while maintaining their relative positioning
+- Add resize handles (corner and edge) to selected icons for proportional and axis-based scaling
+- Create visual feedback showing selection state with bounding box and transform handles
+- Ensure deselection by clicking on empty canvas area
 
-**User-visible outcome:** Users can click and transform nodes in the diagram without accidentally creating duplicate copies, experiencing cleaner and more predictable interaction with the free transform tool.
+**User-visible outcome:** Users can click to select any icon on the diagram, drag it to move the icon and its label together, and use corner/edge handles to resize the icon while maintaining visual quality.

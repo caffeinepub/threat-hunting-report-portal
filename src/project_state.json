@@ -1,31 +1,50 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Diagram editor with free transform tool for moving, rotating, and scaling nodes",
-  "architectural_notes": [
-    "Free transform tool should only enable move/rotate/scale operations, no copy/paste"
-  ],
+  "summary": "Diagram application with free transform tool for icons and text labels",
+  "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-remove-any-copy-paste-behavior-from-the-free-transform-tool-when-clicking-on-nodes-in-the-diagram-canvas",
-      "title": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
+      "id": "feature-implement-a-free-transform-tool-that-allows-users-to-select-and-move-both-icons-and-their-associated-text-labels-together-as-a-single-unit-on-the-attackpathcanvas",
+      "title": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-ensure-the-free-transform-tool-behavior-applies-consistently-to-all-node-types-in-the-diagram-icons-text-labels-images-connections",
-      "title": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
+      "id": "feature-add-resize-functionality-to-the-free-transform-tool-that-allows-users-to-scale-icons-on-the-diagram-using-corner-and-edge-handles",
+      "title": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-create-visual-feedback-for-the-free-transform-tool-showing-selection-state-including-a-bounding-box-or-selection-outline-around-selected-icons-and-their-labels",
+      "title": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Free transform tool to move icons and text labels",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Free transform tool to resize icons on diagram",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
   "projectName": "Threat Hunting Portal",
   "clarification_mode": "instant",
   "clarification_rounds": 0

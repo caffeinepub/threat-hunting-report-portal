@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-any-copy-paste-behavior-from-the-free-transform-tool-when-clicking-on-nodes-in-the-diagram-canvas",
-      "featureTitle": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
+      "featureId": "feature-implement-a-free-transform-tool-that-allows-users-to-select-and-move-both-icons-and-their-associated-text-labels-together-as-a-single-unit-on-the-attackpathcanvas",
+      "featureTitle": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -22,10 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-the-free-transform-tool-behavior-applies-consistently-to-all-node-types-in-the-diagram-icons-text-labels-images-connections",
-      "featureTitle": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
+      "featureId": "feature-add-resize-functionality-to-the-free-transform-tool-that-allows-users-to-scale-icons-on-the-diagram-using-corner-and-edge-handles",
+      "featureTitle": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -38,6 +40,27 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-visual-feedback-for-the-free-transform-tool-showing-selection-state-including-a-bounding-box-or-selection-outline-around-selected-icons-and-their-labels",
+      "featureTitle": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/index.css"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

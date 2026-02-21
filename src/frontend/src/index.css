@@ -66,3 +66,26 @@
         font-feature-settings: "rlig" 1, "calt" 1;
     }
 }
+
+/* Free Transform Tool Styles */
+.selection-box {
+    border: 2px solid oklch(var(--primary));
+    background: oklch(var(--primary) / 0.1);
+    pointer-events: none;
+}
+
+.resize-handle {
+    background: oklch(var(--primary));
+    border: 2px solid oklch(var(--background));
+    border-radius: 2px;
+    z-index: 10;
+}
+
+.resize-handle:hover {
+    background: oklch(var(--primary) / 0.8);
+    transform: scale(1.2);
+}
+
+.dark .resize-handle {
+    border-color: oklch(var(--background));
+}

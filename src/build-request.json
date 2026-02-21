@@ -1,59 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Fix free transform tool to prevent unwanted node duplication on click",
+  "title": "Add free transform tool for moving and resizing diagram elements",
   "projectName": "Threat Hunting Portal",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
+      "text": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2",
-          "msg-3"
+          "msg-user-transform-request"
         ],
         "quotes": [
-          "clicking on nodes in the diagram triggers unwanted copy/paste",
-          "the free transform tool only allow moving/rotating/scaling nodes"
+          "move the icons and text label"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking on any node in the diagram does not create duplicate copies",
-        "The free transform tool only enables moving, rotating, and scaling operations",
-        "No copy/paste functionality is triggered by node clicks in the canvas"
+        "Users can click to select an icon and its text label as a grouped unit",
+        "Dragging a selected icon moves both the icon and its text label together",
+        "The transform tool maintains the relative position between icon and label during movement",
+        "Multiple icons can be moved individually with their respective labels"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
+      "text": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-user-transform-request"
         ],
         "quotes": [
-          "all nodes in the diagram"
+          "can resize the icons on the diagram"
         ]
       },
       "acceptanceCriteria": [
-        "Icons can be transformed without duplication",
-        "Text labels can be transformed without duplication",
-        "Images can be transformed without duplication",
-        "Connection lines can be transformed without duplication"
+        "Selected icons display corner and edge drag handles for resizing",
+        "Dragging corner handles resizes icons proportionally",
+        "Dragging edge handles resizes icons along one axis",
+        "Resized icons maintain their visual quality and aspect ratio when appropriate",
+        "The resize functionality preserves the icon's position on the canvas"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-transform-request"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Selected icon and label display a visible selection indicator (bounding box or outline)",
+        "Selection state is clearly distinguishable from unselected state",
+        "Transform handles are only visible when an element is selected",
+        "Users can deselect by clicking on empty canvas area"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the backend schema or actor implementation",
-    "Preserve existing drag-to-select box functionality",
-    "Maintain the current undo/redo behavior for transform operations"
+    "Maintain compatibility with existing AttackPathCanvas functionality including connections, drawings, and image upload",
+    "Do not modify the backend/main.mo file or diagram state structure",
+    "Preserve existing icon drag-and-drop functionality from the toolbar",
+    "Keep the existing undo/redo system working with transform operations"
   ],
   "nonGoals": [
-    "Adding new transform capabilities beyond move, rotate, and scale",
-    "Implementing copy/paste functionality with keyboard shortcuts",
-    "Changing the visual appearance of the free transform tool"
+    "Rotation of icons or text labels",
+    "Multi-select or group selection of multiple icons",
+    "Transform tools for connections, drawings, or other diagram elements",
+    "Advanced alignment or distribution tools"
   ],
   "imageRequirements": {
     "required": [],

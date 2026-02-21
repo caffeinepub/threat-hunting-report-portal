@@ -1,48 +1,82 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix free transform tool to prevent unwanted node duplication on click",
+  "title": "Add free transform tool for moving and resizing diagram elements",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
+      "summary": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
       "acceptanceCriteria": [
-        "Clicking on any node in the diagram does not create duplicate copies",
-        "The free transform tool only enables moving, rotating, and scaling operations",
-        "No copy/paste functionality is triggered by node clicks in the canvas"
+        "Users can click to select an icon and its text label as a grouped unit",
+        "Dragging a selected icon moves both the icon and its text label together",
+        "The transform tool maintains the relative position between icon and label during movement",
+        "Multiple icons can be moved individually with their respective labels"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Remove or disable any copy/paste logic triggered by node clicks in the canvas. Audit event handlers (onClick, onPointerDown, onPointerUp) for icons, text labels, images, and connections to ensure they do not invoke duplication or clipboard operations. Ensure the free transform tool only enables move, rotate, and scale operations without creating node copies."
-        },
-        {
           "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Review and remove any state management logic that duplicates nodes on selection or click events. Ensure transform operations (move, rotate, scale) do not trigger node duplication in the state management layer."
+          "description": "Add state management for selected icon/label pairs and tracking which element is currently selected for transform operations. Include functions to select/deselect elements and update positions of grouped icon-label pairs together during drag operations."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Implement selection logic to identify and select icon-text label pairs when clicking on icons. Add drag handlers that move both the icon and its associated text label together while maintaining their relative positions. Integrate with the selection state from useAttackPathState to track the currently selected element."
+        },
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Add click handler to enable selection of icons for transform operations. Integrate with the parent canvas selection state to visually indicate when an icon is selected. Modify drag behavior to work with the new grouped transform system that moves icons and their labels together."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
+      "summary": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
       "acceptanceCriteria": [
-        "Icons can be transformed without duplication",
-        "Text labels can be transformed without duplication",
-        "Images can be transformed without duplication",
-        "Connection lines can be transformed without duplication"
+        "Selected icons display corner and edge drag handles for resizing",
+        "Dragging corner handles resizes icons proportionally",
+        "Dragging edge handles resizes icons along one axis",
+        "Resized icons maintain their visual quality and aspect ratio when appropriate",
+        "The resize functionality preserves the icon's position on the canvas"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Extend Icon type to include width and height properties for storing resize dimensions. Add functions to update icon dimensions during resize operations while preserving position. Ensure undo/redo history captures resize state changes."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Add resize handle rendering for selected icons (corner and edge handles). Implement drag handlers for resize handles that calculate new dimensions based on handle position and drag direction. For corner handles, maintain proportional scaling; for edge handles, scale along one axis only. Update icon dimensions in state during resize operations."
+        },
+        {
+          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "operation": "modify",
+          "description": "Support dynamic width and height props for rendering icons at custom sizes. Apply CSS transforms or inline styles to scale icons while maintaining visual quality. Ensure resized icons maintain their position anchor point during scaling operations."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
+      "acceptanceCriteria": [
+        "Selected icon and label display a visible selection indicator (bounding box or outline)",
+        "Selection state is clearly distinguishable from unselected state",
+        "Transform handles are only visible when an element is selected",
+        "Users can deselect by clicking on empty canvas area"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Verify that all node types (icons, text labels, images, connections) handle transform operations uniformly without triggering duplication. Ensure click handlers for each node type consistently apply the same non-duplicating transform behavior. Test that drag-to-select box functionality remains intact for all node types."
+          "description": "Add rendering logic for selection bounding box that encompasses both the icon and its associated text label. Render corner and edge resize handles only when an element is selected. Implement click handler on empty canvas area to deselect the currently selected element. Apply visual styling (border, handles) to indicate selection state."
         },
         {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Review icon-specific event handlers to ensure clicks and drag operations do not trigger copy/paste behavior. Confirm that the icon component only supports move, rotate, and scale operations when the free transform tool is active."
+          "description": "Add CSS classes for transform tool visual feedback including selection bounding box styles, resize handle styles (corner and edge), and hover states for interactive elements. Use theme-aware colors that work in both light and dark modes."
         }
       ]
     }

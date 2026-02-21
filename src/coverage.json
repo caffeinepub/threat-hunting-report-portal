@@ -1,37 +1,54 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T08:05:04.990Z",
+  "generatedAt": "2026-02-21T09:29:05.364Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
+        "summary": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/components/AttackPathIcon.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
+        "summary": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx",
           "frontend/src/components/AttackPathIcon.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/hooks/useAttackPathState.ts",
           "frontend/src/components/AttackPathCanvas.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/index.css"
         ]
       }
     ]
@@ -42,6 +59,8 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/hooks/useAttackPathState.ts",
+    "frontend/src/index.css",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
