@@ -1,52 +1,17 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Attack path visualizer with customizable icons and interactive arrow rotation",
-  "architectural_notes": [
-    "Attack path visualizer includes customizable icon set for various network elements",
-    "Arrow elements support free-form rotation via click-and-drag interaction"
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Man icon illustration for attack path diagram (man-icon.dim_128x128.png)\n- Multiple users icon illustration showing group of people (multiple-users-icon.dim_128x128.png)\n- Multiple computers icon illustration showing multiple computer devices (multiple-computers-icon.dim_128x128.png)",
+  "imageRequirements": "## Required Images\n- Simple single person icon silhouette in dark color on transparent background (user-single.dim_128x128.png)",
   "existing_features": [
     {
-      "id": "feature-replace-the-existing-user-icon-with-a-man-icon-in-the-attack-path-elements-section-the-icon-should-follow-the-same-dimension-pattern-as-existing-icons-64x64-or-128x128-png-and-be-placed-in-frontend-public-assets",
-      "title": "Replace the existing user icon with a man icon in the attack path elements section. The icon should follow the same dimension pattern as existing icons (64x64 or 128x128 PNG) and be placed in frontend/public/assets/.",
+      "id": "feature-replace-the-user-icon-image-in-the-attack-path-template-with-a-single-person-icon-in-a-simple-icon-style-silhouette-or-outlined-figure-this-icon-should-serve-as-a-visual-element-only-with-no-interactive-behavior",
+      "title": "Replace the user icon image in the attack path template with a single person icon in a simple icon style (silhouette or outlined figure). This icon should serve as a visual element only with no interactive behavior.",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-multiple-users-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
-      "title": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-multiple-computers-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
-      "title": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enable-click-and-drag-rotation-for-arrows-in-the-attack-path-visualizer-users-should-be-able-to-click-on-an-arrow-and-drag-to-freely-rotate-it-around-its-connection-points",
-      "title": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-the-export-as-png-functionality-from-the-attack-path-visualizer-this-includes-removing-the-export-button-from-attackpathtoolbar-and-any-associated-export-logic",
-      "title": "Remove the 'Export as PNG' functionality from the attack path visualizer. This includes removing the export button from AttackPathToolbar and any associated export logic.",
-      "reqIds": [
-        "REQ-5"
       ],
       "version": 1
     }
@@ -54,36 +19,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Replace user icon with man icon in attack path visualizer",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Add Multiple Users icon to attack path elements",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Add Multiple Computers icon to attack path elements",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Enable click-and-drag rotation for arrows",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Remove export as PNG functionality",
+      "summary": "Update user icon in attack path template to single person icon style (visual element only)",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Attack Path Visualizer",
+  "projectName": "Update user icon to single person style in attack path template",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

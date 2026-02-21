@@ -1,118 +1,41 @@
 {
   "kind": "build_request",
-  "title": "Update attack path visualizer icons and arrow rotation",
-  "projectName": "Attack Path Visualizer",
+  "title": "Update user icon to single person style in attack path template",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Replace the existing user icon with a man icon in the attack path elements section. The icon should follow the same dimension pattern as existing icons (64x64 or 128x128 PNG) and be placed in frontend/public/assets/.",
+      "text": "Replace the user icon image in the attack path template with a single person icon in a simple icon style (silhouette or outlined figure). This icon should serve as a visual element only with no interactive behavior.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-recent"
         ],
         "quotes": [
-          "replace the existing user with a different styled icon, just a man and should be placed under attack path elements"
+          "Change the user icon image into a single person",
+          "Single icon style visual element"
         ]
       },
       "acceptanceCriteria": [
-        "The user icon in AttackPathToolbar is replaced with a man icon",
-        "The icon maintains consistent sizing with other attack path icons",
-        "The icon is accessible via the attack path elements toolbar"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "Add a Multiple Users icon"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new Multiple Users icon appears in the attack path elements toolbar",
-        "The icon can be dragged onto the canvas",
-        "The icon is stored and rendered correctly in the diagram state"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "Add a Multiple Computers icon"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new Multiple Computers icon appears in the attack path elements toolbar",
-        "The icon can be dragged onto the canvas",
-        "The icon is stored and rendered correctly in the diagram state"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "able to click and drag to rotate arrows freely"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Arrows can be selected by clicking on them",
-        "Selected arrows can be rotated by dragging",
-        "Arrow rotation state is preserved in the diagram state",
-        "Rotation feels natural and responsive during interaction"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Remove the 'Export as PNG' functionality from the attack path visualizer. This includes removing the export button from AttackPathToolbar and any associated export logic.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "remove the export as png"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The 'Export as PNG' button is no longer visible in the toolbar",
-        "All related export functionality and dependencies are removed",
-        "No console errors or broken references remain"
+        "The user icon in AttackPathIcon.tsx displays a single person instead of the current user image",
+        "The icon uses a simple, clean icon style (silhouette or outlined figure)",
+        "The icon is non-interactive and serves as a visual element only",
+        "The icon maintains consistent sizing with other attack path icons"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the backend Motoko code",
-    "Do not change the white background color of the canvas",
-    "Maintain compatibility with existing diagram save/load functionality",
-    "Follow the existing icon pattern used in AttackPathIcon.tsx and AttackPathToolbar.tsx"
+    "Do not modify the interactive drag-and-drop functionality of attack path icons",
+    "Maintain consistency with existing icon sizing and positioning in the attack path canvas"
   ],
   "nonGoals": [
-    "Adding rotation controls for other elements besides arrows",
-    "Implementing rotation angle input fields",
-    "Adding new export formats to replace PNG export",
-    "Modifying the connection logic or arrow drawing algorithm"
+    "Making the user icon interactive or clickable",
+    "Changing other icon types in the attack path template",
+    "Modifying the backend diagram state structure"
   ],
   "imageRequirements": {
     "required": [
-      "Man icon illustration for attack path diagram (man-icon.dim_128x128.png)",
-      "Multiple users icon illustration showing group of people (multiple-users-icon.dim_128x128.png)",
-      "Multiple computers icon illustration showing multiple computer devices (multiple-computers-icon.dim_128x128.png)"
+      "Simple single person icon silhouette in dark color on transparent background (user-single.dim_128x128.png)"
     ],
     "edits": []
   }

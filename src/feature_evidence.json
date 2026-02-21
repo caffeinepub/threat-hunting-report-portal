@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-the-existing-user-icon-with-a-man-icon-in-the-attack-path-elements-section-the-icon-should-follow-the-same-dimension-pattern-as-existing-icons-64x64-or-128x128-png-and-be-placed-in-frontend-public-assets",
-      "featureTitle": "Replace the existing user icon with a man icon in the attack path elements section. The icon should follow the same dimension pattern as existing icons (64x64 or 128x128 PNG) and be placed in frontend/public/assets/.",
+      "featureId": "feature-replace-the-user-icon-image-in-the-attack-path-template-with-a-single-person-icon-in-a-simple-icon-style-silhouette-or-outlined-figure-this-icon-should-serve-as-a-visual-element-only-with-no-interactive-behavior",
+      "featureTitle": "Replace the user icon image in the attack path template with a single person icon in a simple icon style (silhouette or outlined figure). This icon should serve as a visual element only with no interactive behavior.",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
+        "frontend/src/components/AttackPathIcon.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -19,90 +18,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-multiple-users-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
-      "featureTitle": "Add a Multiple Users icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-multiple-computers-icon-to-the-attack-path-elements-section-in-attackpathtoolbar-the-icon-should-be-a-new-draggable-element-following-the-same-pattern-as-existing-icons",
-      "featureTitle": "Add a Multiple Computers icon to the attack path elements section in AttackPathToolbar. The icon should be a new draggable element following the same pattern as existing icons.",
-      "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-enable-click-and-drag-rotation-for-arrows-in-the-attack-path-visualizer-users-should-be-able-to-click-on-an-arrow-and-drag-to-freely-rotate-it-around-its-connection-points",
-      "featureTitle": "Enable click-and-drag rotation for arrows in the attack path visualizer. Users should be able to click on an arrow and drag to freely rotate it around its connection points.",
-      "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/components/AttackPathConnector.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-the-export-as-png-functionality-from-the-attack-path-visualizer-this-includes-removing-the-export-button-from-attackpathtoolbar-and-any-associated-export-logic",
-      "featureTitle": "Remove the 'Export as PNG' functionality from the attack path visualizer. This includes removing the export button from AttackPathToolbar and any associated export logic.",
-      "files": [
-        "frontend/src/components/AttackPathToolbar.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
       ],
       "confidence": "high"
     }

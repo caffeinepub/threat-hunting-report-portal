@@ -8,7 +8,7 @@ interface AttackPathIconProps {
 
 export default function AttackPathIcon({ type, width = 48, height = 48 }: AttackPathIconProps) {
   const iconMap: Record<IconType, string> = {
-    user: '/assets/generated/man-icon.dim_128x128.png',
+    user: '/assets/generated/user-single.dim_128x128.png',
     multipleUsers: '/assets/generated/multiple-users-icon.dim_128x128.png',
     multipleComputers: '/assets/generated/multiple-computers-icon.dim_128x128.png',
     attacker: '/assets/generated/icon-attacker.dim_64x64.png',

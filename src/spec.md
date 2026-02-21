@@ -1,13 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update attack path visualizer with new icons and arrow rotation capability.
+**Goal:** Replace the user icon in the attack path template with a simple single person icon style.
 
 **Planned changes:**
-- Replace the existing user icon with a man icon in attack path elements
-- Add a Multiple Users icon to the attack path elements toolbar
-- Add a Multiple Computers icon to the attack path elements toolbar
-- Enable click-and-drag rotation for arrows
-- Remove the 'Export as PNG' functionality
+- Update the user icon image in AttackPathIcon.tsx to display a single person silhouette
+- Ensure the new icon maintains consistent sizing with other attack path icons
+- Keep the icon as a non-interactive visual element
 
-**User-visible outcome:** Users can drag new man, multiple users, and multiple computers icons onto the attack path canvas, freely rotate arrows by clicking and dragging them, and the PNG export button is removed from the toolbar.
+**User-visible outcome:** Users will see a cleaner, single person silhouette icon in the attack path template instead of the previous user icon design.
