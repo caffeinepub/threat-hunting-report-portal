@@ -1,13 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add image upload functionality and a multiple servers icon to the attack path visualizer.
+**Goal:** Fix the free transform tool to prevent unwanted node duplication when clicking on diagram elements.
 
 **Planned changes:**
-- Add ability to upload and display user images (PNG, JPG, JPEG) on the attack path canvas
-- Allow uploaded images to be repositioned, resized, and deleted like other diagram elements
-- Add a new "multiple servers" icon type to the attack path toolbar
-- Update backend DiagramState to store uploaded image data and metadata
-- Ensure images persist when diagrams are saved and loaded
+- Remove copy/paste behavior triggered by clicking nodes in the diagram canvas
+- Ensure the free transform tool only allows moving, rotating, and scaling operations
+- Apply the fix consistently to all node types (icons, text labels, images, connections)
 
-**User-visible outcome:** Users can upload their own images to the attack path diagram and use a new multiple servers icon to represent server clusters in their threat scenarios.
+**User-visible outcome:** Users can click and transform nodes in the diagram without accidentally creating duplicate copies, experiencing cleaner and more predictable interaction with the free transform tool.

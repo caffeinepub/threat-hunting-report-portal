@@ -63,6 +63,13 @@ interface AttackPathState {
   images: UploadedImage[];
 }
 
+export interface SelectedElements {
+  icons: Set<string>;
+  textLabels: Set<string>;
+  images: Set<string>;
+  connections: Set<string>;
+}
+
 export function useAttackPathState() {
   const [placedIcons, setPlacedIcons] = useState<PlacedIcon[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -76,6 +83,12 @@ export function useAttackPathState() {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | 'arrow' | 'image' | null>(null);
   const [selectedArrowId, setSelectedArrowId] = useState<string | null>(null);
+  const [selectedElements, setSelectedElements] = useState<SelectedElements>({
+    icons: new Set(),
+    textLabels: new Set(),
+    images: new Set(),
+    connections: new Set(),
+  });
   const maxHistorySize = 50;
 
   const saveToHistory = () => {
@@ -289,6 +302,36 @@ export function useAttackPathState() {
     setImages(state.images);
   };
 
+  const selectMultipleElements = (elements: SelectedElements) => {
+    setSelectedElements(elements);
+  };
+
+  const clearSelection = () => {
+    setSelectedElements({
+      icons: new Set(),
+      textLabels: new Set(),
+      images: new Set(),
+      connections: new Set(),
+    });
+  };
+
+  const toggleElementInSelection = (id: string, type: 'icon' | 'text' | 'image' | 'connection') => {
+    setSelectedElements((prev) => {
+      const newSelection = { ...prev };
+      const key = type === 'text' ? 'textLabels' : type === 'connection' ? 'connections' : `${type}s` as keyof SelectedElements;
+      const set = new Set(prev[key]);
+      
+      if (set.has(id)) {
+        set.delete(id);
+      } else {
+        set.add(id);
+      }
+      
+      newSelection[key] = set;
+      return newSelection;
+    });
+  };
+
   return {
     placedIcons,
     connections,
@@ -307,6 +350,10 @@ export function useAttackPathState() {
     setSelectedElementType,
     selectedArrowId,
     setSelectedArrowId,
+    selectedElements,
+    selectMultipleElements,
+    clearSelection,
+    toggleElementInSelection,
     addIcon,
     moveIcon,
     resizeIcon,

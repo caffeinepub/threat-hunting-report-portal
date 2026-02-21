@@ -1,60 +1,48 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add image upload and multiple servers icon to attack path visualizer",
+  "title": "Fix free transform tool to prevent unwanted node duplication on click",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add the ability to load and display user-provided images within the attack path diagram canvas",
+      "summary": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
       "acceptanceCriteria": [
-        "Users can upload image files (PNG, JPG, JPEG) from their local system",
-        "Uploaded images appear as placeable elements on the attack path canvas",
-        "Images can be repositioned, resized, and deleted like other diagram elements",
-        "Images persist when diagrams are saved and loaded",
-        "Image upload interface is accessible from the attack path toolbar"
+        "Clicking on any node in the diagram does not create duplicate copies",
+        "The free transform tool only enables moving, rotating, and scaling operations",
+        "No copy/paste functionality is triggered by node clicks in the canvas"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Add images array to diagram state, add handlers for adding, moving, resizing, and deleting uploaded images. Include methods to convert File objects to ExternalBlob instances from the blob-storage component. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
-          "operation": "modify",
-          "description": "Add an image upload button to the toolbar that triggers a file input (accept PNG, JPG, JPEG). When a file is selected, convert it to ExternalBlob using ExternalBlob.fromBytes() with upload progress tracking via withUploadProgress(). Add the uploaded image to the canvas state."
-        },
-        {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Add rendering logic for uploaded images from state. Images should be displayed at their stored positions with stored dimensions. Implement drag-to-reposition, corner resize handles, and selection/deletion behavior similar to icons. Images should render using ExternalBlob.getDirectURL() for optimal streaming and caching. Handle click events for selection and deletion when eraser tool is active."
+          "description": "Remove or disable any copy/paste logic triggered by node clicks in the canvas. Audit event handlers (onClick, onPointerDown, onPointerUp) for icons, text labels, images, and connections to ensure they do not invoke duplication or clipboard operations. Ensure the free transform tool only enables move, rotate, and scale operations without creating node copies."
         },
         {
-          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Update diagram save operation to include images array in DiagramState. When loading diagrams, populate images from loaded state. Ensure images are cleared when clearing the canvas."
+          "description": "Review and remove any state management logic that duplicates nodes on selection or click events. Ensure transform operations (move, rotate, scale) do not trigger node duplication in the state management layer."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters",
+      "summary": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
       "acceptanceCriteria": [
-        "A new 'multiple servers' icon type is available in the attack path toolbar",
-        "The icon visually represents multiple servers (e.g., stacked servers or server cluster)",
-        "The icon can be dragged onto the canvas like existing icon types",
-        "The icon integrates with existing connection, selection, and manipulation features"
+        "Icons can be transformed without duplication",
+        "Text labels can be transformed without duplication",
+        "Images can be transformed without duplication",
+        "Connection lines can be transformed without duplication"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathToolbar.tsx",
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Add a new 'multiple-servers' icon type to the toolbar's draggable icon list. Use the generated image at frontend/public/assets/generated/multiple-servers.dim_128x128.png as the icon source. Position it logically near the existing server icon in the toolbar."
+          "description": "Verify that all node types (icons, text labels, images, connections) handle transform operations uniformly without triggering duplication. Ensure click handlers for each node type consistently apply the same non-duplicating transform behavior. Test that drag-to-select box functionality remains intact for all node types."
         },
         {
           "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Add mapping for 'multiple-servers' iconType to render the image from frontend/public/assets/generated/multiple-servers.dim_128x128.png. Ensure it follows the same drag-and-drop, selection, and connection behavior as existing icon types."
+          "description": "Review icon-specific event handlers to ensure clicks and drag operations do not trigger copy/paste behavior. Confirm that the icon component only supports move, rotate, and scale operations when the free transform tool is active."
         }
       ]
     }

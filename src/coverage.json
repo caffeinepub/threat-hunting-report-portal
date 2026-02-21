@@ -1,71 +1,47 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T04:27:05.986Z",
+  "generatedAt": "2026-02-21T08:05:04.990Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 2,
     "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add the ability to load and display user-provided images or pictures within the attack path diagram canvas",
+        "summary": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathToolbar.tsx",
           "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/hooks/useAttackPathState.ts"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/pages/AttackPathPage.tsx"
+          "frontend/src/components/AttackPathCanvas.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters or multiple server instances",
+        "summary": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx",
           "frontend/src/components/AttackPathIcon.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AttackPathToolbar.tsx",
-          "frontend/src/components/AttackPathIcon.tsx"
+          "frontend/src/components/AttackPathCanvas.tsx"
         ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Update the backend DiagramState type to support storing uploaded image data including image content and metadata",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/multiple-servers.dim_128x128.png",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
     "frontend/src/components/AttackPathCanvas.tsx",
-    "frontend/src/components/AttackPathIcon.tsx",
-    "frontend/src/components/AttackPathToolbar.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useAttackPathState.ts",
-    "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

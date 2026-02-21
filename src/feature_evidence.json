@@ -2,13 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-the-ability-to-load-and-display-user-provided-images-or-pictures-within-the-attack-path-diagram-canvas",
-      "featureTitle": "Add the ability to load and display user-provided images or pictures within the attack path diagram canvas",
+      "featureId": "feature-remove-any-copy-paste-behavior-from-the-free-transform-tool-when-clicking-on-nodes-in-the-diagram-canvas",
+      "featureTitle": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx",
-        "frontend/src/hooks/useAttackPathState.ts",
-        "frontend/src/pages/AttackPathPage.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -25,11 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-multiple-servers-icon-to-the-attack-path-visualizer-toolbar-for-representing-server-clusters-or-multiple-server-instances",
-      "featureTitle": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters or multiple server instances",
+      "featureId": "feature-ensure-the-free-transform-tool-behavior-applies-consistently-to-all-node-types-in-the-diagram-icons-text-labels-images-connections",
+      "featureTitle": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx",
-        "frontend/src/components/AttackPathToolbar.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",

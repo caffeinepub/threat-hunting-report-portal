@@ -1,51 +1,31 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "Diagram editor with free transform tool for moving, rotating, and scaling nodes",
+  "architectural_notes": [
+    "Free transform tool should only enable move/rotate/scale operations, no copy/paste"
+  ],
   "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Multiple servers icon illustration showing stacked or clustered servers in a simple, clean style matching existing attack path icons (multiple-servers.dim_128x128.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-add-the-ability-to-load-and-display-user-provided-images-or-pictures-within-the-attack-path-diagram-canvas",
-      "title": "Add the ability to load and display user-provided images or pictures within the attack path diagram canvas",
+      "id": "feature-remove-any-copy-paste-behavior-from-the-free-transform-tool-when-clicking-on-nodes-in-the-diagram-canvas",
+      "title": "Remove any copy/paste behavior from the free transform tool when clicking on nodes in the diagram canvas",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-multiple-servers-icon-to-the-attack-path-visualizer-toolbar-for-representing-server-clusters-or-multiple-server-instances",
-      "title": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters or multiple server instances",
+      "id": "feature-ensure-the-free-transform-tool-behavior-applies-consistently-to-all-node-types-in-the-diagram-icons-text-labels-images-connections",
+      "title": "Ensure the free transform tool behavior applies consistently to all node types in the diagram (icons, text labels, images, connections)",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Add ability to load images/pictures in attack path visualizer diagram",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Add multiple servers icon to attack path visualizer",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Update the backend DiagramState type to support storing uploaded image data including image content and metadata",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    }
-  ],
+  "new_feature_requests": [],
   "projectName": "Threat Hunting Portal",
   "clarification_mode": "instant",
   "clarification_rounds": 0
