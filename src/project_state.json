@@ -5,13 +5,21 @@
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Simple single person icon silhouette in dark color on transparent background (user-single.dim_128x128.png)",
+  "imageRequirements": "## Required Images\n- Multiple servers icon illustration showing stacked or clustered servers in a simple, clean style matching existing attack path icons (multiple-servers.dim_128x128.png)",
   "existing_features": [
     {
-      "id": "feature-replace-the-user-icon-image-in-the-attack-path-template-with-a-single-person-icon-in-a-simple-icon-style-silhouette-or-outlined-figure-this-icon-should-serve-as-a-visual-element-only-with-no-interactive-behavior",
-      "title": "Replace the user icon image in the attack path template with a single person icon in a simple icon style (silhouette or outlined figure). This icon should serve as a visual element only with no interactive behavior.",
+      "id": "feature-add-the-ability-to-load-and-display-user-provided-images-or-pictures-within-the-attack-path-diagram-canvas",
+      "title": "Add the ability to load and display user-provided images or pictures within the attack path diagram canvas",
       "reqIds": [
         "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-multiple-servers-icon-to-the-attack-path-visualizer-toolbar-for-representing-server-clusters-or-multiple-server-instances",
+      "title": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters or multiple server instances",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
@@ -19,12 +27,26 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update user icon in attack path template to single person icon style (visual element only)",
+      "summary": "Add ability to load images/pictures in attack path visualizer diagram",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add multiple servers icon to attack path visualizer",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Update the backend DiagramState type to support storing uploaded image data including image content and metadata",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Update user icon to single person style in attack path template",
+  "projectName": "Threat Hunting Portal",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

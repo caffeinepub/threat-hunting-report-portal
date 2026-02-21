@@ -1,11 +1,14 @@
 import AttackPathIcon from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2 } from 'lucide-react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2, Image } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ExternalBlob } from '@/backend';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
-export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user' | 'multipleUsers' | 'multipleComputers';
+export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user' | 'multipleUsers' | 'multipleComputers' | 'multipleServers';
 
 const iconTypes: { type: IconType; label: string }[] = [
   { type: 'user', label: 'Man' },
@@ -15,6 +18,7 @@ const iconTypes: { type: IconType; label: string }[] = [
   { type: 'computer', label: 'Computer' },
   { type: 'multipleComputers', label: 'Multiple Computers' },
   { type: 'server', label: 'Server' },
+  { type: 'multipleServers', label: 'Multiple Servers' },
   { type: 'domain', label: 'Domain' },
   { type: 'fileFolder', label: 'File/Folder' },
   { type: 'exe', label: '.exe' },
@@ -41,6 +45,7 @@ interface AttackPathToolbarProps {
   onTextColorChange: (color: string) => void;
   fontSize: number;
   onFontSizeChange: (size: number) => void;
+  onImageUpload: (file: ExternalBlob, name: string) => void;
 }
 
 export default function AttackPathToolbar({ 
@@ -56,8 +61,62 @@ export default function AttackPathToolbar({
   onTextColorChange,
   fontSize,
   onFontSizeChange,
+  onImageUpload,
 }: AttackPathToolbarProps) {
   const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
+      toast.error('Please upload a PNG, JPG, or JPEG image');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Read file as ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Create ExternalBlob with upload progress tracking
+      const externalBlob = ExternalBlob.fromBytes(uint8Array).withUploadProgress((percentage) => {
+        setUploadProgress(percentage);
+      });
+
+      // Call the upload handler
+      onImageUpload(externalBlob, file.name);
+
+      toast.success('Image uploaded successfully');
+      setUploadProgress(0);
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -182,6 +241,35 @@ export default function AttackPathToolbar({
         >
           <Eraser className="h-4 w-4 mr-2" />
           Eraser
+        </Button>
+      </div>
+
+      <Separator />
+
+      <div>
+        <h3 className="font-semibold text-sm mb-2">Image Upload</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Add custom images to your diagram
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+          onClick={handleImageUploadClick}
+          disabled={isUploading}
+        >
+          <Image className="h-4 w-4 mr-2" />
+          {isUploading ? `Uploading ${uploadProgress}%` : 'Upload Image'}
         </Button>
       </div>
 

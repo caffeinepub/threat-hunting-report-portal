@@ -56,6 +56,15 @@ export const FreehandDrawing = IDL.Record({
   'strokeWidth' : IDL.Float64,
   'points' : IDL.Vec(Position),
 });
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const Image = IDL.Record({
+  'id' : IDL.Text,
+  'file' : ExternalBlob,
+  'name' : IDL.Text,
+  'size' : IDL.Record({ 'height' : IDL.Float64, 'width' : IDL.Float64 }),
+  'description' : IDL.Text,
+  'position' : Position,
+});
 export const DiagramState = IDL.Record({
   'lines' : IDL.Vec(Line),
   'lastModified' : IDL.Int,
@@ -63,6 +72,7 @@ export const DiagramState = IDL.Record({
   'textLabels' : IDL.Vec(TextLabel),
   'icons' : IDL.Vec(Icon),
   'freehandDrawings' : IDL.Vec(FreehandDrawing),
+  'images' : IDL.Vec(Image),
 });
 export const NamedDiagram = IDL.Record({
   'name' : IDL.Text,
@@ -180,6 +190,15 @@ export const idlFactory = ({ IDL }) => {
     'strokeWidth' : IDL.Float64,
     'points' : IDL.Vec(Position),
   });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const Image = IDL.Record({
+    'id' : IDL.Text,
+    'file' : ExternalBlob,
+    'name' : IDL.Text,
+    'size' : IDL.Record({ 'height' : IDL.Float64, 'width' : IDL.Float64 }),
+    'description' : IDL.Text,
+    'position' : Position,
+  });
   const DiagramState = IDL.Record({
     'lines' : IDL.Vec(Line),
     'lastModified' : IDL.Int,
@@ -187,6 +206,7 @@ export const idlFactory = ({ IDL }) => {
     'textLabels' : IDL.Vec(TextLabel),
     'icons' : IDL.Vec(Icon),
     'freehandDrawings' : IDL.Vec(FreehandDrawing),
+    'images' : IDL.Vec(Image),
   });
   const NamedDiagram = IDL.Record({
     'name' : IDL.Text,

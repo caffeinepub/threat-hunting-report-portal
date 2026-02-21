@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { IconType } from '@/components/AttackPathToolbar';
+import { ExternalBlob } from '@/backend';
 
 export interface PlacedIcon {
   id: string;
@@ -41,6 +42,17 @@ export interface TextLabel {
   height?: number;
 }
 
+export interface UploadedImage {
+  id: string;
+  file: ExternalBlob;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  name: string;
+  description: string;
+}
+
 export type DrawingTool = 'freehand' | 'line' | 'arrow' | 'text' | 'eraser' | 'transform' | null;
 
 interface AttackPathState {
@@ -48,6 +60,7 @@ interface AttackPathState {
   connections: Connection[];
   drawings: DrawingPath[];
   textLabels: TextLabel[];
+  images: UploadedImage[];
 }
 
 export function useAttackPathState() {
@@ -55,12 +68,13 @@ export function useAttackPathState() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [drawings, setDrawings] = useState<DrawingPath[]>([]);
   const [textLabels, setTextLabels] = useState<TextLabel[]>([]);
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const [activeDrawingTool, setActiveDrawingTool] = useState<DrawingTool>(null);
   const [textColor, setTextColor] = useState<string>('#000000');
   const [fontSize, setFontSize] = useState<number>(16);
   const [history, setHistory] = useState<AttackPathState[]>([]);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
-  const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | 'arrow' | null>(null);
+  const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | 'arrow' | 'image' | null>(null);
   const [selectedArrowId, setSelectedArrowId] = useState<string | null>(null);
   const maxHistorySize = 50;
 
@@ -70,6 +84,7 @@ export function useAttackPathState() {
       connections: [...connections],
       drawings: [...drawings],
       textLabels: [...textLabels],
+      images: [...images],
     };
     setHistory((prev) => {
       const newHistory = [...prev, currentState];
@@ -89,6 +104,7 @@ export function useAttackPathState() {
     setConnections(previousState.connections);
     setDrawings(previousState.drawings);
     setTextLabels(previousState.textLabels);
+    setImages(previousState.images);
     setHistory((prev) => prev.slice(0, -1));
   };
 
@@ -223,12 +239,45 @@ export function useAttackPathState() {
     );
   };
 
+  const addImage = (file: ExternalBlob, x: number, y: number, name: string, description: string = '') => {
+    saveToHistory();
+    const newImage: UploadedImage = {
+      id: `image-${Date.now()}-${Math.random()}`,
+      file,
+      x,
+      y,
+      width: 200,
+      height: 200,
+      name,
+      description,
+    };
+    setImages((prev) => [...prev, newImage]);
+  };
+
+  const moveImage = (id: string, x: number, y: number) => {
+    setImages((prev) =>
+      prev.map((image) => (image.id === id ? { ...image, x, y } : image))
+    );
+  };
+
+  const resizeImage = (id: string, width: number, height: number) => {
+    setImages((prev) =>
+      prev.map((image) => (image.id === id ? { ...image, width, height } : image))
+    );
+  };
+
+  const removeImage = (id: string) => {
+    saveToHistory();
+    setImages((prev) => prev.filter((image) => image.id !== id));
+  };
+
   const clearAll = () => {
     saveToHistory();
     setPlacedIcons([]);
     setConnections([]);
     setDrawings([]);
     setTextLabels([]);
+    setImages([]);
   };
 
   const restoreState = (state: AttackPathState) => {
@@ -237,6 +286,7 @@ export function useAttackPathState() {
     setConnections(state.connections);
     setDrawings(state.drawings);
     setTextLabels(state.textLabels);
+    setImages(state.images);
   };
 
   return {
@@ -244,6 +294,7 @@ export function useAttackPathState() {
     connections,
     drawings,
     textLabels,
+    images,
     activeDrawingTool,
     setActiveDrawingTool,
     textColor,
@@ -269,6 +320,10 @@ export function useAttackPathState() {
     addTextLabel,
     removeTextLabel,
     updateTextLabel,
+    addImage,
+    moveImage,
+    resizeImage,
+    removeImage,
     clearAll,
     undo,
     canUndo,

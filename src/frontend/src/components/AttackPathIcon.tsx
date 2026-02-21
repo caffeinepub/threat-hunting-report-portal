@@ -11,6 +11,7 @@ export default function AttackPathIcon({ type, width = 48, height = 48 }: Attack
     user: '/assets/generated/user-single.dim_128x128.png',
     multipleUsers: '/assets/generated/multiple-users-icon.dim_128x128.png',
     multipleComputers: '/assets/generated/multiple-computers-icon.dim_128x128.png',
+    multipleServers: '/assets/generated/multiple-servers.dim_128x128.png',
     attacker: '/assets/generated/icon-attacker.dim_64x64.png',
     computer: '/assets/generated/computer-icon.dim_128x128.png',
     server: '/assets/generated/icon-server.dim_64x64.png',

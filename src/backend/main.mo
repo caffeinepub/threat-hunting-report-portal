@@ -7,7 +7,11 @@ import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
+import Storage "blob-storage/Storage";
 
+import Migration "migration";
+
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -58,13 +62,27 @@ actor {
     fontWeight : Text;
   };
 
-  // Complete Diagram State
+  // Image Types
+  public type Image = {
+    id : Text;
+    file : Storage.ExternalBlob;
+    position : Position;
+    size : {
+      width : Float;
+      height : Float;
+    };
+    name : Text;
+    description : Text;
+  };
+
+  // Complete Diagram State (Updated)
   public type DiagramState = {
     icons : [Icon];
     connections : [Connection];
     freehandDrawings : [FreehandDrawing];
     lines : [Line];
     textLabels : [TextLabel];
+    images : [Image];
     lastModified : Int;
   };
 
@@ -229,3 +247,4 @@ actor {
     };
   };
 };
+

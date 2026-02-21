@@ -23,7 +23,9 @@ export interface DiagramState {
   'textLabels' : Array<TextLabel>,
   'icons' : Array<Icon>,
   'freehandDrawings' : Array<FreehandDrawing>,
+  'images' : Array<Image>,
 }
+export type ExternalBlob = Uint8Array;
 export interface FreehandDrawing {
   'color' : string,
   'strokeWidth' : number,
@@ -33,6 +35,14 @@ export interface Icon {
   'id' : string,
   'name' : string,
   'iconType' : string,
+  'position' : Position,
+}
+export interface Image {
+  'id' : string,
+  'file' : ExternalBlob,
+  'name' : string,
+  'size' : { 'height' : number, 'width' : number },
+  'description' : string,
   'position' : Position,
 }
 export interface Line {

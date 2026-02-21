@@ -1,41 +1,80 @@
 {
   "kind": "build_request",
-  "title": "Update user icon to single person style in attack path template",
+  "title": "Add image upload and multiple servers icon to attack path visualizer",
+  "projectName": "Threat Hunting Portal",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Replace the user icon image in the attack path template with a single person icon in a simple icon style (silhouette or outlined figure). This icon should serve as a visual element only with no interactive behavior.",
+      "text": "Add the ability to load and display user-provided images or pictures within the attack path diagram canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-latest"
         ],
         "quotes": [
-          "Change the user icon image into a single person",
-          "Single icon style visual element"
+          "add a feature where I can load an image or picture in the diagram"
         ]
       },
       "acceptanceCriteria": [
-        "The user icon in AttackPathIcon.tsx displays a single person instead of the current user image",
-        "The icon uses a simple, clean icon style (silhouette or outlined figure)",
-        "The icon is non-interactive and serves as a visual element only",
-        "The icon maintains consistent sizing with other attack path icons"
+        "Users can upload image files (PNG, JPG, JPEG) from their local system",
+        "Uploaded images appear as placeable elements on the attack path canvas",
+        "Images can be repositioned, resized, and deleted like other diagram elements",
+        "Images persist when diagrams are saved and loaded",
+        "Image upload interface is accessible from the attack path toolbar"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a multiple servers icon to the attack path visualizer toolbar for representing server clusters or multiple server instances",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "add a multiple servers icon"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new 'multiple servers' icon type is available in the attack path toolbar",
+        "The icon visually represents multiple servers (e.g., stacked servers or server cluster)",
+        "The icon can be dragged onto the canvas like existing icon types",
+        "The icon integrates with existing connection, selection, and manipulation features"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Update the backend DiagramState type to support storing uploaded image data including image content and metadata",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ]
+      },
+      "acceptanceCriteria": [
+        "DiagramState schema includes a new field for uploaded images with position, dimensions, and image data",
+        "Image data is stored efficiently (base64 or blob format)",
+        "Existing diagram save/load operations handle image data correctly"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the interactive drag-and-drop functionality of attack path icons",
-    "Maintain consistency with existing icon sizing and positioning in the attack path canvas"
+    "Images must be stored within the DiagramState backend structure",
+    "Use existing AttackPathCanvas component patterns for image manipulation",
+    "Maintain compatibility with existing diagram save/load functionality",
+    "Follow the single-actor backend architecture in backend/main.mo"
   ],
   "nonGoals": [
-    "Making the user icon interactive or clickable",
-    "Changing other icon types in the attack path template",
-    "Modifying the backend diagram state structure"
+    "Image editing capabilities (cropping, filters, effects)",
+    "External image hosting or CDN integration",
+    "Real-time collaborative image editing",
+    "Vector graphics or SVG editing tools",
+    "Image compression or optimization beyond basic formats"
   ],
   "imageRequirements": {
     "required": [
-      "Simple single person icon silhouette in dark color on transparent background (user-single.dim_128x128.png)"
+      "Multiple servers icon illustration showing stacked or clustered servers in a simple, clean style matching existing attack path icons (multiple-servers.dim_128x128.png)"
     ],
     "edits": []
   }

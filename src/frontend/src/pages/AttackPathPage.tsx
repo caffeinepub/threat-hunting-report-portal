@@ -6,6 +6,7 @@ import SaveDiagramDialog from '@/components/SaveDiagramDialog';
 import LoadDiagramDialog from '@/components/LoadDiagramDialog';
 import { useSaveDiagramState } from '@/hooks/useSaveDiagramState';
 import type { NamedDiagram } from '@/backend';
+import { ExternalBlob } from '@/backend';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,7 @@ export default function AttackPathPage() {
     connections,
     drawings,
     textLabels,
+    images,
     activeDrawingTool,
     setActiveDrawingTool,
     textColor,
@@ -49,6 +51,10 @@ export default function AttackPathPage() {
     addTextLabel,
     removeTextLabel,
     updateTextLabel,
+    addImage,
+    moveImage,
+    resizeImage,
+    removeImage,
     clearAll,
     undo,
     canUndo,
@@ -66,6 +72,11 @@ export default function AttackPathPage() {
     if (newMode !== 'draw') {
       setActiveDrawingTool(null);
     }
+  };
+
+  const handleImageUpload = (file: ExternalBlob, name: string) => {
+    // Add image to center of canvas
+    addImage(file, 400, 300, name, '');
   };
 
   const handleSave = async (name: string) => {
@@ -104,6 +115,14 @@ export default function AttackPathPage() {
         fontSize: label.fontSize || 16,
         color: label.color,
         fontWeight: 'bold',
+      })),
+      images: images.map((image) => ({
+        id: image.id,
+        file: image.file,
+        position: { x: image.x, y: image.y },
+        size: { width: image.width, height: image.height },
+        name: image.name,
+        description: image.description,
       })),
       lastModified: BigInt(Date.now() * 1000000),
     };
@@ -162,13 +181,23 @@ export default function AttackPathPage() {
         width: undefined,
         height: undefined,
       })),
+      images: state.images.map((image) => ({
+        id: image.id,
+        file: image.file,
+        x: image.position.x,
+        y: image.position.y,
+        width: image.size.width,
+        height: image.size.height,
+        name: image.name,
+        description: image.description,
+      })),
     };
 
     restoreState(restoredState);
     toast.success(`Diagram "${diagram.name}" loaded successfully`);
   };
 
-  const handleSelectElement = (id: string | null, type: 'icon' | 'text' | 'arrow' | null) => {
+  const handleSelectElement = (id: string | null, type: 'icon' | 'text' | 'arrow' | 'image' | null) => {
     setSelectedElementId(id);
     setSelectedElementType(type);
   };
@@ -193,6 +222,7 @@ export default function AttackPathPage() {
           onTextColorChange={setTextColor}
           fontSize={fontSize}
           onFontSizeChange={setFontSize}
+          onImageUpload={handleImageUpload}
         />
       </div>
 
@@ -242,6 +272,7 @@ export default function AttackPathPage() {
           connections={connections}
           drawings={drawings}
           textLabels={textLabels}
+          images={images}
           mode={mode}
           activeDrawingTool={activeDrawingTool}
           textColor={textColor}
@@ -262,6 +293,10 @@ export default function AttackPathPage() {
           onAddTextLabel={addTextLabel}
           onRemoveTextLabel={removeTextLabel}
           onUpdateTextLabel={updateTextLabel}
+          onAddImage={addImage}
+          onMoveImage={moveImage}
+          onResizeImage={resizeImage}
+          onRemoveImage={removeImage}
           onSelectElement={handleSelectElement}
           onSelectArrow={handleSelectArrow}
         />
