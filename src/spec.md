@@ -1,13 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Add a free transform tool to the AttackPathCanvas that allows users to move and resize diagram icons and their text labels together.
+**Goal:** Update attack path diagram icons to use uploaded file type images that match their semantic names.
 
 **Planned changes:**
-- Implement selection functionality that groups icons with their text labels as a single unit
-- Add drag functionality to move selected icon-label pairs together while maintaining their relative positioning
-- Add resize handles (corner and edge) to selected icons for proportional and axis-based scaling
-- Create visual feedback showing selection state with bounding box and transform handles
-- Ensure deselection by clicking on empty canvas area
+- Replace seven attack path diagram icons with user-uploaded images (word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, ppt.png)
+- Map each uploaded image to its corresponding IconType in AttackPathIcon.tsx based on file name semantics
 
-**User-visible outcome:** Users can click to select any icon on the diagram, drag it to move the icon and its label together, and use corner/edge handles to resize the icon while maintaining visual quality.
+**User-visible outcome:** Attack path diagrams display file type icons that visually match the actual file types they represent (Word documents show DOC icon, PDFs show PDF icon, etc.).

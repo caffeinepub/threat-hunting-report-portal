@@ -1,82 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add free transform tool for moving and resizing diagram elements",
+  "title": "Update attack path diagram icons to match file type names",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
+      "summary": "Replace seven attack path diagram icons with uploaded images matching file type semantics",
       "acceptanceCriteria": [
-        "Users can click to select an icon and its text label as a grouped unit",
-        "Dragging a selected icon moves both the icon and its text label together",
-        "The transform tool maintains the relative position between icon and label during movement",
-        "Multiple icons can be moved individually with their respective labels"
+        "Icon at div[12]/img[1] uses word.png for Word document icon",
+        "Icon at div[13]/img[1] uses pdf.png for PDF document icon",
+        "Icon at div[14]/img[1] uses excel.png for Excel/CSV document icon",
+        "Icon at div[15]/img[1] uses script-1.png for script file icon",
+        "Icon at div[16]/img[1] uses zip.png for archive file icon",
+        "Icon at div[17]/img[1] uses dll-1.png for DLL/library file icon",
+        "Icon at div[18]/img[1] uses ppt.png for PowerPoint document icon",
+        "All seven uploaded images are correctly mapped to their respective IconType values in AttackPathIcon.tsx"
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Add state management for selected icon/label pairs and tracking which element is currently selected for transform operations. Include functions to select/deselect elements and update positions of grouped icon-label pairs together during drag operations."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Implement selection logic to identify and select icon-text label pairs when clicking on icons. Add drag handlers that move both the icon and its associated text label together while maintaining their relative positions. Integrate with the selection state from useAttackPathState to track the currently selected element."
-        },
         {
           "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Add click handler to enable selection of icons for transform operations. Integrate with the parent canvas selection state to visually indicate when an icon is selected. Modify drag behavior to work with the new grouped transform system that moves icons and their labels together."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
-      "acceptanceCriteria": [
-        "Selected icons display corner and edge drag handles for resizing",
-        "Dragging corner handles resizes icons proportionally",
-        "Dragging edge handles resizes icons along one axis",
-        "Resized icons maintain their visual quality and aspect ratio when appropriate",
-        "The resize functionality preserves the icon's position on the canvas"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Extend Icon type to include width and height properties for storing resize dimensions. Add functions to update icon dimensions during resize operations while preserving position. Ensure undo/redo history captures resize state changes."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Add resize handle rendering for selected icons (corner and edge handles). Implement drag handlers for resize handles that calculate new dimensions based on handle position and drag direction. For corner handles, maintain proportional scaling; for edge handles, scale along one axis only. Update icon dimensions in state during resize operations."
-        },
-        {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
-          "operation": "modify",
-          "description": "Support dynamic width and height props for rendering icons at custom sizes. Apply CSS transforms or inline styles to scale icons while maintaining visual quality. Ensure resized icons maintain their position anchor point during scaling operations."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
-      "acceptanceCriteria": [
-        "Selected icon and label display a visible selection indicator (bounding box or outline)",
-        "Selection state is clearly distinguishable from unselected state",
-        "Transform handles are only visible when an element is selected",
-        "Users can deselect by clicking on empty canvas area"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Add rendering logic for selection bounding box that encompasses both the icon and its associated text label. Render corner and edge resize handles only when an element is selected. Implement click handler on empty canvas area to deselect the currently selected element. Apply visual styling (border, handles) to indicate selection state."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add CSS classes for transform tool visual feedback including selection bounding box styles, resize handle styles (corner and edge), and hover states for interactive elements. Use theme-aware colors that work in both light and dark modes."
+          "description": "Update the icon mapping logic to use the uploaded images (word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, ppt.png) from frontend/public/assets/ for their corresponding IconType values. Map word.png to Word document type, pdf.png to PDF type, excel.png to Excel/CSV type, script-1.png to script file type, zip.png to archive type, dll-1.png to DLL/library type, and ppt.png to PowerPoint type. Preserve all existing drag-and-drop functionality and ensure the component continues to handle icon placement and interaction correctly."
         }
       ]
     }

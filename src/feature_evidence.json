@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-implement-a-free-transform-tool-that-allows-users-to-select-and-move-both-icons-and-their-associated-text-labels-together-as-a-single-unit-on-the-attackpathcanvas",
-      "featureTitle": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
+      "featureId": "feature-replace-icon-images-for-seven-specific-attack-path-diagram-icons-at-xpath-locations-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-1-div-3-div-12-img-1-div-13-img-1-div-14-img-1-div-15-img-1-div-16-img-1-div-17-img-1-and-div-18-img-1-with-uploaded-images-word-png-pdf-png-excel-png-script-1-png-zip-png-dll-1-png-and-ppt-png-respectively-mapping-each-image-to-its-corresponding-icon-type-based-on-file-name-semantics",
+      "featureTitle": "Replace icon images for seven specific attack path diagram icons at XPath locations /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[12]/img[1], div[13]/img[1], div[14]/img[1], div[15]/img[1], div[16]/img[1], div[17]/img[1], and div[18]/img[1] with uploaded images word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, and ppt.png respectively, mapping each image to its corresponding icon type based on file name semantics",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
+        "frontend/src/components/AttackPathIcon.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -19,48 +18,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-resize-functionality-to-the-free-transform-tool-that-allows-users-to-scale-icons-on-the-diagram-using-corner-and-edge-handles",
-      "featureTitle": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
-      "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-visual-feedback-for-the-free-transform-tool-showing-selection-state-including-a-bounding-box-or-selection-outline-around-selected-icons-and-their-labels",
-      "featureTitle": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
-      "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }

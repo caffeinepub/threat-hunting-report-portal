@@ -1,76 +1,41 @@
 {
   "kind": "build_request",
-  "title": "Add free transform tool for moving and resizing diagram elements",
+  "title": "Update attack path diagram icons to match file type names",
   "projectName": "Threat Hunting Portal",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
+      "text": "Replace icon images for seven specific attack path diagram icons at XPath locations /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[12]/img[1], div[13]/img[1], div[14]/img[1], div[15]/img[1], div[16]/img[1], div[17]/img[1], and div[18]/img[1] with uploaded images word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, and ppt.png respectively, mapping each image to its corresponding icon type based on file name semantics",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-transform-request"
+          "msg-last"
         ],
         "quotes": [
-          "move the icons and text label"
+          "change image of the icons based on there names"
         ]
       },
       "acceptanceCriteria": [
-        "Users can click to select an icon and its text label as a grouped unit",
-        "Dragging a selected icon moves both the icon and its text label together",
-        "The transform tool maintains the relative position between icon and label during movement",
-        "Multiple icons can be moved individually with their respective labels"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-transform-request"
-        ],
-        "quotes": [
-          "can resize the icons on the diagram"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Selected icons display corner and edge drag handles for resizing",
-        "Dragging corner handles resizes icons proportionally",
-        "Dragging edge handles resizes icons along one axis",
-        "Resized icons maintain their visual quality and aspect ratio when appropriate",
-        "The resize functionality preserves the icon's position on the canvas"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-transform-request"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Selected icon and label display a visible selection indicator (bounding box or outline)",
-        "Selection state is clearly distinguishable from unselected state",
-        "Transform handles are only visible when an element is selected",
-        "Users can deselect by clicking on empty canvas area"
+        "Icon at div[12]/img[1] uses word.png for Word document icon",
+        "Icon at div[13]/img[1] uses pdf.png for PDF document icon",
+        "Icon at div[14]/img[1] uses excel.png for Excel/CSV document icon",
+        "Icon at div[15]/img[1] uses script-1.png for script file icon",
+        "Icon at div[16]/img[1] uses zip.png for archive file icon",
+        "Icon at div[17]/img[1] uses dll-1.png for DLL/library file icon",
+        "Icon at div[18]/img[1] uses ppt.png for PowerPoint document icon",
+        "All seven uploaded images are correctly mapped to their respective IconType values in AttackPathIcon.tsx"
       ]
     }
   ],
   "constraints": [
-    "Maintain compatibility with existing AttackPathCanvas functionality including connections, drawings, and image upload",
-    "Do not modify the backend/main.mo file or diagram state structure",
-    "Preserve existing icon drag-and-drop functionality from the toolbar",
-    "Keep the existing undo/redo system working with transform operations"
+    "Must preserve existing drag-and-drop functionality in AttackPathIcon.tsx",
+    "Must maintain backward compatibility with existing diagram state that references these icon types"
   ],
   "nonGoals": [
-    "Rotation of icons or text labels",
-    "Multi-select or group selection of multiple icons",
-    "Transform tools for connections, drawings, or other diagram elements",
-    "Advanced alignment or distribution tools"
+    "Modifying other icons not specified in the seven XPath locations",
+    "Changing the IconType enum or type system",
+    "Altering the canvas rendering logic beyond icon image sources"
   ],
   "imageRequirements": {
     "required": [],

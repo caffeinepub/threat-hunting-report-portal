@@ -1,32 +1,16 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Diagram application with free transform tool for icons and text labels",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-implement-a-free-transform-tool-that-allows-users-to-select-and-move-both-icons-and-their-associated-text-labels-together-as-a-single-unit-on-the-attackpathcanvas",
-      "title": "Implement a free transform tool that allows users to select and move both icons and their associated text labels together as a single unit on the AttackPathCanvas",
+      "id": "feature-replace-icon-images-for-seven-specific-attack-path-diagram-icons-at-xpath-locations-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-1-div-3-div-12-img-1-div-13-img-1-div-14-img-1-div-15-img-1-div-16-img-1-div-17-img-1-and-div-18-img-1-with-uploaded-images-word-png-pdf-png-excel-png-script-1-png-zip-png-dll-1-png-and-ppt-png-respectively-mapping-each-image-to-its-corresponding-icon-type-based-on-file-name-semantics",
+      "title": "Replace icon images for seven specific attack path diagram icons at XPath locations /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[12]/img[1], div[13]/img[1], div[14]/img[1], div[15]/img[1], div[16]/img[1], div[17]/img[1], and div[18]/img[1] with uploaded images word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, and ppt.png respectively, mapping each image to its corresponding icon type based on file name semantics",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-resize-functionality-to-the-free-transform-tool-that-allows-users-to-scale-icons-on-the-diagram-using-corner-and-edge-handles",
-      "title": "Add resize functionality to the free transform tool that allows users to scale icons on the diagram using corner and edge handles",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-visual-feedback-for-the-free-transform-tool-showing-selection-state-including-a-bounding-box-or-selection-outline-around-selected-icons-and-their-labels",
-      "title": "Create visual feedback for the free transform tool showing selection state, including a bounding box or selection outline around selected icons and their labels",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
@@ -34,13 +18,7 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Free transform tool to move icons and text labels",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Free transform tool to resize icons on diagram",
+      "summary": "Change icon images to match their names",
       "reqIds": [],
       "status": "pending"
     }

@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import AttackPathToolbar from '@/components/AttackPathToolbar';
 import AttackPathCanvas from '@/components/AttackPathCanvas';
+import AttackPathToolbar from '@/components/AttackPathToolbar';
 import { useAttackPathState } from '@/hooks/useAttackPathState';
+import { Button } from '@/components/ui/button';
+import { Layers, Pencil } from 'lucide-react';
 import SaveDiagramDialog from '@/components/SaveDiagramDialog';
 import LoadDiagramDialog from '@/components/LoadDiagramDialog';
 import { useSaveDiagramState } from '@/hooks/useSaveDiagramState';
-import type { NamedDiagram } from '@/backend';
-import { ExternalBlob } from '@/backend';
+import { useGetAllDiagrams } from '@/hooks/useGetAllDiagrams';
+import { toast } from 'sonner';
+import { NamedDiagram } from '@/backend';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+import { ExternalBlob } from '@/backend';
 
 export default function AttackPathPage() {
   const {
@@ -38,6 +41,9 @@ export default function AttackPathPage() {
     setSelectedElementType,
     selectedArrowId,
     setSelectedArrowId,
+    selectedElements,
+    selectMultipleElements,
+    clearSelection,
     addIcon,
     moveIcon,
     resizeIcon,
@@ -65,206 +71,247 @@ export default function AttackPathPage() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
-  const saveMutation = useSaveDiagramState();
+  const [textRotation, setTextRotation] = useState(0);
 
-  const handleModeChange = (newMode: 'place' | 'connect' | 'draw') => {
-    setMode(newMode);
-    if (newMode !== 'draw') {
-      setActiveDrawingTool(null);
-    }
+  const saveDiagramMutation = useSaveDiagramState();
+  const { data: allDiagrams = [], isLoading: isLoadingDiagrams } = useGetAllDiagrams();
+
+  const handleSave = () => {
+    setSaveDialogOpen(true);
   };
 
-  const handleImageUpload = (file: ExternalBlob, name: string) => {
-    // Add image to center of canvas
-    addImage(file, 400, 300, name, '');
-  };
-
-  const handleSave = async (name: string) => {
-    const diagramState = {
-      icons: placedIcons.map((icon) => ({
-        id: icon.id,
-        iconType: icon.type,
-        position: { x: icon.x, y: icon.y },
-        name: icon.type,
-      })),
-      connections: connections.map((conn) => ({
-        sourceId: conn.sourceId,
-        targetId: conn.targetId,
-        connectionType: 'default',
-        color: '#000000',
-      })),
-      freehandDrawings: drawings
-        .filter((d) => d.type === 'freehand')
-        .map((d) => ({
-          points: d.points.map((p) => ({ x: p.x, y: p.y })),
-          color: '#000000',
-          strokeWidth: 2,
-        })),
-      lines: drawings
-        .filter((d) => d.type === 'line' || d.type === 'arrow')
-        .map((d) => ({
-          startPosition: d.points[0],
-          endPosition: d.points[1],
-          color: '#000000',
-          strokeWidth: 2,
-          isArrow: d.type === 'arrow',
-        })),
-      textLabels: textLabels.map((label) => ({
-        content: label.text,
-        position: { x: label.x, y: label.y },
-        fontSize: label.fontSize || 16,
-        color: label.color,
-        fontWeight: 'bold',
-      })),
-      images: images.map((image) => ({
-        id: image.id,
-        file: image.file,
-        position: { x: image.x, y: image.y },
-        size: { width: image.width, height: image.height },
-        name: image.name,
-        description: image.description,
-      })),
-      lastModified: BigInt(Date.now() * 1000000),
-    };
-
+  const handleSaveConfirm = async (name: string) => {
     try {
-      await saveMutation.mutateAsync({ name, state: diagramState });
-      setSaveDialogOpen(false);
+      const diagramState = {
+        icons: placedIcons.map((icon) => ({
+          id: icon.id,
+          iconType: icon.type,
+          position: { x: icon.x, y: icon.y },
+          name: icon.name || '',
+        })),
+        connections: connections.map((conn) => ({
+          sourceId: conn.sourceId,
+          targetId: conn.targetId,
+          connectionType: 'arrow',
+          color: conn.color || 'oklch(0.65 0.18 150)',
+        })),
+        freehandDrawings: drawings
+          .filter((d) => d.type === 'freehand')
+          .map((d) => ({
+            points: d.points.map((p) => ({ x: p.x, y: p.y })),
+            color: d.color || '#000000',
+            strokeWidth: d.strokeWidth || 2,
+          })),
+        lines: drawings
+          .filter((d) => d.type === 'line' || d.type === 'arrow')
+          .map((d) => {
+            const drawingType: 'line' | 'arrow' = d.type === 'arrow' ? 'arrow' : 'line';
+            return {
+              startPosition: { x: d.points[0].x, y: d.points[0].y },
+              endPosition: { x: d.points[1].x, y: d.points[1].y },
+              color: d.color || '#000000',
+              strokeWidth: d.strokeWidth || 2,
+              isArrow: drawingType === 'arrow',
+            };
+          }),
+        textLabels: textLabels.map((label) => ({
+          content: label.text,
+          position: { x: label.x, y: label.y },
+          fontSize: label.fontSize || 16,
+          color: label.color,
+          fontWeight: label.fontWeight || 'normal',
+        })),
+        images: images.map((img) => ({
+          id: img.id,
+          file: img.file,
+          position: { x: img.x, y: img.y },
+          size: { width: img.width, height: img.height },
+          name: img.name,
+          description: img.description,
+        })),
+        lastModified: BigInt(Date.now()),
+      };
+
+      await saveDiagramMutation.mutateAsync({ name, state: diagramState });
       toast.success('Diagram saved successfully');
+      setSaveDialogOpen(false);
     } catch (error) {
-      toast.error('Failed to save diagram');
       console.error('Save error:', error);
+      toast.error('Failed to save diagram');
     }
   };
 
-  const handleLoad = (diagram: NamedDiagram) => {
-    const state = diagram.state;
-    
-    const restoredState = {
-      placedIcons: state.icons.map((icon) => ({
+  const handleLoad = () => {
+    setLoadDialogOpen(true);
+  };
+
+  const handleLoadDiagram = (diagram: NamedDiagram) => {
+    try {
+      const state = diagram.state;
+
+      const loadedIcons = state.icons.map((icon) => ({
         id: icon.id,
         type: icon.iconType as any,
         x: icon.position.x,
         y: icon.position.y,
         width: 48,
         height: 48,
-      })),
-      connections: state.connections.map((conn) => ({
+        name: icon.name,
+      }));
+
+      const loadedConnections = state.connections.map((conn) => ({
         id: `conn-${Date.now()}-${Math.random()}`,
         sourceId: conn.sourceId,
         targetId: conn.targetId,
+        color: conn.color,
         rotation: 0,
-      })),
-      drawings: [
+      }));
+
+      const loadedDrawings = [
         ...state.freehandDrawings.map((drawing) => ({
           id: `drawing-${Date.now()}-${Math.random()}`,
           type: 'freehand' as const,
-          points: drawing.points,
+          points: drawing.points.map((p) => ({ x: p.x, y: p.y })),
+          color: drawing.color,
+          strokeWidth: drawing.strokeWidth,
+          rotation: 0,
         })),
         ...state.lines.map((line) => {
-          const drawingType = line.isArrow ? 'arrow' : 'line';
+          const lineType = line.isArrow ? 'arrow' : 'line';
           return {
             id: `drawing-${Date.now()}-${Math.random()}`,
-            type: drawingType as 'arrow' | 'line',
-            points: [line.startPosition, line.endPosition],
+            type: lineType as 'arrow' | 'line',
+            points: [
+              { x: line.startPosition.x, y: line.startPosition.y },
+              { x: line.endPosition.x, y: line.endPosition.y },
+            ],
+            color: line.color,
+            strokeWidth: line.strokeWidth,
+            rotation: 0,
           };
         }),
-      ],
-      textLabels: state.textLabels.map((label) => ({
+      ];
+
+      const loadedTextLabels = state.textLabels.map((label) => ({
         id: `text-${Date.now()}-${Math.random()}`,
         text: label.content,
         x: label.position.x,
         y: label.position.y,
         color: label.color,
         fontSize: label.fontSize,
+        fontWeight: label.fontWeight,
         rotation: 0,
         width: undefined,
         height: undefined,
-      })),
-      images: state.images.map((image) => ({
-        id: image.id,
-        file: image.file,
-        x: image.position.x,
-        y: image.position.y,
-        width: image.size.width,
-        height: image.size.height,
-        name: image.name,
-        description: image.description,
-      })),
-    };
+      }));
 
-    restoreState(restoredState);
-    toast.success(`Diagram "${diagram.name}" loaded successfully`);
+      const loadedImages = state.images.map((img) => ({
+        id: img.id,
+        file: img.file,
+        x: img.position.x,
+        y: img.position.y,
+        width: img.size.width,
+        height: img.size.height,
+        name: img.name,
+        description: img.description,
+      }));
+
+      restoreState({
+        placedIcons: loadedIcons,
+        connections: loadedConnections,
+        drawings: loadedDrawings,
+        textLabels: loadedTextLabels,
+        images: loadedImages,
+      });
+
+      toast.success('Diagram loaded successfully');
+      setLoadDialogOpen(false);
+    } catch (error) {
+      console.error('Load error:', error);
+      toast.error('Failed to load diagram');
+    }
+  };
+
+  const handleClear = () => {
+    setClearDialogOpen(true);
+  };
+
+  const handleClearConfirm = () => {
+    clearAll();
+    toast.success('Diagram cleared');
+    setClearDialogOpen(false);
+  };
+
+  const handleImageUpload = (file: ExternalBlob, name: string) => {
+    addImage(file, 100, 100, name, '');
   };
 
   const handleSelectElement = (id: string | null, type: 'icon' | 'text' | 'arrow' | 'image' | null) => {
     setSelectedElementId(id);
     setSelectedElementType(type);
+    
+    // Update text rotation when selecting a text element
+    if (id && type === 'text') {
+      const label = textLabels.find((l) => l.id === id);
+      if (label) {
+        setTextRotation(label.rotation || 0);
+      }
+    }
   };
 
-  const handleSelectArrow = (id: string | null) => {
-    setSelectedArrowId(id);
+  const handleTextRotationChange = (rotation: number) => {
+    setTextRotation(rotation);
+    
+    // Apply rotation to selected text element
+    if (selectedElementId && selectedElementType === 'text') {
+      updateTextLabel(selectedElementId, { rotation });
+    }
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      <div className="w-64 border-r bg-background p-4 overflow-y-auto">
+    <div className="flex h-[calc(100vh-4rem)] w-full">
+      {/* Sidebar */}
+      <div className="w-80 border-r border-border bg-background overflow-y-auto p-6">
         <AttackPathToolbar
           activeDrawingTool={activeDrawingTool}
           onDrawingToolChange={setActiveDrawingTool}
           onUndo={undo}
           canUndo={canUndo}
-          onSave={() => setSaveDialogOpen(true)}
-          onLoad={() => setLoadDialogOpen(true)}
-          onClear={() => setClearDialogOpen(true)}
-          isSaving={saveMutation.isPending}
+          onSave={handleSave}
+          onLoad={handleLoad}
+          onClear={handleClear}
+          isSaving={saveDiagramMutation.isPending}
           textColor={textColor}
           onTextColorChange={setTextColor}
           fontSize={fontSize}
           onFontSizeChange={setFontSize}
           onImageUpload={handleImageUpload}
+          selectedElementId={selectedElementId}
+          selectedElementType={selectedElementType}
+          textRotation={textRotation}
+          onTextRotationChange={handleTextRotationChange}
         />
       </div>
 
-      <div className="flex-1 flex flex-col">
-        <div className="bg-background border-b p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleModeChange('place')}
-                className={`px-4 py-2 rounded ${
-                  mode === 'place' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-                }`}
-              >
-                Place
-              </button>
-              <button
-                onClick={() => handleModeChange('connect')}
-                className={`px-4 py-2 rounded ${
-                  mode === 'connect' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-                }`}
-              >
-                Connect
-              </button>
-              <button
-                onClick={() => handleModeChange('draw')}
-                className={`px-4 py-2 rounded ${
-                  mode === 'draw' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-                }`}
-              >
-                Draw
-              </button>
-            </div>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Mode: <span className="font-semibold capitalize">{mode}</span>
-            {activeDrawingTool && (
-              <>
-                {' '}
-                | Tool: <span className="font-semibold capitalize">{activeDrawingTool}</span>
-              </>
-            )}
-          </div>
+      {/* Main Canvas Area */}
+      <div className="flex-1 p-6">
+        <div className="mb-4 flex gap-2">
+          <Button
+            variant={mode === 'place' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setMode('place')}
+          >
+            <Layers className="h-4 w-4 mr-2" />
+            Place Mode
+          </Button>
+          <Button
+            variant={mode === 'connect' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setMode('connect')}
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Connect Mode
+          </Button>
         </div>
 
         <AttackPathCanvas
@@ -280,6 +327,7 @@ export default function AttackPathPage() {
           selectedElementId={selectedElementId}
           selectedElementType={selectedElementType}
           selectedArrowId={selectedArrowId}
+          selectedElements={selectedElements}
           onAddIcon={addIcon}
           onMoveIcon={moveIcon}
           onResizeIcon={resizeIcon}
@@ -298,41 +346,39 @@ export default function AttackPathPage() {
           onResizeImage={resizeImage}
           onRemoveImage={removeImage}
           onSelectElement={handleSelectElement}
-          onSelectArrow={handleSelectArrow}
+          onSelectArrow={setSelectedArrowId}
+          onSelectMultipleElements={selectMultipleElements}
+          onClearSelection={clearSelection}
         />
       </div>
 
+      {/* Save Dialog */}
       <SaveDiagramDialog
         open={saveDialogOpen}
         onOpenChange={setSaveDialogOpen}
-        onSave={handleSave}
-        isSaving={saveMutation.isPending}
+        onSave={handleSaveConfirm}
+        isSaving={saveDiagramMutation.isPending}
       />
 
+      {/* Load Dialog */}
       <LoadDiagramDialog
         open={loadDialogOpen}
         onOpenChange={setLoadDialogOpen}
-        onLoadDiagram={handleLoad}
+        onLoadDiagram={handleLoadDiagram}
       />
 
+      {/* Clear Confirmation Dialog */}
       <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear Canvas</AlertDialogTitle>
+            <AlertDialogTitle>Clear Diagram?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to clear the entire canvas? This action cannot be undone.
+              This will remove all elements from the canvas. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                clearAll();
-                setClearDialogOpen(false);
-              }}
-            >
-              Clear
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleClearConfirm}>Clear</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

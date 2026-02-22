@@ -1,9 +1,10 @@
 import AttackPathIcon from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Trash2, Image } from 'lucide-react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2, Image } from 'lucide-react';
 import { DrawingTool } from '@/hooks/useAttackPathState';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { ExternalBlob } from '@/backend';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -46,6 +47,10 @@ interface AttackPathToolbarProps {
   fontSize: number;
   onFontSizeChange: (size: number) => void;
   onImageUpload: (file: ExternalBlob, name: string) => void;
+  selectedElementId: string | null;
+  selectedElementType: 'icon' | 'text' | 'arrow' | 'image' | null;
+  textRotation: number;
+  onTextRotationChange: (rotation: number) => void;
 }
 
 export default function AttackPathToolbar({ 
@@ -62,6 +67,10 @@ export default function AttackPathToolbar({
   fontSize,
   onFontSizeChange,
   onImageUpload,
+  selectedElementId,
+  selectedElementType,
+  textRotation,
+  onTextRotationChange,
 }: AttackPathToolbarProps) {
   const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +126,8 @@ export default function AttackPathToolbar({
       }
     }
   };
+
+  const showTextControls = activeDrawingTool === 'text' || (selectedElementId && selectedElementType === 'text');
 
   return (
     <div className="space-y-4">
@@ -184,7 +195,7 @@ export default function AttackPathToolbar({
           <Type className="h-4 w-4 mr-2" />
           Text Label
         </Button>
-        {activeDrawingTool === 'text' && (
+        {showTextControls && (
           <div className="ml-6 space-y-3">
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">Font Size:</p>
@@ -222,8 +233,28 @@ export default function AttackPathToolbar({
                 />
               </div>
             </div>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Rotation: {textRotation}°</p>
+              <Slider
+                value={[textRotation]}
+                onValueChange={(values) => onTextRotationChange(values[0])}
+                min={0}
+                max={360}
+                step={1}
+                className="w-full"
+              />
+            </div>
           </div>
         )}
+        <Button
+          variant={activeDrawingTool === 'transform' ? 'default' : 'outline'}
+          size="sm"
+          className="w-full justify-start"
+          onClick={() => onDrawingToolChange(activeDrawingTool === 'transform' ? null : 'transform')}
+        >
+          <Move className="h-4 w-4 mr-2" />
+          Free Transform
+        </Button>
         <Button
           variant={activeDrawingTool === 'eraser' ? 'destructive' : 'outline'}
           size="sm"

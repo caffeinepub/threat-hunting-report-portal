@@ -7,6 +7,7 @@ import { useGetCallerUserProfile } from '../hooks/useGetCallerUserProfile';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isAttackPathPage = location.pathname === '/attack-path';
   const { data: userProfile } = useGetCallerUserProfile();
 
   return (
@@ -65,7 +66,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className={isAttackPathPage ? 'w-full' : 'container mx-auto px-4 py-8'}>
+        {children}
+      </main>
 
       <footer className="border-t border-border mt-16 py-8 bg-card/30">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">

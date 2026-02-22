@@ -10,7 +10,6 @@ export interface PlacedIcon {
   width?: number;
   height?: number;
   name?: string;
-  labelId?: string; // Associated text label ID
 }
 
 export interface Connection {
@@ -41,7 +40,6 @@ export interface TextLabel {
   rotation?: number;
   width?: number;
   height?: number;
-  iconId?: string; // Associated icon ID
 }
 
 export interface UploadedImage {
@@ -55,7 +53,7 @@ export interface UploadedImage {
   description: string;
 }
 
-export type DrawingTool = 'freehand' | 'line' | 'arrow' | 'text' | 'eraser' | null;
+export type DrawingTool = 'freehand' | 'line' | 'arrow' | 'text' | 'eraser' | 'transform' | null;
 
 interface AttackPathState {
   placedIcons: PlacedIcon[];
@@ -63,6 +61,13 @@ interface AttackPathState {
   drawings: DrawingPath[];
   textLabels: TextLabel[];
   images: UploadedImage[];
+}
+
+export interface SelectedElements {
+  icons: Set<string>;
+  textLabels: Set<string>;
+  images: Set<string>;
+  connections: Set<string>;
 }
 
 export function useAttackPathState() {
@@ -78,6 +83,12 @@ export function useAttackPathState() {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedElementType, setSelectedElementType] = useState<'icon' | 'text' | 'arrow' | 'image' | null>(null);
   const [selectedArrowId, setSelectedArrowId] = useState<string | null>(null);
+  const [selectedElements, setSelectedElements] = useState<SelectedElements>({
+    icons: new Set(),
+    textLabels: new Set(),
+    images: new Set(),
+    connections: new Set(),
+  });
   const maxHistorySize = 50;
 
   const saveToHistory = () => {
@@ -114,57 +125,21 @@ export function useAttackPathState() {
 
   const addIcon = (type: IconType, x: number, y: number) => {
     saveToHistory();
-    const iconId = `icon-${Date.now()}-${Math.random()}`;
-    const labelId = `text-${Date.now()}-${Math.random()}`;
-    
     const newIcon: PlacedIcon = {
-      id: iconId,
+      id: `icon-${Date.now()}-${Math.random()}`,
       type,
       x,
       y,
       width: 48,
       height: 48,
-      labelId,
     };
-    
-    const newLabel: TextLabel = {
-      id: labelId,
-      text: type,
-      x: x,
-      y: y + 60,
-      color: textColor,
-      fontSize: 14,
-      fontWeight: 'normal',
-      iconId,
-    };
-    
     setPlacedIcons((prev) => [...prev, newIcon]);
-    setTextLabels((prev) => [...prev, newLabel]);
   };
 
   const moveIcon = (id: string, x: number, y: number) => {
-    const icon = placedIcons.find((i) => i.id === id);
-    if (!icon) return;
-    
-    const oldX = icon.x;
-    const oldY = icon.y;
-    const deltaX = x - oldX;
-    const deltaY = y - oldY;
-    
     setPlacedIcons((prev) =>
       prev.map((icon) => (icon.id === id ? { ...icon, x, y } : icon))
     );
-    
-    // Move associated label
-    if (icon.labelId) {
-      setTextLabels((prev) =>
-        prev.map((label) =>
-          label.id === icon.labelId
-            ? { ...label, x: label.x + deltaX, y: label.y + deltaY }
-            : label
-        )
-      );
-    }
   };
 
   const resizeIcon = (id: string, width: number, height: number) => {
@@ -175,15 +150,7 @@ export function useAttackPathState() {
 
   const removeIcon = (id: string) => {
     saveToHistory();
-    const icon = placedIcons.find((i) => i.id === id);
-    
     setPlacedIcons((prev) => prev.filter((icon) => icon.id !== id));
-    
-    // Remove associated label
-    if (icon?.labelId) {
-      setTextLabels((prev) => prev.filter((label) => label.id !== icon.labelId));
-    }
-    
     // Also remove connections involving this icon
     setConnections((prev) =>
       prev.filter((conn) => conn.sourceId !== id && conn.targetId !== id)
@@ -335,6 +302,36 @@ export function useAttackPathState() {
     setImages(state.images);
   };
 
+  const selectMultipleElements = (elements: SelectedElements) => {
+    setSelectedElements(elements);
+  };
+
+  const clearSelection = () => {
+    setSelectedElements({
+      icons: new Set(),
+      textLabels: new Set(),
+      images: new Set(),
+      connections: new Set(),
+    });
+  };
+
+  const toggleElementInSelection = (id: string, type: 'icon' | 'text' | 'image' | 'connection') => {
+    setSelectedElements((prev) => {
+      const newSelection = { ...prev };
+      const key = type === 'text' ? 'textLabels' : type === 'connection' ? 'connections' : `${type}s` as keyof SelectedElements;
+      const set = new Set(prev[key]);
+      
+      if (set.has(id)) {
+        set.delete(id);
+      } else {
+        set.add(id);
+      }
+      
+      newSelection[key] = set;
+      return newSelection;
+    });
+  };
+
   return {
     placedIcons,
     connections,
@@ -353,6 +350,10 @@ export function useAttackPathState() {
     setSelectedElementType,
     selectedArrowId,
     setSelectedArrowId,
+    selectedElements,
+    selectMultipleElements,
+    clearSelection,
+    toggleElementInSelection,
     addIcon,
     moveIcon,
     resizeIcon,
