@@ -1,21 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-22T07:39:32.462Z",
+  "generatedAt": "2026-02-22T08:41:10.794Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Replace icon images for seven specific attack path diagram icons at XPath locations /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[12]/img[1], div[13]/img[1], div[14]/img[1], div[15]/img[1], div[16]/img[1], div[17]/img[1], and div[18]/img[1] with uploaded images word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, and ppt.png respectively, mapping each image to its corresponding icon type based on file name semantics",
+        "id": "REQ-7",
+        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx"
+        ],
+        "matchedFiles": [
           "frontend/src/components/AttackPathIcon.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathCanvas.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/AttackPathIcon.tsx"

@@ -9,14 +9,14 @@ interface AttackPathIconProps {
 export default function AttackPathIcon({ type, width = 48, height = 48 }: AttackPathIconProps) {
   const iconMap: Record<IconType, string> = {
     user: '/assets/generated/user-single.dim_128x128.png',
-    multipleUsers: '/assets/generated/multiple-users-icon.dim_128x128.png',
-    multipleComputers: '/assets/generated/multiple-computers-icon.dim_128x128.png',
-    multipleServers: '/assets/generated/multiple-servers.dim_128x128.png',
-    attacker: '/assets/generated/icon-attacker.dim_64x64.png',
-    computer: '/assets/generated/computer-icon.dim_128x128.png',
-    server: '/assets/generated/icon-server.dim_64x64.png',
-    domain: '/assets/generated/icon-domain.dim_64x64.png',
-    email: '/assets/generated/icon-email.dim_64x64.png',
+    multipleUsers: '/assets/multiple users icon.png',
+    multipleComputers: '/assets/multiple computer.png',
+    multipleServers: '/assets/Multiple Server Icon.png',
+    attacker: '/assets/attacker.png',
+    computer: '/assets/Computer.png',
+    server: '/assets/server icon.png',
+    domain: '/assets/Domain.png',
+    email: '/assets/email.png',
     fileFolder: '/assets/generated/icon-file.dim_64x64.png',
     exe: '/assets/exe.png',
     dll: '/assets/dll-1.png',
@@ -26,7 +26,7 @@ export default function AttackPathIcon({ type, width = 48, height = 48 }: Attack
     pdf: '/assets/pdf.png',
     ppt: '/assets/ppt.png',
     zip: '/assets/zip.png',
-    c2: '/assets/generated/c2-icon.dim_128x128.png',
+    c2: '/assets/Command and Control.png',
   };
 
   const iconSrc = iconMap[type];

@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update attack path diagram icons to use uploaded file type images that match their semantic names.
+**Goal:** Replace three specific icon images in the attack path diagram with uploaded images based on their names.
 
 **Planned changes:**
-- Replace seven attack path diagram icons with user-uploaded images (word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, ppt.png)
-- Map each uploaded image to its corresponding IconType in AttackPathIcon.tsx based on file name semantics
+- Replace the icon at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with 'Multiple Server Icon.png'
+- Replace the icon at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with 'Command and Control.png'
+- Replace the icon at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with 'Domain.png'
 
-**User-visible outcome:** Attack path diagrams display file type icons that visually match the actual file types they represent (Word documents show DOC icon, PDFs show PDF icon, etc.).
+**User-visible outcome:** The attack path diagram displays the correct custom icons at the three specified locations, matching the uploaded image files.

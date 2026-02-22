@@ -1,11 +1,36 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-22T07:39:32.459Z",
-  "summary": "The diff implements REQ-1 completely. All seven file type icons in AttackPathIcon.tsx have been updated to use the specified uploaded images (word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, ppt.png) mapped to their corresponding IconType values. The drag-and-drop functionality is preserved. No hallucinated features detected.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-22T08:41:10.791Z",
+  "summary": "The diff shows changes to AttackPathIcon.tsx that update icon mappings for 'multipleServers', 'domain', and 'c2' types to use the new uploaded images. However, the BuildRequest specifies XPath-based replacements in the DOM, not changes to icon type mappings in a component. The implementation addresses icon updates but through a different mechanism than requested.",
+  "missing_requirements": [
+    {
+      "id": "REQ-7",
+      "requirement": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
+      "reason": "The diff shows changes to AttackPathIcon.tsx component mappings, but no evidence of XPath-based DOM manipulation to target the specific element at the requested XPath location. The requirement explicitly calls for updating an element at a specific XPath, not updating component icon mappings.",
+      "evidence": [
+        "frontend/src/components/AttackPathIcon.tsx"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+      "reason": "The diff shows changes to AttackPathIcon.tsx component mappings, but no evidence of XPath-based DOM manipulation to target the specific element at the requested XPath location. The requirement explicitly calls for updating an element at a specific XPath, not updating component icon mappings.",
+      "evidence": [
+        "frontend/src/components/AttackPathIcon.tsx"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "requirement": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+      "reason": "The diff shows changes to AttackPathIcon.tsx component mappings, but no evidence of XPath-based DOM manipulation to target the specific element at the requested XPath location. The requirement explicitly calls for updating an element at a specific XPath, not updating component icon mappings.",
+      "evidence": [
+        "frontend/src/components/AttackPathIcon.tsx"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.95,
+  "confidence": 0.75,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/AttackPathIcon.tsx",

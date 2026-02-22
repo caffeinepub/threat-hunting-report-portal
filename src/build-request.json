@@ -1,41 +1,69 @@
 {
   "kind": "build_request",
-  "title": "Update attack path diagram icons to match file type names",
-  "projectName": "Threat Hunting Portal",
+  "title": "Update icon images at three XPath locations based on uploaded names",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Replace icon images for seven specific attack path diagram icons at XPath locations /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[12]/img[1], div[13]/img[1], div[14]/img[1], div[15]/img[1], div[16]/img[1], div[17]/img[1], and div[18]/img[1] with uploaded images word.png, pdf.png, excel.png, script-1.png, zip.png, dll-1.png, and ppt.png respectively, mapping each image to its corresponding icon type based on file name semantics",
+      "id": "REQ-7",
+      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-current"
         ],
         "quotes": [
           "change image of the icons based on there names"
         ]
       },
       "acceptanceCriteria": [
-        "Icon at div[12]/img[1] uses word.png for Word document icon",
-        "Icon at div[13]/img[1] uses pdf.png for PDF document icon",
-        "Icon at div[14]/img[1] uses excel.png for Excel/CSV document icon",
-        "Icon at div[15]/img[1] uses script-1.png for script file icon",
-        "Icon at div[16]/img[1] uses zip.png for archive file icon",
-        "Icon at div[17]/img[1] uses dll-1.png for DLL/library file icon",
-        "Icon at div[18]/img[1] uses ppt.png for PowerPoint document icon",
-        "All seven uploaded images are correctly mapped to their respective IconType values in AttackPathIcon.tsx"
+        "The icon at the specified XPath displays the uploaded Multiple Server Icon.png image",
+        "The image is properly sized and rendered in the attack path diagram"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-current"
+        ],
+        "quotes": [
+          "change image of the icons based on there names"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The icon at the specified XPath displays the uploaded Command and Control.png image",
+        "The image is properly sized and rendered in the attack path diagram"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-current"
+        ],
+        "quotes": [
+          "change image of the icons based on there names"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The icon at the specified XPath displays the uploaded Domain.png image",
+        "The image is properly sized and rendered in the attack path diagram"
       ]
     }
   ],
   "constraints": [
-    "Must preserve existing drag-and-drop functionality in AttackPathIcon.tsx",
-    "Must maintain backward compatibility with existing diagram state that references these icon types"
+    "Only modify the three specific icon elements identified by the provided XPath expressions",
+    "Use the exact uploaded image files: 'Multiple Server Icon.png', 'Command and Control.png', and 'Domain.png'",
+    "Preserve existing drag-and-drop functionality and icon placement behavior"
   ],
   "nonGoals": [
-    "Modifying other icons not specified in the seven XPath locations",
-    "Changing the IconType enum or type system",
-    "Altering the canvas rendering logic beyond icon image sources"
+    "Modifying any other icon images not specified by the XPath expressions",
+    "Changing icon rendering logic or canvas behavior",
+    "Adding new icon types to the toolbar"
   ],
   "imageRequirements": {
     "required": [],
