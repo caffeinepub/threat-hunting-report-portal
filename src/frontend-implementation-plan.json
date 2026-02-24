@@ -1,65 +1,86 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update icon images at three XPath locations based on uploaded names",
+  "title": "Add draggable icon toolbar with 6 security icons",
   "requirements": [
     {
-      "id": "REQ-7",
-      "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
+      "id": "REQ-1",
+      "summary": "Add Lucide React icons for Backdoor/Virus, Phishing Email, Cloud Server, Firewall, Router Device, and Scheduled Task to the AttackPathToolbar component",
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Multiple Server Icon.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Six new icon buttons are added to the AttackPathToolbar using Lucide React library",
+        "Icons are arranged horizontally in the toolbar",
+        "Icons use appropriate Lucide React components (Bug/Shield for Backdoor, Mail for Phishing, Cloud for Cloud Server, Shield for Firewall, Wifi for Router, Clock for Scheduled Task)"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Update the icon type mapping to use the uploaded 'Multiple Server Icon.png' image file located at frontend/public/assets/Multiple Server Icon.png for the appropriate icon type (likely 'multipleServers' or similar). Ensure the image path is correctly referenced and the icon renders at the proper size within the attack path diagram."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "If necessary, update the icon rendering logic to ensure icons using the uploaded Multiple Server Icon.png file display correctly at the XPath location specified. Verify that drag-and-drop functionality and icon placement behavior are preserved for this icon type."
+          "description": "Add six new icon type constants to the ICON_TYPES array: 'backdoor', 'phishing', 'cloud-server', 'firewall', 'router', and 'scheduled-task'. Add corresponding Lucide React icon imports (Bug, Mail, Cloud, Shield, Wifi, Clock). Update the icon button rendering logic to use Lucide React icons instead of image assets for these six new types. Ensure the icons are displayed horizontally in the toolbar alongside existing icon buttons. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-8",
-      "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+      "id": "REQ-2",
+      "summary": "Implement drag-and-drop functionality for the six security icons so users can drag them from the toolbar and drop them into the attack path diagram canvas",
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Command and Control.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Each icon button in the toolbar supports drag operations",
+        "Icons can be dragged from the toolbar and dropped onto the AttackPathCanvas",
+        "Dropped icons are placed at the correct coordinates on the canvas",
+        "The icon type information is preserved during drag-and-drop"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AttackPathIcon.tsx",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Update the icon type mapping to use the uploaded 'Command and Control.png' image file located at frontend/public/assets/Command and Control.png for the appropriate icon type (likely 'c2' or 'commandAndControl'). Ensure the image path is correctly referenced and the icon renders at the proper size within the attack path diagram."
+          "description": "Add draggable={true} attribute and onDragStart handler to the six new icon buttons. In the onDragStart handler, use dataTransfer.setData to store the icon type as 'iconType' and set effectAllowed to 'copy'. Ensure the drag data format matches what AttackPathCanvas expects for drop handling."
         },
         {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "If necessary, update the icon rendering logic to ensure icons using the uploaded Command and Control.png file display correctly at the XPath location specified. Verify that drag-and-drop functionality and icon placement behavior are preserved for this icon type."
+          "description": "Update the onDrop handler to support dropping icons from the toolbar. Extract the icon type from event.dataTransfer.getData('iconType'). Calculate the drop position relative to the canvas using event.clientX/Y and canvas.getBoundingClientRect(). Call the existing icon placement logic (addIcon or equivalent from useAttackPathState) with the icon type and calculated position. Ensure dropped icons are added to the diagram state and rendered correctly."
         }
       ]
     },
     {
-      "id": "REQ-9",
-      "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+      "id": "REQ-3",
+      "summary": "Update the icon type definitions in AttackPathToolbar to include the six new security icon types: backdoor, phishing, cloud-server, firewall, router, and scheduled-task",
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Domain.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Icon type enum or type definition includes all six new icon types",
+        "AttackPathIcon component can render all six new icon types",
+        "Icon type mapping correctly associates each type with its Lucide React icon component"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathIcon.tsx",
           "operation": "modify",
-          "description": "Update the icon type mapping to use the uploaded 'Domain.png' image file located at frontend/public/assets/Domain.png for the appropriate icon type (likely 'domain'). Ensure the image path is correctly referenced and the icon renders at the proper size within the attack path diagram."
+          "description": "Add conditional rendering logic to handle the six new Lucide React icon types ('backdoor', 'phishing', 'cloud-server', 'firewall', 'router', 'scheduled-task'). Import the corresponding Lucide React components (Bug, Mail, Cloud, Shield, Wifi, Clock). For these icon types, render the Lucide React component instead of an img element. Maintain existing drag-and-drop support and styling. Reference the generated icon assets at frontend/public/assets/generated/backdoor-virus-icon.dim_256x256.png, frontend/public/assets/generated/phishing-email-icon.dim_256x256.png, frontend/public/assets/generated/cloud-server-icon.dim_256x256.png, frontend/public/assets/generated/firewall-icon.dim_256x256.png, frontend/public/assets/generated/router-device-icon.dim_256x256.png, and frontend/public/assets/generated/scheduled-task-icon.dim_256x256.png as fallback if needed, but prioritize Lucide React icons."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Ensure dragged security icons integrate with existing AttackPathCanvas functionality including selection, movement, connection, and state management",
+      "acceptanceCriteria": [
+        "Dropped icons can be selected, moved, and connected like existing icons",
+        "Icons are included in save/load diagram state operations",
+        "Icons work with undo functionality",
+        "Icons can be deleted and support multi-select operations"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Verify that the addIcon method (or equivalent icon placement function) properly initializes all required icon properties including id, name, iconType, and position. Ensure the new icon types ('backdoor', 'phishing', 'cloud-server', 'firewall', 'router', 'scheduled-task') are compatible with existing state management, undo history tracking, and serialization logic. No changes needed if the current implementation is type-agnostic and treats all iconType values uniformly."
         },
         {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "If necessary, update the icon rendering logic to ensure icons using the uploaded Domain.png file display correctly at the XPath location specified. Verify that drag-and-drop functionality and icon placement behavior are preserved for this icon type."
+          "description": "Verify that the icon selection, movement (onMouseMove for drag), connection creation, deletion, and multi-select operations work correctly with the new icon types. Ensure that the existing event handlers (onClick for selection, onMouseDown/onMouseMove for dragging, connection mode logic) treat the new Lucide-based icons identically to existing image-based icons. Test that icons rendered with Lucide React components respond to click and drag events as expected."
+        },
+        {
+          "path": "frontend/src/pages/AttackPathPage.tsx",
+          "operation": "modify",
+          "description": "Verify that the save diagram dialog (SaveDiagramDialog) and load diagram dialog (LoadDiagramDialog) correctly persist and restore icons of the new types. Ensure the diagram state serialization includes all icon properties (id, name, iconType, position) and that deserialized icons are rendered correctly after loading. Confirm undo functionality properly reverts icon placement operations for the new icon types."
         }
       ]
     }

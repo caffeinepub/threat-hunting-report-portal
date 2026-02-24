@@ -1,50 +1,59 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-22T08:41:10.794Z",
+  "generatedAt": "2026-02-24T07:36:10.026Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 4,
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-7",
-        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
+        "id": "REQ-1",
+        "summary": "Add Lucide React icons for Backdoor/Virus, Phishing Email, Cloud Server, Firewall, Router Device, and Scheduled Task to the AttackPathToolbar component",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx",
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Implement drag-and-drop functionality for the six security icons so users can drag them from the toolbar and drop them into the attack path diagram canvas",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathToolbar.tsx",
           "frontend/src/components/AttackPathCanvas.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AttackPathToolbar.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Update the icon type definitions in AttackPathToolbar to include the six new security icon types: backdoor, phishing, cloud-server, firewall, router, and scheduled-task",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AttackPathIcon.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/AttackPathIcon.tsx"
         ]
       },
       {
-        "id": "REQ-8",
-        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
-        "status": "implemented",
+        "id": "REQ-4",
+        "summary": "Ensure dragged security icons integrate with existing AttackPathCanvas functionality including selection, movement, connection, and state management",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx",
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/hooks/useAttackPathState.ts",
+          "frontend/src/components/AttackPathCanvas.tsx",
+          "frontend/src/pages/AttackPathPage.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx"
-        ]
-      },
-      {
-        "id": "REQ-9",
-        "summary": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx",
-          "frontend/src/components/AttackPathCanvas.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AttackPathIcon.tsx"
-        ]
+        "matchedFiles": []
       }
     ]
   },
@@ -54,6 +63,7 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/AttackPathIcon.tsx",
+    "frontend/src/components/AttackPathToolbar.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

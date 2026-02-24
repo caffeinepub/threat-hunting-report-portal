@@ -1,69 +1,89 @@
 {
   "kind": "build_request",
-  "title": "Update icon images at three XPath locations based on uploaded names",
+  "title": "Add draggable icon toolbar with 6 security icons",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-7",
-      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
+      "id": "REQ-1",
+      "text": "Add Lucide React icons for Backdoor/Virus, Phishing Email, Cloud Server, Firewall, Router Device, and Scheduled Task to the AttackPathToolbar component",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-current"
+          "msg-recent"
         ],
         "quotes": [
-          "change image of the icons based on there names"
+          "cleaner, more consistent modern icons",
+          "horizontally"
         ]
       },
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Multiple Server Icon.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Six new icon buttons are added to the AttackPathToolbar using Lucide React library",
+        "Icons are arranged horizontally in the toolbar",
+        "Icons use appropriate Lucide React components (Bug/Shield for Backdoor, Mail for Phishing, Cloud for Cloud Server, Shield for Firewall, Wifi for Router, Clock for Scheduled Task)"
       ]
     },
     {
-      "id": "REQ-8",
-      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+      "id": "REQ-2",
+      "text": "Implement drag-and-drop functionality for the six security icons so users can drag them from the toolbar and drop them into the attack path diagram canvas",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-current"
+          "msg-recent"
         ],
         "quotes": [
-          "change image of the icons based on there names"
+          "I could drag and drop in the diagram"
         ]
       },
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Command and Control.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Each icon button in the toolbar supports drag operations",
+        "Icons can be dragged from the toolbar and dropped onto the AttackPathCanvas",
+        "Dropped icons are placed at the correct coordinates on the canvas",
+        "The icon type information is preserved during drag-and-drop"
       ]
     },
     {
-      "id": "REQ-9",
-      "text": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+      "id": "REQ-3",
+      "text": "Update the icon type definitions in AttackPathToolbar to include the six new security icon types: backdoor, phishing, cloud-server, firewall, router, and scheduled-task",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-current"
-        ],
-        "quotes": [
-          "change image of the icons based on there names"
+          "msg-recent"
         ]
       },
       "acceptanceCriteria": [
-        "The icon at the specified XPath displays the uploaded Domain.png image",
-        "The image is properly sized and rendered in the attack path diagram"
+        "Icon type enum or type definition includes all six new icon types",
+        "AttackPathIcon component can render all six new icon types",
+        "Icon type mapping correctly associates each type with its Lucide React icon component"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Ensure dragged security icons integrate with existing AttackPathCanvas functionality including selection, movement, connection, and state management",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dropped icons can be selected, moved, and connected like existing icons",
+        "Icons are included in save/load diagram state operations",
+        "Icons work with undo functionality",
+        "Icons can be deleted and support multi-select operations"
       ]
     }
   ],
   "constraints": [
-    "Only modify the three specific icon elements identified by the provided XPath expressions",
-    "Use the exact uploaded image files: 'Multiple Server Icon.png', 'Command and Control.png', and 'Domain.png'",
-    "Preserve existing drag-and-drop functionality and icon placement behavior"
+    "Use Lucide React icon library exclusively for these icons",
+    "Maintain horizontal toolbar layout",
+    "Do not modify backend diagram state schema",
+    "Icons must integrate with existing drag-and-drop and state management in AttackPathCanvas"
   ],
   "nonGoals": [
-    "Modifying any other icon images not specified by the XPath expressions",
-    "Changing icon rendering logic or canvas behavior",
-    "Adding new icon types to the toolbar"
+    "Changing the visual style of existing toolbar elements",
+    "Adding filtering or search functionality for icons",
+    "Implementing custom icon designs or animations",
+    "Modifying the backend data model"
   ],
   "imageRequirements": {
     "required": [],

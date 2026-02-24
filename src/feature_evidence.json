@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-the-icon-image-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-1-div-3-div-8-img-1-with-the-uploaded-multiple-server-icon-png-image",
-      "featureTitle": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[8]/img[1]' with the uploaded 'Multiple Server Icon.png' image",
+      "featureId": "feature-add-lucide-react-icons-for-backdoor-virus-phishing-email-cloud-server-firewall-router-device-and-scheduled-task-to-the-attackpathtoolbar-component",
+      "featureTitle": "Add Lucide React icons for Backdoor/Virus, Phishing Email, Cloud Server, Firewall, Router Device, and Scheduled Task to the AttackPathToolbar component",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx"
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,15 +17,15 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-icon-image-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-1-div-3-div-9-img-1-with-the-uploaded-command-and-control-png-image",
-      "featureTitle": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[9]/img[1]' with the uploaded 'Command and Control.png' image",
+      "featureId": "feature-implement-drag-and-drop-functionality-for-the-six-security-icons-so-users-can-drag-them-from-the-toolbar-and-drop-them-into-the-attack-path-diagram-canvas",
+      "featureTitle": "Implement drag-and-drop functionality for the six security icons so users can drag them from the toolbar and drop them into the attack path diagram canvas",
       "files": [
-        "frontend/src/components/AttackPathIcon.tsx"
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -37,13 +37,13 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-icon-image-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-1-div-3-div-19-img-1-with-the-uploaded-domain-png-image",
-      "featureTitle": "Replace the icon image at XPath '/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[3]/div[19]/img[1]' with the uploaded 'Domain.png' image",
+      "featureId": "feature-update-the-icon-type-definitions-in-attackpathtoolbar-to-include-the-six-new-security-icon-types-backdoor-phishing-cloud-server-firewall-router-and-scheduled-task",
+      "featureTitle": "Update the icon type definitions in AttackPathToolbar to include the six new security icon types: backdoor, phishing, cloud-server, firewall, router, and scheduled-task",
       "files": [
         "frontend/src/components/AttackPathIcon.tsx"
       ],
@@ -57,7 +57,7 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-9"
+        "REQ-3"
       ],
       "confidence": "high"
     }

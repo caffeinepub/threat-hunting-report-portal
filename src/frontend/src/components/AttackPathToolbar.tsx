@@ -9,7 +9,7 @@ import { ExternalBlob } from '@/backend';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user' | 'multipleUsers' | 'multipleComputers' | 'multipleServers';
+export type IconType = 'email' | 'attacker' | 'computer' | 'server' | 'domain' | 'fileFolder' | 'exe' | 'dll' | 'pdf' | 'ppt' | 'csv' | 'zip' | 'doc' | 'c2' | 'script' | 'user' | 'multipleUsers' | 'multipleComputers' | 'multipleServers' | 'backdoor' | 'phishing' | 'cloudServer' | 'firewall' | 'router' | 'scheduledTask';
 
 const iconTypes: { type: IconType; label: string }[] = [
   { type: 'user', label: 'Man' },
@@ -31,6 +31,12 @@ const iconTypes: { type: IconType; label: string }[] = [
   { type: 'zip', label: '.zip' },
   { type: 'doc', label: 'Microsoft Word' },
   { type: 'c2', label: 'Command & Control' },
+  { type: 'backdoor', label: 'Backdoor/Virus' },
+  { type: 'phishing', label: 'Phishing Email' },
+  { type: 'cloudServer', label: 'Cloud Server' },
+  { type: 'firewall', label: 'Firewall' },
+  { type: 'router', label: 'Router Device' },
+  { type: 'scheduledTask', label: 'Scheduled Task' },
 ];
 
 interface AttackPathToolbarProps {
