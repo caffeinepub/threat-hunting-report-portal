@@ -1,48 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Extend eraser and free transform tools for all diagram elements",
+  "title": "Resizable images, resizable text, and rotation via Free Transform tool",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Extend the eraser tool to erase all diagram element types (icons, text labels, freehand drawings, lines/arrows, and images)",
+      "summary": "Add resize capability for uploaded images on the attack path canvas with 8 drag handles",
       "acceptanceCriteria": [
-        "Eraser tool removes icons/attack path nodes when clicked or dragged over them",
-        "Eraser tool removes text labels when clicked or dragged over them",
-        "Eraser tool removes freehand drawings when clicked or dragged over them",
-        "Eraser tool removes line and arrow connections when clicked or dragged over them",
-        "Eraser tool removes image elements when clicked or dragged over them",
-        "All other toolbar tools remain unaffected"
+        "Selecting an uploaded image on the canvas shows 8 resize handles around it.",
+        "Dragging a corner or edge handle resizes the image element.",
+        "The image visually updates during the drag operation.",
+        "Resize state is persisted as part of the diagram element (width/height)."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Extend the Image interface to include width and height fields if not already present. Ensure these dimensions are tracked in state and included in the undo/redo history. Update any helper functions that create or modify Image elements to preserve these dimensions."
+        },
+        {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Extend the eraser tool (toolbar button 7, tool type 'eraser') to detect and remove all diagram element types. Add hit detection logic in the handleMouseDown and handleMouseMove handlers when selectedTool === 'eraser' to check if the mouse coordinates intersect with icons (DiagramIcon), text labels (TextLabel), freehand drawings (FreehandDrawing), lines/arrows (Line/Connection), or images (Image). When an element is intersected, call the appropriate delete function from useAttackPathState (deleteIcon, deleteTextLabel, deleteFreehandDrawing, deleteLine, deleteConnection, deleteImage). Ensure eraser logic does not interfere with other tool behaviors."
+          "description": "Implement image resize logic. When an Image element is selected, render 8 resize handles (4 corners + 4 edge midpoints) around the image bounding box. Add mouse event handlers that detect drag operations on these handles and update the Image width/height in real time via the useAttackPathState hook. Support Shift-key constraint for aspect ratio preservation during corner drags. Ensure resize operations are recorded in the undo/redo history."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Extend the free transform tool to support selecting, moving, and resizing icon elements (DiagramIcon) in the diagram",
+      "summary": "Add resize capability for text elements on the attack path canvas with 8 drag handles",
       "acceptanceCriteria": [
-        "Activating the free transform tool and clicking an icon displays a selection bounding box with resize handles",
-        "Dragging an icon while free transform is active moves it to the new position",
-        "Dragging a corner or edge handle resizes the icon proportionally or freely",
-        "Icon position and size changes are persisted to diagram state",
-        "Deselecting (clicking elsewhere) hides the handles",
-        "Existing free transform behavior for images and text labels is not broken"
+        "Selecting a text element on the canvas shows 8 resize handles around the text box.",
+        "Dragging a handle resizes the text box in real time.",
+        "Text wraps within the new dimensions of the text box.",
+        "Width and height are stored on the TextLabel element in useAttackPathState."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Extend the TextLabel interface to include width and height fields. Ensure these dimensions are tracked in state and included in the undo/redo history. Update any helper functions that create or modify TextLabel elements to preserve these dimensions."
+        },
+        {
           "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Extend the free transform tool (toolbar button 8, tool type 'freeTransform') to support icons. Add selection logic in handleMouseDown when selectedTool === 'freeTransform' to detect clicks on icon elements and store the selected icon reference (similar to selectedImage and selectedLabel). Render a selection bounding box with 8 resize handles around the selected icon (reuse the existing renderResizeHandles pattern for images/text). Implement drag-to-move behavior in handleMouseMove to update the icon's position via updateIcon from useAttackPathState. Implement resize handle dragging to scale the icon's width and height, updating icon state via updateIcon. Add deselection logic on background clicks to clear the selected icon. Ensure existing free transform behavior for images and text labels continues to work."
-        },
+          "description": "Implement text element resize logic. When a TextLabel element is selected, render 8 resize handles (4 corners + 4 edge midpoints) around the text bounding box. Add mouse event handlers that detect drag operations on these handles and update the TextLabel width/height in real time via the useAttackPathState hook. Ensure the rendered text wraps within the resized box dimensions (using SVG foreignObject or div with overflow handling). Ensure resize operations are recorded in the undo/redo history."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add rotation capability for text and image elements via the Free Transform tool",
+      "acceptanceCriteria": [
+        "With the Free Transform tool active, selecting a text or image element shows a rotation handle.",
+        "Dragging the rotation handle rotates the element around its center in real time.",
+        "Rotation angle is stored on the element in useAttackPathState (TextLabel and Image types).",
+        "The rotated transform is correctly applied via CSS transform or SVG transform attribute.",
+        "Rotation is preserved when the diagram is saved and reloaded."
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/hooks/useAttackPathState.ts",
           "operation": "modify",
-          "description": "Add an updateIcon function to the useAttackPathState hook that accepts an icon id and partial icon properties (position, width, height) and updates the corresponding icon in the icons array, recording the change in history for undo/redo. Ensure the Icon interface in this file supports width and height properties if not already present."
+          "description": "Extend both the TextLabel and Image interfaces to include a rotation field (in degrees, defaulting to 0). Ensure rotation angle is tracked in state and included in the undo/redo history. Update any helper functions that create or modify these elements to preserve the rotation value."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Implement rotation logic for the Free Transform tool. When the Free Transform tool is active and a TextLabel or Image element is selected, render a rotation handle (e.g., a small circle or icon) positioned above the element's bounding box. Add mouse event handlers that track drag movements on the rotation handle, calculate the rotation angle relative to the element's center, and update the element's rotation field in real time via the useAttackPathState hook. Apply the rotation using CSS transform: rotate() or SVG transform attribute. Ensure rotation operations are recorded in the undo/redo history and that rotated elements render correctly when the diagram is reloaded."
         }
       ]
     }

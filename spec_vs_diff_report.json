@@ -1,28 +1,29 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T12:47:56.840Z",
-  "summary": "The diff modifies AttackPathCanvas.tsx, useAttackPathState.ts, AttackPathPage.tsx, and related files. The canvas component adds resize handle logic and type definitions consistent with REQ-2 (free transform for icons), and the page adds optional delete handlers for freehand drawings and lines. However, the diff is truncated and key implementation details cannot be fully verified. Based on available evidence, REQ-1 partial implementation is visible but the freehand deletion handler is explicitly a no-op, and REQ-2 shows resize handle infrastructure added.",
+  "generatedAt": "2026-02-27T11:50:14.016Z",
+  "summary": "The diff implements resizable images (REQ-1), resizable text elements (REQ-2), and rotation via the Free Transform tool (REQ-3) in AttackPathCanvas.tsx and useAttackPathState.ts. The state types TextLabel and ImageElement now include width, height, and rotation fields. Resize handles (8 positions) and rotation handle logic are present in the canvas component. However, save/load serialization in AttackPathPage.tsx does not persist width, height, or rotation for textLabels, meaning those values would be lost on save/reload.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Eraser tool removes freehand drawings when clicked or dragged over them",
-      "reason": "In AttackPathPage.tsx, handleDeleteFreehandDrawing is explicitly a no-op — it computes newDrawings but then uses 'void newDrawings' to suppress an unused warning and comments that it 'skips freehand deletion silently (no-op)'. The hook does not expose a deleteFreehandDrawing method, so freehand erasure is not actually implemented.",
+      "id": "REQ-3",
+      "requirement": "Rotation is preserved when the diagram is saved and reloaded.",
+      "reason": "In AttackPathPage.tsx, the handleSaveConfirm function maps textLabels without including rotation, and the truncated diff does not confirm rotation is included for images either. These fields appear to be dropped during serialization to DiagramState, so rotation would not survive a save/reload cycle.",
       "evidence": [
         "frontend/src/pages/AttackPathPage.tsx"
       ]
     },
     {
-      "id": "REQ-1",
-      "requirement": "Eraser tool removes line and arrow connections when clicked or dragged over them",
-      "reason": "AttackPathPage.tsx shows handleDeleteLine is truncated with the same limitation comment pattern as handleDeleteFreehandDrawing, strongly suggesting it is also a no-op. The diff is truncated so full confirmation is not possible, but visible evidence raises strong concern.",
+      "id": "REQ-2",
+      "requirement": "Width and height are stored on the TextLabel element and persisted on save/reload.",
+      "reason": "While width and height fields exist on the TextLabel interface in useAttackPathState.ts, the save serialization in AttackPathPage.tsx maps textLabels using only content, position, fontSize, color, and fontWeight — omitting width and height. Dimensions would be lost on save and not restored on reload.",
       "evidence": [
-        "frontend/src/pages/AttackPathPage.tsx"
+        "frontend/src/pages/AttackPathPage.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ]
     }
   ],
   "hallucinated_features": [],
-  "confidence": 0.52,
+  "confidence": 0.72,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/AttackPathCanvas.tsx",

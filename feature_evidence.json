@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-extend-the-eraser-tool-button-7-in-the-toolbar-tool-type-eraser-in-attackpathcanvas-tsx-so-that-it-can-erase-all-diagram-element-types-icons-diagramicon-text-labels-textlabel-freehand-drawings-freehanddrawing-lines-arrows-line-connection-and-image-elements-image-when-the-eraser-is-active-and-a-user-clicks-or-drags-over-any-of-these-elements-they-should-be-removed-from-the-diagram-state",
-      "featureTitle": "Extend the eraser tool (button 7 in the toolbar, tool type 'eraser') in AttackPathCanvas.tsx so that it can erase all diagram element types: icons (DiagramIcon), text labels (TextLabel), freehand drawings (FreehandDrawing), lines/arrows (Line/Connection), and image elements (Image). When the eraser is active and a user clicks or drags over any of these elements, they should be removed from the diagram state.",
+      "featureId": "feature-uploaded-images-placed-on-the-attack-path-canvas-must-be-resizable-when-an-image-element-is-selected-display-8-drag-handles-corners-and-edge-midpoints-that-allow-the-user-to-resize-the-image-by-dragging-the-image-dimensions-must-update-in-real-time-during-the-drag-and-the-aspect-ratio-should-optionally-be-constrained-e-g-holding-shift",
+      "featureTitle": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -22,8 +23,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-extend-the-free-transform-tool-button-8-in-the-toolbar-tool-type-freetransform-in-attackpathcanvas-tsx-to-support-selecting-moving-and-resizing-icon-elements-diagramicon-attackpathicon-in-the-diagram-when-the-free-transform-tool-is-active-clicking-an-icon-should-show-selection-handles-that-allow-the-user-to-drag-to-move-the-icon-and-drag-corner-edge-handles-to-resize-it-consistent-with-how-images-and-text-labels-already-support-free-transform",
-      "featureTitle": "Extend the free transform tool (button 8 in the toolbar, tool type 'freeTransform') in AttackPathCanvas.tsx to support selecting, moving, and resizing icon elements (DiagramIcon/AttackPathIcon) in the diagram. When the free transform tool is active, clicking an icon should show selection handles that allow the user to drag to move the icon and drag corner/edge handles to resize it, consistent with how images and text labels already support free transform.",
+      "featureId": "feature-text-elements-added-via-the-add-text-toolbar-button-must-be-resizable-when-a-text-element-is-selected-display-8-drag-handles-that-allow-the-user-to-resize-the-text-box-the-text-should-wrap-within-the-resized-box-and-the-element-dimensions-must-be-stored-in-state",
+      "featureTitle": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
       "files": [
         "frontend/src/components/AttackPathCanvas.tsx",
         "frontend/src/hooks/useAttackPathState.ts"
@@ -39,6 +40,27 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-the-free-transform-tool-must-support-rotating-both-text-elements-and-uploaded-image-elements-on-the-attack-path-canvas-when-the-free-transform-tool-is-active-and-an-element-text-or-image-is-selected-display-a-rotation-handle-e-g-above-the-bounding-box-that-the-user-can-drag-to-rotate-the-element-around-its-center-the-rotation-angle-must-be-stored-in-element-state-and-applied-as-a-css-svg-transform",
+      "featureTitle": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

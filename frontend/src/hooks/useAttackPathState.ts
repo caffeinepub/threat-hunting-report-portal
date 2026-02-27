@@ -214,24 +214,8 @@ export function useAttackPathState() {
     pushHistory(newState);
   }, [state, pushHistory]);
 
-  const deleteFreehandDrawing = useCallback((idx: number) => {
-    const newState = {
-      ...state,
-      freehandDrawings: state.freehandDrawings.filter((_, i) => i !== idx),
-    };
-    pushHistory(newState);
-  }, [state, pushHistory]);
-
   const addLine = useCallback((line: LineElement) => {
     const newState = { ...state, lines: [...state.lines, line] };
-    pushHistory(newState);
-  }, [state, pushHistory]);
-
-  const deleteLine = useCallback((idx: number) => {
-    const newState = {
-      ...state,
-      lines: state.lines.filter((_, i) => i !== idx),
-    };
     pushHistory(newState);
   }, [state, pushHistory]);
 
@@ -436,9 +420,7 @@ export function useAttackPathState() {
     addConnection,
     deleteConnection,
     addFreehandDrawing,
-    deleteFreehandDrawing,
     addLine,
-    deleteLine,
     addTextLabel,
     updateTextLabel,
     updateTextLabelImmediate,

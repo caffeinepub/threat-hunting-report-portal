@@ -88,25 +88,6 @@ export default function AttackPathPage() {
     reader.readAsDataURL(file);
   };
 
-  // Delete freehand drawing by index
-  const handleDeleteFreehandDrawing = (idx: number) => {
-    const drawing = diagramState.state.freehandDrawings[idx];
-    if (!drawing) return;
-    // Re-add all drawings except the one at idx via state manipulation
-    // Since useAttackPathState doesn't expose deleteFreehandDrawing by index,
-    // we use a workaround: push a new state with the drawing removed
-    const newDrawings = diagramState.state.freehandDrawings.filter((_, i) => i !== idx);
-    // We'll use addFreehandDrawing indirectly — instead, we expose a clear+re-add pattern
-    // The cleanest approach: call deleteIcon-equivalent. Since there's no deleteFreehandDrawing,
-    // we skip freehand deletion silently (no-op) unless the hook exposes it.
-    void newDrawings; // suppress unused warning
-  };
-
-  // Delete line by index — same limitation
-  const handleDeleteLine = (idx: number) => {
-    void idx;
-  };
-
   const { state } = diagramState;
 
   return (
@@ -157,8 +138,6 @@ export default function AttackPathPage() {
           onUpdateImage={diagramState.updateImage}
           onUpdateImageImmediate={diagramState.updateImageImmediate}
           onDeleteImage={diagramState.deleteImage}
-          onDeleteFreehandDrawing={handleDeleteFreehandDrawing}
-          onDeleteLine={handleDeleteLine}
         />
       </div>
 
