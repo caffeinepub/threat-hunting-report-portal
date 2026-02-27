@@ -1,137 +1,119 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useGetAllDiagrams } from '@/hooks/useGetAllDiagrams';
-import { useDeleteDiagramState } from '@/hooks/useDeleteDiagramState';
-import { Loader2, Trash2 } from 'lucide-react';
+import React from 'react';
+import { FolderOpen, Trash2, LayoutGrid } from 'lucide-react';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useState } from 'react';
-import type { NamedDiagram } from '@/backend';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { useGetAllDiagrams } from '../hooks/useGetAllDiagrams';
+import { useDeleteDiagramState } from '../hooks/useDeleteDiagramState';
+import { NamedDiagram } from '../backend';
 
 interface LoadDiagramDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onLoadDiagram: (diagram: NamedDiagram) => void;
+  onLoad: (diagram: NamedDiagram) => void;
 }
 
-export default function LoadDiagramDialog({ open, onOpenChange, onLoadDiagram }: LoadDiagramDialogProps) {
-  const { data: diagrams, isLoading } = useGetAllDiagrams();
+const LoadDiagramDialog: React.FC<LoadDiagramDialogProps> = ({ open, onOpenChange, onLoad }) => {
+  const { data: diagrams = [], isLoading } = useGetAllDiagrams();
   const deleteMutation = useDeleteDiagramState();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [diagramToDelete, setDiagramToDelete] = useState<{ id: bigint; name: string } | null>(null);
-  const [selectedDiagramIndex, setSelectedDiagramIndex] = useState<number | null>(null);
 
-  const handleDeleteClick = (e: React.MouseEvent, index: number, diagramName: string) => {
-    e.stopPropagation();
-    setDiagramToDelete({ id: BigInt(index), name: diagramName });
-    setDeleteDialogOpen(true);
+  const formatDate = (lastModified: bigint) => {
+    const ms = Number(lastModified) / 1_000_000;
+    return new Date(ms).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
-  const handleConfirmDelete = async () => {
-    if (diagramToDelete) {
-      await deleteMutation.mutateAsync(diagramToDelete.id);
-      setDeleteDialogOpen(false);
-      setDiagramToDelete(null);
-      setSelectedDiagramIndex(null);
+  const handleLoad = (diagram: NamedDiagram) => {
+    onLoad(diagram);
+    onOpenChange(false);
+  };
+
+  const handleDelete = async (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deleteMutation.mutateAsync(BigInt(index));
+    } catch (err) {
+      console.error('Delete failed:', err);
     }
   };
 
-  const handleLoadClick = (diagram: NamedDiagram, index: number) => {
-    setSelectedDiagramIndex(index);
-    onLoadDiagram(diagram);
-    onOpenChange(false);
-    setSelectedDiagramIndex(null);
-  };
-
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Load Diagram</DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : diagrams && diagrams.length > 0 ? (
-              <ScrollArea className="h-[400px] pr-4">
-                <div className="space-y-2">
-                  {diagrams.map((diagram, index) => {
-                    // Convert nanoseconds to milliseconds for JavaScript Date
-                    const lastModifiedMs = Number(diagram.state.lastModified) / 1_000_000;
-                    const lastModified = new Date(lastModifiedMs);
-                    
-                    return (
-                      <div
-                        key={index}
-                        className={`flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors group ${
-                          selectedDiagramIndex === index ? 'bg-accent border-primary' : ''
-                        }`}
-                      >
-                        <div className="flex-1" onClick={() => handleLoadClick(diagram, index)}>
-                          <h3 className="font-semibold text-lg">{diagram.name}</h3>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            <p>Icons: {diagram.state.icons.length}</p>
-                            <p>Connections: {diagram.state.connections.length}</p>
-                            <p>Text Labels: {diagram.state.textLabels.length}</p>
-                            <p>Last modified: {lastModified.toLocaleString()}</p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => handleDeleteClick(e, index, diagram.name)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          {deleteMutation.isPending && diagramToDelete?.id === BigInt(index) ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          )}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No saved diagrams found.</p>
-                <p className="text-sm mt-2">Create and save a diagram to see it here.</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FolderOpen size={18} />
+            Load Diagram
+          </DialogTitle>
+          <DialogDescription>
+            Select a saved diagram to load onto the canvas.
+          </DialogDescription>
+        </DialogHeader>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the diagram "{diagramToDelete?.name}". This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        <div className="mt-2 max-h-80 overflow-y-auto">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : diagrams.length === 0 ? (
+            <div className="text-center py-8">
+              <LayoutGrid size={32} className="mx-auto mb-3 text-muted-foreground opacity-40" />
+              <p className="text-sm text-muted-foreground">No saved diagrams found.</p>
+              <p className="text-xs text-muted-foreground mt-1 opacity-70">
+                Save a diagram first to load it here.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {diagrams.map((diagram, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer group"
+                  onClick={() => handleLoad(diagram)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{diagram.name}</p>
+                    <div className="flex gap-3 mt-0.5 text-xs text-muted-foreground">
+                      <span>{diagram.state.icons.length} icons</span>
+                      <span>{diagram.state.connections.length} connections</span>
+                      {diagram.state.textLabels.length > 0 && (
+                        <span>{diagram.state.textLabels.length} labels</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 opacity-70">
+                      {formatDate(diagram.state.lastModified)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e) => handleDelete(index, e)}
+                      disabled={deleteMutation.isPending}
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded text-destructive hover:bg-destructive/10 transition-all disabled:opacity-50"
+                      title="Delete diagram"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                    <div className="p-1.5 rounded text-primary">
+                      <FolderOpen size={14} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
-}
+};
+
+export default LoadDiagramDialog;

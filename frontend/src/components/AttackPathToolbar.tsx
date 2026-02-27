@@ -1,68 +1,68 @@
-import AttackPathIcon, { IconType } from './AttackPathIcon';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Redo, Save, FolderOpen, Move, Trash2, Image, MousePointer } from 'lucide-react';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { Pencil, Minus, ArrowRight, Eraser, Type, MousePointer, RotateCcw, RotateCw, Save, FolderOpen, Move, Trash2, Image } from 'lucide-react';
+import { ToolType } from './AttackPathCanvas';
 import { toast } from 'sonner';
 
-const iconTypes: { type: IconType; label: string }[] = [
-  { type: 'user', label: 'User' },
-  { type: 'multipleusers', label: 'Multiple Users' },
-  { type: 'email', label: 'Email' },
-  { type: 'attacker', label: 'Attacker' },
-  { type: 'computer', label: 'Computer' },
-  { type: 'multiplecomputers', label: 'Multiple Computers' },
-  { type: 'server', label: 'Server' },
-  { type: 'multipleservers', label: 'Multiple Servers' },
-  { type: 'domain', label: 'Domain' },
-  { type: 'file', label: 'File/Folder' },
-  { type: 'exe', label: '.exe' },
-  { type: 'dll', label: '.dll' },
-  { type: 'script', label: 'Script' },
-  { type: 'pdf', label: '.pdf' },
-  { type: 'ppt', label: '.ppt' },
-  { type: 'excel', label: 'Microsoft Excel' },
-  { type: 'zip', label: '.zip' },
-  { type: 'word', label: 'Microsoft Word' },
-  { type: 'c2', label: 'Command & Control' },
-  { type: 'backdoor', label: 'Backdoor/Virus' },
-  { type: 'phishing', label: 'Phishing Email' },
-  { type: 'cloudserver', label: 'Cloud Server' },
-  { type: 'firewall', label: 'Firewall' },
-  { type: 'router', label: 'Router Device' },
-  { type: 'scheduledtask', label: 'Scheduled Task' },
-  { type: 'powershell', label: 'PowerShell' },
-  { type: 'javascript', label: 'JavaScript' },
-  { type: 'webbrowser', label: 'Web Browser' },
+const ICON_DEFINITIONS: { type: string; label: string; src: string }[] = [
+  { type: 'attacker', label: 'Attacker', src: '/assets/attacker.png' },
+  { type: 'computer', label: 'Computer', src: '/assets/Computer.png' },
+  { type: 'server', label: 'Server', src: '/assets/server icon.png' },
+  { type: 'multipleservers', label: 'Multi-Server', src: '/assets/Multiple Server Icon.png' },
+  { type: 'cloudserver', label: 'Cloud', src: '/assets/Cloud Server.png' },
+  { type: 'router', label: 'Router', src: '/assets/Router Device Icon.jpg' },
+  { type: 'firewall', label: 'Firewall', src: '/assets/Firewall.png' },
+  { type: 'domain', label: 'Domain', src: '/assets/Domain.png' },
+  { type: 'multiplecomputers', label: 'Multi-PC', src: '/assets/multiple computer.png' },
+  { type: 'multipleusers', label: 'Users', src: '/assets/multiple users icon.png' },
+  { type: 'email', label: 'Email', src: '/assets/email.png' },
+  { type: 'phishing', label: 'Phishing', src: '/assets/phishing email icon-2.jpg' },
+  { type: 'powershell', label: 'PowerShell', src: '/assets/powershell-2.png' },
+  { type: 'backdoor', label: 'Backdoor', src: '/assets/backdoor-1.jpg' },
+  { type: 'dll', label: 'DLL', src: '/assets/dll.png' },
+  { type: 'exe', label: 'EXE', src: '/assets/exe.png' },
+  { type: 'script', label: 'Script', src: '/assets/script.png' },
+  { type: 'scheduledtask', label: 'Sched. Task', src: '/assets/Scheduled Task.jpg' },
+  { type: 'c2', label: 'C2', src: '/assets/Command and Control.png' },
+  { type: 'webbrowser', label: 'Browser', src: '/assets/web browser.png' },
+  { type: 'word', label: 'Word', src: '/assets/word.png' },
+  { type: 'excel', label: 'Excel', src: '/assets/excel.png' },
+  { type: 'pdf', label: 'PDF', src: '/assets/pdf.png' },
+  { type: 'zip', label: 'ZIP', src: '/assets/zip.png' },
+  { type: 'ppt', label: 'PPT', src: '/assets/ppt.png' },
 ];
 
 interface AttackPathToolbarProps {
-  activeTool: string;
-  onToolChange: (tool: string) => void;
+  activeTool: ToolType;
+  onToolChange: (tool: ToolType) => void;
+  onSave: () => void;
+  onLoad: () => void;
   onUndo: () => void;
   onRedo: () => void;
   onClear: () => void;
-  onSave: () => void;
-  onLoad: () => void;
   onAddImage: (file: File) => void;
-  canUndo?: boolean;
-  canRedo?: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
-export default function AttackPathToolbar({
+const AttackPathToolbar: React.FC<AttackPathToolbarProps> = ({
   activeTool,
   onToolChange,
+  onSave,
+  onLoad,
   onUndo,
   onRedo,
   onClear,
-  onSave,
-  onLoad,
   onAddImage,
-  canUndo = false,
-  canRedo = false,
-}: AttackPathToolbarProps) {
+  canUndo,
+  canRedo,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const handleDragStart = (e: React.DragEvent<HTMLImageElement>, iconType: string) => {
+    e.dataTransfer.setData('iconType', iconType);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
 
   const handleImageUploadClick = () => {
     fileInputRef.current?.click();
@@ -71,17 +71,14 @@ export default function AttackPathToolbar({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
       toast.error('Please upload a PNG, JPG, or JPEG image');
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size must be less than 5MB');
       return;
     }
-
     try {
       setIsUploading(true);
       onAddImage(file);
@@ -90,76 +87,104 @@ export default function AttackPathToolbar({
       toast.error('Failed to add image');
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const toolBtn = (tool: string, label: string, Icon: React.ElementType) => (
-    <Button
-      variant={activeTool === tool ? 'default' : 'outline'}
-      size="sm"
-      className="w-full justify-start"
-      onClick={() => onToolChange(activeTool === tool ? 'select' : tool)}
-    >
-      <Icon className="h-4 w-4 mr-2" />
-      {label}
-    </Button>
-  );
+  const toolButtons: { tool: ToolType; icon: React.ReactNode; label: string }[] = [
+    { tool: 'select', icon: <MousePointer size={15} />, label: 'Select' },
+    { tool: 'connect', icon: <ArrowRight size={15} />, label: 'Connect' },
+    { tool: 'pen', icon: <Pencil size={15} />, label: 'Draw' },
+    { tool: 'line', icon: <Minus size={15} />, label: 'Line' },
+    { tool: 'arrow', icon: <ArrowRight size={15} />, label: 'Arrow' },
+    { tool: 'text', icon: <Type size={15} />, label: 'Text' },
+    { tool: 'freeTransform', icon: <Move size={15} />, label: 'Transform' },
+    { tool: 'eraser', icon: <Eraser size={15} />, label: 'Eraser' },
+  ];
 
   return (
-    <div className="w-56 flex-shrink-0 border-r border-border bg-card overflow-y-auto p-3 space-y-4">
-      <div>
-        <h3 className="font-semibold text-sm mb-1">Attack Path Elements</h3>
-        <p className="text-xs text-muted-foreground mb-3">
-          Drag icons onto the canvas
-        </p>
+    <div className="flex flex-col h-full bg-card border-r border-border overflow-hidden" style={{ width: '11rem' }}>
+      {/* Header */}
+      <div className="px-3 py-2 border-b border-border">
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</h2>
       </div>
 
-      <div className="space-y-2">
-        {iconTypes.map((icon) => (
-          <div
-            key={icon.type}
-            className="flex items-center gap-2 cursor-grab active:cursor-grabbing rounded px-1 py-0.5 hover:bg-muted transition-colors"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData('iconType', icon.type);
-              e.dataTransfer.setData('iconName', icon.label);
-            }}
+      {/* Drawing Tools */}
+      <div className="px-2 py-2 border-b border-border">
+        <div className="grid grid-cols-2 gap-1">
+          {toolButtons.map(({ tool, icon, label }) => (
+            <button
+              key={tool}
+              onClick={() => onToolChange(tool)}
+              title={label}
+              className={`flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs transition-colors ${
+                activeTool === tool
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              }`}
+            >
+              {icon}
+              <span className="text-[10px] leading-none">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="px-2 py-2 border-b border-border">
+        <div className="grid grid-cols-2 gap-1">
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            title="Undo"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            <AttackPathIcon type={icon.type} size={28} />
-            <span className="text-xs font-medium truncate">{icon.label}</span>
-          </div>
-        ))}
-      </div>
-
-      <Separator />
-
-      <div>
-        <h3 className="font-semibold text-sm mb-2">Tools</h3>
-      </div>
-
-      <div className="space-y-1.5">
-        {toolBtn('select', 'Select / Move', MousePointer)}
-        {toolBtn('connect', 'Connect Icons', ArrowRight)}
-        {toolBtn('pen', 'Freehand Draw', Pencil)}
-        {toolBtn('line', 'Draw Line', Minus)}
-        {toolBtn('arrow', 'Draw Arrow', ArrowRight)}
-        {toolBtn('text', 'Add Text', Type)}
-        {toolBtn('freeTransform', 'Free Transform', Move)}
-        {toolBtn('eraser', 'Eraser', Eraser)}
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={handleImageUploadClick}
-          disabled={isUploading}
-        >
-          <Image className="h-4 w-4 mr-2" />
-          {isUploading ? 'Adding...' : 'Upload Image'}
-        </Button>
+            <RotateCcw size={15} />
+            <span className="text-[10px] leading-none">Undo</span>
+          </button>
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            title="Redo"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <RotateCw size={15} />
+            <span className="text-[10px] leading-none">Redo</span>
+          </button>
+          <button
+            onClick={onSave}
+            title="Save Diagram"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <Save size={15} />
+            <span className="text-[10px] leading-none">Save</span>
+          </button>
+          <button
+            onClick={onLoad}
+            title="Load Diagram"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <FolderOpen size={15} />
+            <span className="text-[10px] leading-none">Load</span>
+          </button>
+          <button
+            onClick={handleImageUploadClick}
+            disabled={isUploading}
+            title="Upload Image"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <Image size={15} />
+            <span className="text-[10px] leading-none">{isUploading ? 'Adding…' : 'Image'}</span>
+          </button>
+          <button
+            onClick={onClear}
+            title="Clear Canvas"
+            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 size={15} />
+            <span className="text-[10px] leading-none">Clear</span>
+          </button>
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -169,61 +194,35 @@ export default function AttackPathToolbar({
         />
       </div>
 
-      <Separator />
-
-      <div className="space-y-1.5">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={onUndo}
-          disabled={!canUndo}
-        >
-          <Undo className="h-4 w-4 mr-2" />
-          Undo
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={onRedo}
-          disabled={!canRedo}
-        >
-          <Redo className="h-4 w-4 mr-2" />
-          Redo
-        </Button>
-
-        <Button
-          variant="default"
-          size="sm"
-          className="w-full justify-start"
-          onClick={onSave}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Diagram
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={onLoad}
-        >
-          <FolderOpen className="h-4 w-4 mr-2" />
-          Load Diagram
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start text-destructive hover:text-destructive"
-          onClick={onClear}
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Clear Canvas
-        </Button>
+      {/* Icons Section */}
+      <div className="px-2 py-2 flex-1 overflow-y-auto">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+          Drag to Canvas
+        </p>
+        <div className="grid grid-cols-3 gap-1">
+          {ICON_DEFINITIONS.map((iconDef) => (
+            <div
+              key={iconDef.type}
+              className="flex flex-col items-center gap-0.5 p-1 rounded hover:bg-accent cursor-default"
+              title={iconDef.label}
+            >
+              {/* Only the image is draggable — not the label */}
+              <img
+                src={iconDef.src}
+                alt={iconDef.label}
+                draggable
+                onDragStart={(e) => handleDragStart(e, iconDef.type)}
+                className="w-8 h-8 object-contain cursor-grab active:cursor-grabbing select-none"
+              />
+              <span className="text-[9px] text-muted-foreground leading-none text-center truncate w-full pointer-events-none select-none">
+                {iconDef.label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default AttackPathToolbar;

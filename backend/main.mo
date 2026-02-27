@@ -72,7 +72,7 @@ actor {
     description : Text;
   };
 
-  // Complete Diagram State (Updated)
+  // Complete Diagram State
   public type DiagramState = {
     icons : [Icon];
     connections : [Connection];
@@ -83,7 +83,7 @@ actor {
     lastModified : Int;
   };
 
-  // Named Diagram with Name Field Addition
+  // Named Diagram
   public type NamedDiagram = {
     name : Text;
     state : DiagramState;
@@ -95,6 +95,7 @@ actor {
 
   let diagramStore = Map.empty<Principal, Map.Map<Nat, NamedDiagram>>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let idCounters = Map.empty<Principal, Nat>();
   let accessControlState = AccessControl.initState();
 
   include MixinAuthorization(accessControlState);
@@ -127,16 +128,27 @@ actor {
       Runtime.trap("Unauthorized: Only users can save diagram state");
     };
 
+    // Fetch or create user diagrams
     let userDiagrams = switch (diagramStore.get(caller)) {
       case (null) { Map.empty<Nat, NamedDiagram>() };
       case (?existing) { existing };
     };
 
-    let id = userDiagrams.size();
+    // Fetch the next available ID for the user
+    let id = switch (idCounters.get(caller)) {
+      case (null) { 0 };
+      case (?counter) { counter };
+    };
+
     let namedDiagram : NamedDiagram = { name; state };
     userDiagrams.add(id, namedDiagram);
 
+    // Save user diagrams back
     diagramStore.add(caller, userDiagrams);
+
+    // Update the user's next available ID
+    idCounters.add(caller, id + 1);
+
     id;
   };
 

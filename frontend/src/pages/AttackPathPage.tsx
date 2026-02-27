@@ -6,7 +6,7 @@ import SaveDiagramDialog from '../components/SaveDiagramDialog';
 import LoadDiagramDialog from '../components/LoadDiagramDialog';
 import { useAttackPathState } from '../hooks/useAttackPathState';
 import { useSaveDiagramState } from '../hooks/useSaveDiagramState';
-import { ExternalBlob, NamedDiagram, DiagramState } from '../backend';
+import { NamedDiagram } from '../backend';
 
 export default function AttackPathPage() {
   const [activeTool, setActiveTool] = useState<ToolType>('select');
@@ -21,51 +21,7 @@ export default function AttackPathPage() {
   };
 
   const handleSaveConfirm = async (name: string) => {
-    const s = diagramState.state;
-
-    const diagramStatePayload: DiagramState = {
-      icons: s.icons.map(icon => ({
-        id: icon.id,
-        iconType: icon.iconType,
-        position: { x: icon.position.x, y: icon.position.y },
-        name: icon.name,
-      })),
-      connections: s.connections.map(conn => ({
-        sourceId: conn.sourceId,
-        targetId: conn.targetId,
-        connectionType: conn.connectionType,
-        color: conn.color,
-      })),
-      freehandDrawings: s.freehandDrawings.map(d => ({
-        points: d.points.map(p => ({ x: p.x, y: p.y })),
-        color: d.color,
-        strokeWidth: d.strokeWidth,
-      })),
-      lines: s.lines.map(l => ({
-        startPosition: { x: l.startPosition.x, y: l.startPosition.y },
-        endPosition: { x: l.endPosition.x, y: l.endPosition.y },
-        color: l.color,
-        strokeWidth: l.strokeWidth,
-        isArrow: l.isArrow,
-      })),
-      textLabels: s.textLabels.map(label => ({
-        content: label.content,
-        position: { x: label.position.x, y: label.position.y },
-        fontSize: label.fontSize,
-        color: label.color,
-        fontWeight: label.fontWeight,
-      })),
-      images: s.images.map(img => ({
-        id: img.id,
-        file: ExternalBlob.fromURL(img.url),
-        position: { x: img.position.x, y: img.position.y },
-        size: { width: img.width, height: img.height },
-        name: img.name,
-        description: img.description,
-      })),
-      lastModified: BigInt(Date.now()),
-    };
-
+    const diagramStatePayload = diagramState.serializeForBackend();
     await saveMutation.mutateAsync({ name, state: diagramStatePayload });
     setSaveDialogOpen(false);
   };
@@ -129,7 +85,9 @@ export default function AttackPathPage() {
           onAddConnection={diagramState.addConnection}
           onDeleteConnection={diagramState.deleteConnection}
           onAddFreehandDrawing={diagramState.addFreehandDrawing}
+          onDeleteFreehandDrawing={diagramState.deleteFreehandDrawing}
           onAddLine={diagramState.addLine}
+          onDeleteLine={diagramState.deleteLine}
           onAddTextLabel={diagramState.addTextLabel}
           onUpdateTextLabel={diagramState.updateTextLabel}
           onUpdateTextLabelImmediate={diagramState.updateTextLabelImmediate}
@@ -142,7 +100,7 @@ export default function AttackPathPage() {
       </div>
 
       {/* Right Sidebar */}
-      <DiagramSidebar onLoadDiagram={handleLoadDiagram} />
+      <DiagramSidebar onLoad={handleLoadDiagram} />
 
       {/* Save Dialog */}
       <SaveDiagramDialog
@@ -156,7 +114,7 @@ export default function AttackPathPage() {
       <LoadDiagramDialog
         open={loadDialogOpen}
         onOpenChange={setLoadDialogOpen}
-        onLoadDiagram={handleLoadDiagram}
+        onLoad={handleLoadDiagram}
       />
     </div>
   );

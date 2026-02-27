@@ -1,72 +1,54 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Resizable images, resizable text, and rotation via Free Transform tool",
+  "title": "Fix save/load diagram persistence and restrict icon drag to image only",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add resize capability for uploaded images on the attack path canvas with 8 drag handles",
+      "summary": "Fix the save diagram functionality so that saved diagrams immediately appear in DiagramSidebar and LoadDiagramDialog without requiring a page reload",
       "acceptanceCriteria": [
-        "Selecting an uploaded image on the canvas shows 8 resize handles around it.",
-        "Dragging a corner or edge handle resizes the image element.",
-        "The image visually updates during the drag operation.",
-        "Resize state is persisted as part of the diagram element (width/height)."
+        "After saving a diagram via SaveDiagramDialog, the diagram appears in DiagramSidebar and LoadDiagramDialog immediately without a page reload.",
+        "Loading a saved diagram from the sidebar/dialog restores all icons, connections, drawings, lines, text labels, and images correctly.",
+        "The useSaveDiagramState mutation correctly invalidates the allDiagrams and diagramState caches on success so the list refreshes.",
+        "No data is lost between save and load operations."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "path": "frontend/src/hooks/useSaveDiagramState.ts",
           "operation": "modify",
-          "description": "Extend the Image interface to include width and height fields if not already present. Ensure these dimensions are tracked in state and included in the undo/redo history. Update any helper functions that create or modify Image elements to preserve these dimensions."
+          "description": "Update the mutation's onSuccess callback to invalidate both the 'allDiagrams' query key (used by DiagramSidebar and LoadDiagramDialog) and the 'diagramState' query key. Ensure queryClient.invalidateQueries is called with both keys to trigger immediate refetch of the diagram list."
         },
         {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "path": "frontend/src/components/SaveDiagramDialog.tsx",
           "operation": "modify",
-          "description": "Implement image resize logic. When an Image element is selected, render 8 resize handles (4 corners + 4 edge midpoints) around the image bounding box. Add mouse event handlers that detect drag operations on these handles and update the Image width/height in real time via the useAttackPathState hook. Support Shift-key constraint for aspect ratio preservation during corner drags. Ensure resize operations are recorded in the undo/redo history."
+          "description": "After the save mutation succeeds, ensure the dialog closes and any local UI state is updated to reflect the newly saved diagram. Verify that the mutation's onSuccess handler properly triggers the sidebar and load dialog to refresh their lists."
+        },
+        {
+          "path": "frontend/src/components/DiagramSidebar.tsx",
+          "operation": "modify",
+          "description": "Ensure the useGetAllDiagrams hook is properly configured to refetch when its query is invalidated. Verify that the component displays the updated list immediately after a save operation without requiring manual refresh or page reload."
+        },
+        {
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "operation": "modify",
+          "description": "Ensure the useGetAllDiagrams hook is properly configured to refetch when its query is invalidated. Verify that the dialog displays the updated list immediately after a save operation, showing the newly saved diagram in the list."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add resize capability for text elements on the attack path canvas with 8 drag handles",
+      "summary": "Restrict drag-and-drop behavior on toolbar icon buttons so that only the icon image element is draggable, not the text label beneath it",
       "acceptanceCriteria": [
-        "Selecting a text element on the canvas shows 8 resize handles around the text box.",
-        "Dragging a handle resizes the text box in real time.",
-        "Text wraps within the new dimensions of the text box.",
-        "Width and height are stored on the TextLabel element in useAttackPathState."
+        "Dragging a toolbar icon button initiates the drag using only the icon image as the drag source/ghost, not the label text.",
+        "The label text beneath the icon is not draggable and does not appear in the drag ghost image.",
+        "Dropping the dragged icon onto the canvas places the correct icon type at the drop position.",
+        "All toolbar icon buttons exhibit this behavior consistently, not just the third button in div[7]."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Extend the TextLabel interface to include width and height fields. Ensure these dimensions are tracked in state and included in the undo/redo history. Update any helper functions that create or modify TextLabel elements to preserve these dimensions."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Implement text element resize logic. When a TextLabel element is selected, render 8 resize handles (4 corners + 4 edge midpoints) around the text bounding box. Add mouse event handlers that detect drag operations on these handles and update the TextLabel width/height in real time via the useAttackPathState hook. Ensure the rendered text wraps within the resized box dimensions (using SVG foreignObject or div with overflow handling). Ensure resize operations are recorded in the undo/redo history."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add rotation capability for text and image elements via the Free Transform tool",
-      "acceptanceCriteria": [
-        "With the Free Transform tool active, selecting a text or image element shows a rotation handle.",
-        "Dragging the rotation handle rotates the element around its center in real time.",
-        "Rotation angle is stored on the element in useAttackPathState (TextLabel and Image types).",
-        "The rotated transform is correctly applied via CSS transform or SVG transform attribute.",
-        "Rotation is preserved when the diagram is saved and reloaded."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAttackPathState.ts",
-          "operation": "modify",
-          "description": "Extend both the TextLabel and Image interfaces to include a rotation field (in degrees, defaulting to 0). Ensure rotation angle is tracked in state and included in the undo/redo history. Update any helper functions that create or modify these elements to preserve the rotation value."
-        },
-        {
-          "path": "frontend/src/components/AttackPathCanvas.tsx",
-          "operation": "modify",
-          "description": "Implement rotation logic for the Free Transform tool. When the Free Transform tool is active and a TextLabel or Image element is selected, render a rotation handle (e.g., a small circle or icon) positioned above the element's bounding box. Add mouse event handlers that track drag movements on the rotation handle, calculate the rotation angle relative to the element's center, and update the element's rotation field in real time via the useAttackPathState hook. Apply the rotation using CSS transform: rotate() or SVG transform attribute. Ensure rotation operations are recorded in the undo/redo history and that rotated elements render correctly when the diagram is reloaded."
+          "description": "Refactor the icon button rendering so that the draggable attribute and onDragStart handler are applied only to the <img> element, not to the parent button or label text. Wrap the image in a container div if needed, and ensure the text label (beneath the icon) has no drag handlers. Verify that the drag ghost shows only the icon image, and that all toolbar icon buttons behave consistently."
         }
       ]
     }

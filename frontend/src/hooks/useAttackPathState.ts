@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
-import { IconType } from '../components/AttackPathIcon';
-import type { DiagramState, TextLabel as BackendTextLabel, Image as BackendImage } from '../backend';
-
-export type { IconType };
+import type { DiagramState } from '../backend';
+import { ExternalBlob } from '../backend';
 
 export interface Position {
   x: number;
@@ -11,10 +9,11 @@ export interface Position {
 
 export interface PlacedIcon {
   id: string;
-  iconType: IconType;
+  iconType: string;
   position: Position;
   name: string;
-  size: number;
+  width: number;
+  height: number;
   rotation: number;
 }
 
@@ -72,6 +71,8 @@ export interface DiagramStateLocal {
   images: ImageElement[];
 }
 
+const DEFAULT_ICON_WIDTH = 56;
+const DEFAULT_ICON_HEIGHT = 56;
 const DEFAULT_TEXT_WIDTH = 160;
 const DEFAULT_TEXT_HEIGHT = 60;
 const DEFAULT_IMAGE_WIDTH = 150;
@@ -122,13 +123,15 @@ export function useAttackPathState() {
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
-  const addIcon = useCallback((iconType: IconType, position: Position) => {
+  // ── Icons ──────────────────────────────────────────────────────────────────
+  const addIcon = useCallback((iconType: string, position: Position) => {
     const newIcon: PlacedIcon = {
       id: `icon-${Date.now()}-${Math.random()}`,
       iconType,
       position,
       name: iconType,
-      size: 64,
+      width: DEFAULT_ICON_WIDTH,
+      height: DEFAULT_ICON_HEIGHT,
       rotation: 0,
     };
     const newState = { ...state, icons: [...state.icons, newIcon] };
@@ -165,20 +168,35 @@ export function useAttackPathState() {
     }));
   }, []);
 
-  const updateIconSize = useCallback((id: string, size: number) => {
+  const updateIconSize = useCallback((id: string, width: number, height: number) => {
     const newState = {
       ...state,
-      icons: state.icons.map(icon => icon.id === id ? { ...icon, size } : icon),
+      icons: state.icons.map(icon => icon.id === id ? { ...icon, width, height } : icon),
     };
     pushHistory(newState);
   }, [state, pushHistory]);
 
-  const updateIconSizeImmediate = useCallback((id: string, size: number) => {
+  const updateIconSizeImmediate = useCallback((id: string, width: number, height: number) => {
     setState(prev => ({
       ...prev,
-      icons: prev.icons.map(icon => icon.id === id ? { ...icon, size } : icon),
+      icons: prev.icons.map(icon => icon.id === id ? { ...icon, width, height } : icon),
     }));
   }, []);
+
+  const updateIconImmediate = useCallback((id: string, updates: Partial<PlacedIcon>) => {
+    setState(prev => ({
+      ...prev,
+      icons: prev.icons.map(icon => icon.id === id ? { ...icon, ...updates } : icon),
+    }));
+  }, []);
+
+  const updateIcon = useCallback((id: string, updates: Partial<PlacedIcon>) => {
+    const newState = {
+      ...state,
+      icons: state.icons.map(icon => icon.id === id ? { ...icon, ...updates } : icon),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
 
   const deleteIcon = useCallback((id: string) => {
     const newState = {
@@ -189,6 +207,7 @@ export function useAttackPathState() {
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  // ── Connections ────────────────────────────────────────────────────────────
   const addConnection = useCallback((sourceId: string, targetId: string, color: string = '#ef4444') => {
     const newConnection: Connection = {
       id: `conn-${Date.now()}-${Math.random()}`,
@@ -209,16 +228,35 @@ export function useAttackPathState() {
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  // ── Freehand ───────────────────────────────────────────────────────────────
   const addFreehandDrawing = useCallback((drawing: FreehandDrawing) => {
     const newState = { ...state, freehandDrawings: [...state.freehandDrawings, drawing] };
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  const deleteFreehandDrawing = useCallback((index: number) => {
+    const newState = {
+      ...state,
+      freehandDrawings: state.freehandDrawings.filter((_, i) => i !== index),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  // ── Lines ──────────────────────────────────────────────────────────────────
   const addLine = useCallback((line: LineElement) => {
     const newState = { ...state, lines: [...state.lines, line] };
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  const deleteLine = useCallback((index: number) => {
+    const newState = {
+      ...state,
+      lines: state.lines.filter((_, i) => i !== index),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  // ── Text Labels ────────────────────────────────────────────────────────────
   const addTextLabel = useCallback((content: string, position: Position, fontSize: number = 16, color: string = '#1e293b', fontWeight: string = 'normal') => {
     const newLabel: TextLabel = {
       id: `text-${Date.now()}-${Math.random()}`,
@@ -258,6 +296,7 @@ export function useAttackPathState() {
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  // ── Images ─────────────────────────────────────────────────────────────────
   const addImage = useCallback((url: string, position: Position, name: string = '', description: string = '') => {
     const newImage: ImageElement = {
       id: `img-${Date.now()}-${Math.random()}`,
@@ -296,6 +335,7 @@ export function useAttackPathState() {
     pushHistory(newState);
   }, [state, pushHistory]);
 
+  // ── Diagram-level ──────────────────────────────────────────────────────────
   const clearDiagram = useCallback(() => {
     const empty = createEmptyState();
     pushHistory(empty);
@@ -305,10 +345,11 @@ export function useAttackPathState() {
     const loaded: DiagramStateLocal = {
       icons: backendState.icons.map(icon => ({
         id: icon.id,
-        iconType: icon.iconType as IconType,
+        iconType: icon.iconType,
         position: { x: icon.position.x, y: icon.position.y },
         name: icon.name,
-        size: 64,
+        width: DEFAULT_ICON_WIDTH,
+        height: DEFAULT_ICON_HEIGHT,
         rotation: 0,
       })),
       connections: backendState.connections.map((conn, idx) => ({
@@ -393,7 +434,7 @@ export function useAttackPathState() {
       })),
       images: state.images.map(img => ({
         id: img.id,
-        file: { getDirectURL: () => img.url, getBytes: async () => new Uint8Array(), withUploadProgress: () => ({ getDirectURL: () => img.url, getBytes: async () => new Uint8Array(), withUploadProgress: () => ({} as any), static: {} as any }) } as any,
+        file: ExternalBlob.fromURL(img.url),
         position: { x: img.position.x, y: img.position.y },
         size: { width: img.width, height: img.height },
         name: img.name,
@@ -410,6 +451,8 @@ export function useAttackPathState() {
     undo,
     redo,
     addIcon,
+    updateIcon,
+    updateIconImmediate,
     updateIconPosition,
     updateIconPositionImmediate,
     updateIconRotation,
@@ -420,7 +463,9 @@ export function useAttackPathState() {
     addConnection,
     deleteConnection,
     addFreehandDrawing,
+    deleteFreehandDrawing,
     addLine,
+    deleteLine,
     addTextLabel,
     updateTextLabel,
     updateTextLabelImmediate,

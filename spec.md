@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add resizing and rotation capabilities to image and text elements on the attack path canvas via a Free Transform tool.
+**Goal:** Fix diagram save/load persistence so saved diagrams appear immediately in the sidebar and dialogs, and restrict toolbar icon drag-and-drop to the icon image only (not the text label).
 
 **Planned changes:**
-- When an uploaded image element is selected on the canvas, display 8 drag handles (corners and edge midpoints) to allow resizing; dimensions update in real time and are persisted in element state (width/height).
-- When a text element is selected on the canvas, display 8 drag handles to allow resizing the text box; text wraps within the new dimensions and width/height are stored in state.
-- When the Free Transform tool is active and a text or image element is selected, display a rotation handle above the bounding box; dragging it rotates the element around its center, with the angle stored in element state and applied via CSS/SVG transform.
-- Resize and rotation state (width, height, rotation) are preserved when the diagram is saved and reloaded.
+- After saving a diagram via SaveDiagramDialog, invalidate the `allDiagrams` and `diagramState` caches so the diagram appears immediately in DiagramSidebar and LoadDiagramDialog without a page reload.
+- Ensure loading a saved diagram correctly restores all icons, connections, drawings, lines, text labels, and images.
+- In AttackPathToolbar, move the `draggable` attribute and `onDragStart` handler from the button/container element to the icon image element only, so only the image is draggable and the text label beneath it is not.
 
-**User-visible outcome:** Users can resize uploaded images and text boxes by dragging handles, and rotate them using the Free Transform tool on the attack path canvas.
+**User-visible outcome:** Users can save a diagram and see it immediately in the diagram list without reloading the page. When dragging toolbar icons onto the canvas, only the icon image acts as the drag source, not the label text.

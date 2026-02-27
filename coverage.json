@@ -1,63 +1,55 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T11:50:14.019Z",
+  "generatedAt": "2026-02-27T13:49:17.399Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
+        "summary": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/hooks/useSaveDiagramState.ts",
+          "frontend/src/components/SaveDiagramDialog.tsx",
+          "frontend/src/components/DiagramSidebar.tsx",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/hooks/useSaveDiagramState.ts",
+          "frontend/src/components/DiagramSidebar.tsx",
+          "frontend/src/components/LoadDiagramDialog.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
+        "summary": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/components/AttackPathToolbar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useAttackPathState.ts",
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/components/AttackPathToolbar.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/AttackPathCanvas.tsx",
-    "frontend/src/hooks/useAttackPathState.ts",
+    "frontend/src/components/AttackPathToolbar.tsx",
+    "frontend/src/components/DiagramSidebar.tsx",
+    "frontend/src/components/LoadDiagramDialog.tsx",
+    "frontend/src/hooks/useGetAllDiagrams.ts",
+    "frontend/src/hooks/useSaveDiagramState.ts",
     "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",

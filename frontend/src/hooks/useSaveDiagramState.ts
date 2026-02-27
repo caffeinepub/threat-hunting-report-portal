@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { DiagramState } from '@/backend';
+import { DiagramState } from '../backend';
 
 export function useSaveDiagramState() {
   const { actor } = useActor();
@@ -8,12 +8,12 @@ export function useSaveDiagramState() {
 
   return useMutation({
     mutationFn: async ({ name, state }: { name: string; state: DiagramState }) => {
-      if (!actor) throw new Error('Actor not initialized');
+      if (!actor) throw new Error('Actor not available');
       return actor.saveDiagramState(name, state);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['diagramState'] });
       queryClient.invalidateQueries({ queryKey: ['allDiagrams'] });
+      queryClient.invalidateQueries({ queryKey: ['diagramState'] });
     },
   });
 }

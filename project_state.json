@@ -1,32 +1,27 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Diagram editor with resizable/rotatable image and text elements. Features include: resizable uploaded images with drag handles, resizable text boxes via Add Text function, and rotation support via the Free Transform tool.",
+  "summary": "Diagram tool project with save/load functionality and icon drag behavior fixes in progress.",
   "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Save diagram does not persist correctly or reappear on loadout",
+    "Dragging a toolbar icon also drags the label text beneath it"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-uploaded-images-placed-on-the-attack-path-canvas-must-be-resizable-when-an-image-element-is-selected-display-8-drag-handles-corners-and-edge-midpoints-that-allow-the-user-to-resize-the-image-by-dragging-the-image-dimensions-must-update-in-real-time-during-the-drag-and-the-aspect-ratio-should-optionally-be-constrained-e-g-holding-shift",
-      "title": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
+      "id": "feature-fix-the-save-diagram-functionality-so-that-when-a-user-saves-a-diagram-it-is-correctly-persisted-to-the-backend-and-reappears-when-the-diagram-list-loadout-sidebar-is-opened-or-refreshed-the-saved-diagram-should-appear-in-diagramsidebar-and-loaddiagramdialog-after-saving-without-requiring-a-page-reload",
+      "title": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-text-elements-added-via-the-add-text-toolbar-button-must-be-resizable-when-a-text-element-is-selected-display-8-drag-handles-that-allow-the-user-to-resize-the-text-box-the-text-should-wrap-within-the-resized-box-and-the-element-dimensions-must-be-stored-in-state",
-      "title": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
+      "id": "feature-in-the-attackpathtoolbar-restrict-drag-and-drop-behavior-on-icon-buttons-so-that-only-the-icon-image-element-is-draggable-not-the-text-label-beneath-it-the-draggable-attribute-and-drag-event-handlers-ondragstart-should-be-scoped-to-the-icon-image-element-only-not-the-entire-button-or-label-text-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-7-button-3-is-one-such-toolbar-icon-button",
+      "title": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-the-free-transform-tool-must-support-rotating-both-text-elements-and-uploaded-image-elements-on-the-attack-path-canvas-when-the-free-transform-tool-is-active-and-an-element-text-or-image-is-selected-display-a-rotation-handle-e-g-above-the-bounding-box-that-the-user-can-drag-to-rotate-the-element-around-its-center-the-rotation-angle-must-be-stored-in-element-state-and-applied-as-a-css-svg-transform",
-      "title": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
@@ -34,25 +29,19 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Resizable uploaded images with drag handles on diagram canvas",
+      "summary": "Fix save diagram so it persists and appears on loadout",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Resizable text elements via Add Text function with resize handles",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Rotation support for text and image elements via Free Transform tool",
+      "summary": "Restrict drag behavior to icon image only, not the label",
       "reqIds": [],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Threat Hunting Portal",
+  "projectName": "Fix save/load diagram persistence and restrict icon drag to image only",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

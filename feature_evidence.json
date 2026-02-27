@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-uploaded-images-placed-on-the-attack-path-canvas-must-be-resizable-when-an-image-element-is-selected-display-8-drag-handles-corners-and-edge-midpoints-that-allow-the-user-to-resize-the-image-by-dragging-the-image-dimensions-must-update-in-real-time-during-the-drag-and-the-aspect-ratio-should-optionally-be-constrained-e-g-holding-shift",
-      "featureTitle": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
+      "featureId": "feature-fix-the-save-diagram-functionality-so-that-when-a-user-saves-a-diagram-it-is-correctly-persisted-to-the-backend-and-reappears-when-the-diagram-list-loadout-sidebar-is-opened-or-refreshed-the-saved-diagram-should-appear-in-diagramsidebar-and-loaddiagramdialog-after-saving-without-requiring-a-page-reload",
+      "featureTitle": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
+        "frontend/src/components/DiagramSidebar.tsx",
+        "frontend/src/components/LoadDiagramDialog.tsx",
+        "frontend/src/hooks/useSaveDiagramState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -23,11 +24,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-text-elements-added-via-the-add-text-toolbar-button-must-be-resizable-when-a-text-element-is-selected-display-8-drag-handles-that-allow-the-user-to-resize-the-text-box-the-text-should-wrap-within-the-resized-box-and-the-element-dimensions-must-be-stored-in-state",
-      "featureTitle": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
+      "featureId": "feature-in-the-attackpathtoolbar-restrict-drag-and-drop-behavior-on-icon-buttons-so-that-only-the-icon-image-element-is-draggable-not-the-text-label-beneath-it-the-draggable-attribute-and-drag-event-handlers-ondragstart-should-be-scoped-to-the-icon-image-element-only-not-the-entire-button-or-label-text-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-7-button-3-is-one-such-toolbar-icon-button",
+      "featureTitle": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
+        "frontend/src/components/AttackPathToolbar.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -40,27 +40,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-the-free-transform-tool-must-support-rotating-both-text-elements-and-uploaded-image-elements-on-the-attack-path-canvas-when-the-free-transform-tool-is-active-and-an-element-text-or-image-is-selected-display-a-rotation-handle-e-g-above-the-bounding-box-that-the-user-can-drag-to-rotate-the-element-around-its-center-the-rotation-angle-must-be-stored-in-element-state-and-applied-as-a-css-svg-transform",
-      "featureTitle": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
-      "files": [
-        "frontend/src/components/AttackPathCanvas.tsx",
-        "frontend/src/hooks/useAttackPathState.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }
