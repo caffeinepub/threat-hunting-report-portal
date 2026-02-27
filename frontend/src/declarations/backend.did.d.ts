@@ -10,15 +10,6 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface BoxShape {
-  'id' : string,
-  'title' : string,
-  'color' : string,
-  'borderWidth' : number,
-  'position' : Position,
-  'borderColor' : string,
-  'dimensions' : { 'height' : number, 'width' : number },
-}
 export interface Connection {
   'color' : string,
   'sourceId' : string,
@@ -26,7 +17,6 @@ export interface Connection {
   'targetId' : string,
 }
 export interface DiagramState {
-  'boxShapes' : Array<BoxShape>,
   'lines' : Array<Line>,
   'lastModified' : bigint,
   'connections' : Array<Connection>,

@@ -1,130 +1,31 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "A canvas application with a white background, freehand drawing, shapes (rectangle, circle, triangle, arrow, line, and more), text tool, drag & drop, built-in icon library, and save as PNG export.",
+  "summary": "A diagramming application where users can drag and drop icons onto a canvas. Features include a white diagram background and image-only icons (no labels) when placed on the diagram.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-create-a-full-screen-white-canvas-workspace-as-the-primary-working-area-occupying-the-majority-of-the-viewport-with-a-clean-minimal-ui-surrounding-it",
-      "title": "Create a full-screen white canvas workspace as the primary working area, occupying the majority of the viewport with a clean, minimal UI surrounding it.",
+      "id": "feature-change-the-attack-path-diagram-canvas-background-color-to-white",
+      "title": "Change the attack path diagram canvas background color to white.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-freehand-drawing-tool-that-allows-users-to-draw-freely-on-the-canvas-by-clicking-and-dragging-with-support-for-selecting-stroke-color-and-stroke-width",
-      "title": "Implement a freehand drawing tool that allows users to draw freely on the canvas by clicking and dragging, with support for selecting stroke color and stroke width.",
+      "id": "feature-remove-text-labels-from-icons-after-they-are-dragged-and-placed-onto-the-attack-path-diagram-canvas-icons-on-the-canvas-must-display-the-icon-image-only-with-no-label-text-rendered-beneath-or-beside-them",
+      "title": "Remove text labels from icons after they are dragged and placed onto the attack path diagram canvas. Icons on the canvas must display the icon image only, with no label text rendered beneath or beside them.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-implement-a-built-in-icon-library-panel-that-allows-users-to-browse-and-pick-from-a-set-of-categorized-icons-e-g-arrows-symbols-emojis-common-ui-icons-and-place-them-on-the-canvas-as-draggable-elements",
-      "title": "Implement a built-in icon library panel that allows users to browse and pick from a set of categorized icons (e.g., arrows, symbols, emojis, common UI icons) and place them on the canvas as draggable elements.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-save-as-png-button-that-exports-the-current-canvas-content-as-a-png-image-file-and-triggers-a-browser-download",
-      "title": "Implement a Save as PNG button that exports the current canvas content as a PNG image file and triggers a browser download.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-design-and-apply-a-clean-minimal-creative-visual-theme-for-the-application-a-light-neutral-background-for-the-app-chrome-not-the-canvas-a-slim-left-or-top-toolbar-with-clearly-labeled-icon-buttons-subtle-shadows-and-borders-and-a-sans-serif-typography-system-the-canvas-itself-must-remain-pure-white",
-      "title": "Design and apply a clean, minimal creative visual theme for the application: a light neutral background for the app chrome (not the canvas), a slim left or top toolbar with clearly labeled icon buttons, subtle shadows and borders, and a sans-serif typography system. The canvas itself must remain pure white.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "White canvas workspace as the main area",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Freehand drawing tool",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Shapes tool (rectangle, circle, triangle, arrow, line, and more)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Text tool for placing text on the canvas",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Drag & drop to move and reposition elements",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Built-in icon library for picking and placing icons",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Save/export canvas as PNG",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Implement a shapes tool that allows users to draw and place the following shapes on the canvas: rectangle, circle, triangle, arrow, line, star, diamond, and hexagon. Each shape should be draggable and resizable after placement.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Implement a text tool that allows users to click anywhere on the canvas to place an editable text label, with support for font size and color customization.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-12",
-      "summary": "All canvas elements (shapes, text labels, icons, freehand drawings) must be individually selectable and draggable to reposition them anywhere on the canvas.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Add an undo action (keyboard shortcut Ctrl+Z and a toolbar button) that reverts the last canvas operation, supporting at least 20 steps of history.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "status": "pending"
-    }
-  ],
+  "new_feature_requests": [],
   "gameProjectType": "none",
-  "projectName": "Canvas App",
+  "projectName": "Threat Hunting Portal",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

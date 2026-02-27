@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-full-screen-white-canvas-workspace-as-the-primary-working-area-occupying-the-majority-of-the-viewport-with-a-clean-minimal-ui-surrounding-it",
-      "featureTitle": "Create a full-screen white canvas workspace as the primary working area, occupying the majority of the viewport with a clean, minimal UI surrounding it.",
+      "featureId": "feature-change-the-attack-path-diagram-canvas-background-color-to-white",
+      "featureTitle": "Change the attack path diagram canvas background color to white.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/pages/CanvasStudioPage.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -24,10 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-a-freehand-drawing-tool-that-allows-users-to-draw-freely-on-the-canvas-by-clicking-and-dragging-with-support-for-selecting-stroke-color-and-stroke-width",
-      "featureTitle": "Implement a freehand drawing tool that allows users to draw freely on the canvas by clicking and dragging, with support for selecting stroke color and stroke width.",
+      "featureId": "feature-remove-text-labels-from-icons-after-they-are-dragged-and-placed-onto-the-attack-path-diagram-canvas-icons-on-the-canvas-must-display-the-icon-image-only-with-no-label-text-rendered-beneath-or-beside-them",
+      "featureTitle": "Remove text labels from icons after they are dragged and placed onto the attack path diagram canvas. Icons on the canvas must display the icon image only, with no label text rendered beneath or beside them.",
       "files": [
-        "frontend/src/pages/CanvasStudioPage.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -40,70 +38,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-built-in-icon-library-panel-that-allows-users-to-browse-and-pick-from-a-set-of-categorized-icons-e-g-arrows-symbols-emojis-common-ui-icons-and-place-them-on-the-canvas-as-draggable-elements",
-      "featureTitle": "Implement a built-in icon library panel that allows users to browse and pick from a set of categorized icons (e.g., arrows, symbols, emojis, common UI icons) and place them on the canvas as draggable elements.",
-      "files": [
-        "frontend/src/data/iconLibrary.ts",
-        "frontend/src/pages/CanvasStudioPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-save-as-png-button-that-exports-the-current-canvas-content-as-a-png-image-file-and-triggers-a-browser-download",
-      "featureTitle": "Implement a Save as PNG button that exports the current canvas content as a PNG image file and triggers a browser download.",
-      "files": [
-        "frontend/src/utils/canvasExport.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-design-and-apply-a-clean-minimal-creative-visual-theme-for-the-application-a-light-neutral-background-for-the-app-chrome-not-the-canvas-a-slim-left-or-top-toolbar-with-clearly-labeled-icon-buttons-subtle-shadows-and-borders-and-a-sans-serif-typography-system-the-canvas-itself-must-remain-pure-white",
-      "featureTitle": "Design and apply a clean, minimal creative visual theme for the application: a light neutral background for the app chrome (not the canvas), a slim left or top toolbar with clearly labeled icon buttons, subtle shadows and borders, and a sans-serif typography system. The canvas itself must remain pure white.",
-      "files": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/CanvasStudioPage.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-9"
       ],
       "confidence": "high"
     }

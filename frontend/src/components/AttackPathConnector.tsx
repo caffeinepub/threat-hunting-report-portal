@@ -6,7 +6,6 @@ interface AttackPathConnectorProps {
   targetY: number;
   rotation?: number;
   isSelected?: boolean;
-  isDotted?: boolean;
   onClick: (id: string) => void;
 }
 
@@ -18,7 +17,6 @@ export default function AttackPathConnector({
   targetY,
   rotation = 0,
   isSelected = false,
-  isDotted = false,
   onClick,
 }: AttackPathConnectorProps) {
   // Calculate arrow angle
@@ -35,16 +33,16 @@ export default function AttackPathConnector({
 
   // Shorten the line to not overlap with icons
   const shortenDistance = 24;
-  const shortenRatio = lineLength > 0 ? (lineLength - shortenDistance) / lineLength : 1;
+  const shortenRatio = (lineLength - shortenDistance) / lineLength;
 
   // Calculate rotated endpoints
   const dx = targetX - sourceX;
   const dy = targetY - sourceY;
-
+  
   // Apply rotation around center
   const rotatedDx = dx * Math.cos((rotation * Math.PI) / 180) - dy * Math.sin((rotation * Math.PI) / 180);
   const rotatedDy = dx * Math.sin((rotation * Math.PI) / 180) + dy * Math.cos((rotation * Math.PI) / 180);
-
+  
   const rotatedTargetX = centerX + rotatedDx / 2;
   const rotatedTargetY = centerY + rotatedDy / 2;
   const rotatedSourceX = centerX - rotatedDx / 2;
@@ -60,11 +58,7 @@ export default function AttackPathConnector({
   const arrowPoint2X = adjustedTargetX - arrowSize * Math.cos(angle + Math.PI / 6);
   const arrowPoint2Y = adjustedTargetY - arrowSize * Math.sin(angle + Math.PI / 6);
 
-  const strokeColor = isSelected
-    ? 'oklch(0.55 0.25 250)'
-    : isDotted
-    ? 'oklch(0.50 0.20 30)'
-    : 'oklch(0.65 0.18 150)';
+  const strokeColor = isSelected ? 'oklch(0.55 0.25 250)' : 'oklch(0.65 0.18 150)';
   const strokeWidth = isSelected ? 3 : 2;
 
   return (
@@ -85,7 +79,7 @@ export default function AttackPathConnector({
         stroke="transparent"
         strokeWidth="12"
       />
-
+      
       {/* Visible line */}
       <line
         x1={rotatedSourceX}
@@ -94,10 +88,9 @@ export default function AttackPathConnector({
         y2={adjustedTargetY}
         stroke={strokeColor}
         strokeWidth={strokeWidth}
-        strokeDasharray={isDotted ? '6,4' : undefined}
         markerEnd="url(#arrowhead)"
       />
-
+      
       {/* Arrow head */}
       <polygon
         points={`${adjustedTargetX},${adjustedTargetY} ${arrowPoint1X},${arrowPoint1Y} ${arrowPoint2X},${arrowPoint2Y}`}

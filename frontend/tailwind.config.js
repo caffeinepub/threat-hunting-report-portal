@@ -57,22 +57,14 @@ export default {
                     5: 'oklch(var(--chart-5))'
                 },
                 sidebar: {
-                    DEFAULT: 'oklch(var(--sidebar, var(--card)))',
-                    foreground: 'oklch(var(--sidebar-foreground, var(--card-foreground)))',
-                    primary: 'oklch(var(--sidebar-primary, var(--primary)))',
-                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground, var(--primary-foreground)))',
-                    accent: 'oklch(var(--sidebar-accent, var(--accent)))',
-                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground, var(--accent-foreground)))',
-                    border: 'oklch(var(--sidebar-border, var(--border)))',
-                    ring: 'oklch(var(--sidebar-ring, var(--ring)))'
-                },
-                // Canvas Studio design tokens
-                canvas: {
-                    chrome: 'oklch(var(--canvas-chrome))',
-                    fg: 'oklch(var(--canvas-chrome-fg))',
-                    border: 'oklch(var(--canvas-border))',
-                    hover: 'oklch(var(--canvas-hover))',
-                    accent: 'oklch(var(--canvas-accent))',
+                    DEFAULT: 'oklch(var(--sidebar))',
+                    foreground: 'oklch(var(--sidebar-foreground))',
+                    primary: 'oklch(var(--sidebar-primary))',
+                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground))',
+                    accent: 'oklch(var(--sidebar-accent))',
+                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
+                    border: 'oklch(var(--sidebar-border))',
+                    ring: 'oklch(var(--sidebar-ring))'
                 }
             },
             borderRadius: {

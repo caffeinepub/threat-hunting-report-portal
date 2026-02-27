@@ -96,7 +96,6 @@ export interface Icon {
     position: Position;
 }
 export interface DiagramState {
-    boxShapes: Array<BoxShape>;
     lines: Array<Line>;
     lastModified: bigint;
     connections: Array<Connection>;
@@ -114,18 +113,6 @@ export interface TextLabel {
     fontWeight: string;
     position: Position;
     fontSize: number;
-}
-export interface BoxShape {
-    id: string;
-    title: string;
-    color: string;
-    borderWidth: number;
-    position: Position;
-    borderColor: string;
-    dimensions: {
-        height: number;
-        width: number;
-    };
 }
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
@@ -202,7 +189,7 @@ export interface backendInterface {
     saveDiagramState(name: string, state: DiagramState): Promise<bigint>;
     updateDiagramName(id: bigint, newName: string): Promise<void>;
 }
-import type { BoxShape as _BoxShape, Connection as _Connection, DiagramState as _DiagramState, ExternalBlob as _ExternalBlob, FreehandDrawing as _FreehandDrawing, Icon as _Icon, Image as _Image, Line as _Line, NamedDiagram as _NamedDiagram, Position as _Position, TextLabel as _TextLabel, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { Connection as _Connection, DiagramState as _DiagramState, ExternalBlob as _ExternalBlob, FreehandDrawing as _FreehandDrawing, Icon as _Icon, Image as _Image, Line as _Line, NamedDiagram as _NamedDiagram, Position as _Position, TextLabel as _TextLabel, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -535,7 +522,6 @@ async function from_candid_record_n13(_uploadFile: (file: ExternalBlob) => Promi
     };
 }
 async function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    boxShapes: Array<_BoxShape>;
     lines: Array<_Line>;
     lastModified: bigint;
     connections: Array<_Connection>;
@@ -544,7 +530,6 @@ async function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promi
     freehandDrawings: Array<_FreehandDrawing>;
     images: Array<_Image>;
 }): Promise<{
-    boxShapes: Array<BoxShape>;
     lines: Array<Line>;
     lastModified: bigint;
     connections: Array<Connection>;
@@ -554,7 +539,6 @@ async function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promi
     images: Array<Image>;
 }> {
     return {
-        boxShapes: value.boxShapes,
         lines: value.lines,
         lastModified: value.lastModified,
         connections: value.connections,
@@ -640,7 +624,6 @@ function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Arra
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
 async function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    boxShapes: Array<BoxShape>;
     lines: Array<Line>;
     lastModified: bigint;
     connections: Array<Connection>;
@@ -649,7 +632,6 @@ async function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise
     freehandDrawings: Array<FreehandDrawing>;
     images: Array<Image>;
 }): Promise<{
-    boxShapes: Array<_BoxShape>;
     lines: Array<_Line>;
     lastModified: bigint;
     connections: Array<_Connection>;
@@ -659,7 +641,6 @@ async function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise
     images: Array<_Image>;
 }> {
     return {
-        boxShapes: value.boxShapes,
         lines: value.lines,
         lastModified: value.lastModified,
         connections: value.connections,

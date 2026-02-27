@@ -1,274 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Interactive Canvas App with Drawing, Shapes, Icons, and PNG Export",
+  "title": "White diagram background and remove labels from placed icons",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Create a full-screen white canvas workspace as the primary working area",
+      "summary": "Change the attack path diagram canvas background color to white",
       "acceptanceCriteria": [
-        "The canvas renders with a solid white background",
-        "The canvas fills the available workspace area",
-        "The canvas is visually distinct from the surrounding UI chrome"
+        "The canvas/diagram area in AttackPathCanvas.tsx renders with a white (#ffffff) background.",
+        "The white background is visible in both normal and any overlay states."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/CanvasStudioPage.tsx",
-          "operation": "create",
-          "description": "Create the main Canvas Studio page component with a full-screen white canvas workspace that fills the viewport, using HTML5 canvas or SVG with a pure white background (#FFFFFF). The canvas should be contained within a flex layout that allows toolbar and UI chrome to occupy minimal space while the canvas fills the remaining area."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Add a route for /canvas-studio that renders the CanvasStudioPage component. This route should be accessible without authentication as the BuildRequest specifies no backend persistence or authentication requirements."
-        },
-        {
-          "path": "frontend/src/components/Layout.tsx",
-          "operation": "modify",
-          "description": "Add a navigation link to 'Canvas Studio' in the header navigation that routes to /canvas-studio. Update the hero banner logic to not display on the canvas studio page to maximize workspace."
+          "description": "Update the canvas container element's styling to set the background color to white (#ffffff). Ensure the background is applied to the main interactive area where icons, drawings, and connections are rendered. Verify that the white background remains visible during all interaction states (drag, draw, select, erase, etc.)."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Implement a freehand drawing tool with color and stroke width controls",
+      "summary": "Remove text labels from icons after they are placed on the attack path diagram canvas",
       "acceptanceCriteria": [
-        "Clicking and dragging on the canvas draws a freehand stroke",
-        "Stroke color can be changed via a color picker",
-        "Stroke width can be adjusted"
+        "Icons placed on the diagram canvas (AttackPathCanvas.tsx) render without any text label.",
+        "The icon image is still rendered correctly at its correct position and size.",
+        "Icons in the toolbar (AttackPathToolbar.tsx) are not affected — they may still show labels if they currently do.",
+        "Existing diagrams loaded from the backend also display icons without labels."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "create",
-          "description": "Create a custom React hook that manages freehand drawing state including current tool, stroke color, stroke width, and mouse/touch event handlers for drawing on canvas. Track drawing paths as arrays of points with color and width metadata. Include undo history management (at least 20 steps) for all drawing operations."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "create",
-          "description": "Create the main canvas workspace component that renders the white canvas area and handles mouse/touch events for drawing. Use HTML5 Canvas or SVG to render freehand paths. Wire up event handlers from useCanvasDrawing hook to enable click-and-drag freehand drawing."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "create",
-          "description": "Create a slim toolbar component (left or top positioned) with clearly labeled icon buttons for tool selection (freehand, shapes, text, icon, select). Include a color picker input for stroke/fill color selection and a number input or slider for stroke width adjustment (range 1-20px recommended). Use shadcn/ui Button and Popover components for controls. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/CanvasStudioPage.tsx",
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
           "operation": "modify",
-          "description": "Integrate the CanvasToolbar and CanvasWorkspace components into the page layout. Pass tool state and drawing settings from useCanvasDrawing hook to both components to keep them synchronized."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Implement a shapes tool with draggable and resizable shapes",
-      "acceptanceCriteria": [
-        "Users can select a shape type from the toolbar",
-        "Shapes include at minimum: rectangle, circle, triangle, arrow, line, star, diamond, hexagon",
-        "Placed shapes can be selected, moved, and resized",
-        "Shape fill color and border color are configurable"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "modify",
-          "description": "Extend the hook to manage shape state including shape type selection (rectangle, circle, triangle, arrow, line, star, diamond, hexagon), shape placement mode, fill color, and border color. Add state for tracking placed shapes with their positions, dimensions, colors, and unique IDs. Include shape manipulation functions (move, resize, select) and add these operations to the undo history."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a shapes submenu or dropdown to the toolbar that displays all shape types as icon buttons (rectangle, circle, triangle, arrow, line, star, diamond, hexagon). Add a separate color picker for fill color and border color when a shape tool is active. Use shadcn/ui DropdownMenu or Popover components for the shape selector. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "modify",
-          "description": "Add rendering logic for all shape types using SVG or Canvas drawing methods. Implement click-to-place or click-and-drag-to-size shape creation. Add selection handles (corner and edge handles) that appear when a shape is selected, enabling drag-to-move and resize operations. Ensure shapes are rendered as vector graphics that can be cleanly selected and manipulated."
-        },
-        {
-          "path": "frontend/src/utils/shapeRenderer.ts",
-          "operation": "create",
-          "description": "Create utility functions for rendering each shape type (rectangle, circle, triangle, arrow, line, star, diamond, hexagon) on canvas or as SVG elements. Each function should accept position, dimensions, colors, and return drawable path data or canvas drawing commands."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Implement a text tool for placing editable text labels with font customization",
-      "acceptanceCriteria": [
-        "Clicking on the canvas in text mode places a text input at that location",
-        "Typed text is rendered on the canvas",
-        "Text labels can be moved by dragging",
-        "Font size and color are configurable"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "modify",
-          "description": "Add text tool state including text labels array (each with content, position, fontSize, color, unique ID), active text editing state, and font customization settings. Add functions to create, edit, and move text labels. Include text operations in the undo history."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a text tool button to the toolbar. When the text tool is active, show font size controls (number input or dropdown with common sizes: 12, 14, 16, 18, 24, 32, 48) and a color picker for text color. Use shadcn/ui Select component for font size selection. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "modify",
-          "description": "Add text placement and editing functionality. When text tool is active and user clicks the canvas, render an inline contenteditable div or input at that position. On blur or Enter key, convert the text input to a rendered text label on the canvas. Render existing text labels as SVG text elements or positioned DOM elements. Add drag handles for moving text labels when selected."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "All canvas elements must be individually selectable and draggable",
-      "acceptanceCriteria": [
-        "Clicking an element selects it and shows selection handles",
-        "Selected elements can be dragged to a new position",
-        "Dragging does not accidentally trigger drawing or other tools"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "modify",
-          "description": "Add selection state tracking (selectedElementId, selectedElementType) and implement element selection logic that prevents tool activation when clicking on existing elements. Add drag state (isDragging, dragStartPosition) and drag handlers that work across all element types (shapes, text, icons, drawings). Ensure dragging operations are added to undo history."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "modify",
-          "description": "Implement element selection on click: detect which element (shape, text, icon, freehand path) is at the click position and highlight it with selection handles (corner resize handles for shapes/icons, bounding box for text). Implement drag-to-move functionality that updates element position in real-time. Add visual feedback (highlight border, selection handles) when an element is selected. Ensure selection mode overrides tool mode to prevent accidental drawing while dragging."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a 'Select' tool button to the toolbar that sets the canvas into selection mode, allowing users to explicitly switch to selection/move mode rather than drawing mode. This button should be the default active tool on page load."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Implement a built-in icon library panel with categorized icons",
-      "acceptanceCriteria": [
-        "A toolbar button opens an icon picker panel",
-        "Icons are organized into categories or searchable",
-        "Clicking an icon places it on the canvas",
-        "Placed icons can be moved, resized, and deleted"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/IconLibraryPanel.tsx",
-          "operation": "create",
-          "description": "Create an icon picker panel component that displays categorized icons from the assets directory. Organize icons into categories (arrows, network, files, users, security, etc.) based on the available generated icons. Use shadcn/ui Tabs component for category navigation and a grid layout for icon display. Include a search input to filter icons by name. When an icon is clicked, emit an event to place it on the canvas. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/data/iconLibrary.ts",
-          "operation": "create",
-          "description": "Create a static data structure that maps icon names to their file paths in frontend/public/assets/generated/. Organize icons into categories (e.g., network: [computer-icon, server-icon, router], files: [pdf-icon, exe-icon, dll-icon], users: [user-icon, multiple-users-icon], security: [firewall, backdoor-virus-icon]). Export an array of icon metadata objects with properties: id, name, category, path."
-        },
-        {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "modify",
-          "description": "Add icon placement state including an array of placed icons (each with id, iconPath, position, scale, rotation). Add functions to add, move, resize, rotate, and delete icons. Include icon operations in the undo history."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add an 'Icon Library' button to the toolbar that toggles the IconLibraryPanel visibility. Use shadcn/ui Popover or Sheet component to display the panel as an overlay or side panel. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "modify",
-          "description": "Add icon rendering logic that displays placed icons as img elements positioned absolutely on the canvas. Implement selection, drag-to-move, and resize handles for icons (similar to shapes). Load icon images from the workspace file path frontend/public/assets/generated/ using the exact filenames with .dim_WIDTHxHEIGHT suffix (e.g., computer-icon.dim_128x128.png)."
-        },
-        {
-          "path": "frontend/src/pages/CanvasStudioPage.tsx",
-          "operation": "modify",
-          "description": "Wire the IconLibraryPanel into the page layout. Position it as an overlay or slide-out panel that can be toggled from the toolbar. Pass icon selection handler from useCanvasDrawing hook to place selected icons on the canvas."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Implement Save as PNG export functionality",
-      "acceptanceCriteria": [
-        "A 'Save as PNG' button is present in the toolbar or header",
-        "Clicking it captures the full canvas content including all elements",
-        "The PNG file is downloaded to the user's device",
-        "The white background is preserved in the exported image"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/canvasExport.ts",
-          "operation": "create",
-          "description": "Create a utility function that exports the canvas to PNG. Use the html2canvas library (already available in the project, see frontend/index.ts) to capture the canvas DOM element including all rendered shapes, text, icons, and drawings. Ensure the white background is included in the capture. Convert the captured canvas to a PNG blob and trigger a browser download with a timestamped filename (e.g., canvas-studio-2024-01-15.png)."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add a 'Save as PNG' button to the toolbar with a download icon. Wire it to call the canvas export utility function. Add loading state and toast notification feedback on successful export using shadcn/ui toast. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Add undo functionality with keyboard shortcut and toolbar button",
-      "acceptanceCriteria": [
-        "Ctrl+Z undoes the most recent canvas action",
-        "An undo button in the toolbar triggers the same behavior",
-        "At least 20 undo steps are supported"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCanvasDrawing.ts",
-          "operation": "modify",
-          "description": "Implement a history stack that tracks all canvas operations (draw, add shape, add text, add icon, move, resize, delete) with a maximum of 20 steps. Add an undo function that pops the last operation from the history and restores the previous canvas state. Ensure all state-modifying operations push to the history stack."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Add an 'Undo' button to the toolbar with a clear undo icon. Disable the button when history is empty. Wire it to call the undo function from useCanvasDrawing hook. Add a tooltip showing 'Undo (Ctrl+Z)'. Use shadcn/ui Button and Tooltip components. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/CanvasWorkspace.tsx",
-          "operation": "modify",
-          "description": "Add a keyboard event listener for Ctrl+Z (or Cmd+Z on Mac) that triggers the undo function. Ensure the listener is properly attached and cleaned up using React useEffect. Prevent default browser undo behavior on the canvas."
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Apply a clean, minimal creative visual theme to the application",
-      "acceptanceCriteria": [
-        "The app chrome uses a light neutral color palette distinct from white",
-        "The toolbar buttons are clearly recognizable with icons and tooltips",
-        "Typography is consistent and uses a clean sans-serif font",
-        "The canvas area is pure white with no tinting"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update the CSS custom properties to define a clean, minimal theme with light neutral colors for the app chrome (use light grays like #F5F5F5, #E5E5E5 for backgrounds, not blue/purple). Ensure the canvas area remains pure white (#FFFFFF). Use existing OKLCH color token structure but adjust hue and saturation to create a neutral palette. Verify that no blue or purple hues are used as primary theme colors."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Extend the Tailwind configuration to support the new neutral color palette. Add utility classes for the app chrome background colors, borders, and shadows that complement the white canvas. Ensure typography settings use a clean sans-serif font family (system fonts or Inter/Roboto if available)."
-        },
-        {
-          "path": "frontend/src/components/CanvasToolbar.tsx",
-          "operation": "modify",
-          "description": "Apply the minimal theme styling to the toolbar: use light neutral background (not white), add subtle borders and shadows for depth, ensure icon buttons are clearly visible with good contrast, and add tooltips to all tool buttons for clarity. Use shadcn/ui Tooltip component for consistent tooltip styling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/Layout.tsx",
-          "operation": "modify",
-          "description": "Update the Layout component to apply the neutral theme colors to the header and footer. Ensure the header uses a light gray background distinct from the white canvas area. Maintain clean typography and subtle borders. Do not display the hero banner on the Canvas Studio page to maximize workspace."
-        },
-        {
-          "path": "frontend/src/pages/CanvasStudioPage.tsx",
-          "operation": "modify",
-          "description": "Ensure the page layout uses the light neutral background for the surrounding chrome (toolbar, header area) while keeping the canvas workspace pure white. Apply consistent spacing and borders to visually separate the canvas from the UI controls."
+          "description": "Modify the icon rendering logic within the canvas to suppress the display of text labels when icons are rendered on the diagram. Ensure that only the icon image is displayed at the correct position and size. The icon's name or label should not be rendered beneath or beside the icon image on the canvas. Verify that this change applies to both newly placed icons and icons loaded from existing saved diagrams. Do not modify the AttackPathIcon component itself; instead, control label visibility through props or conditional rendering within the canvas component."
         }
       ]
     }

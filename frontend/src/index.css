@@ -29,13 +29,6 @@
         --chart-3: 0.65 0.18 80;
         --chart-4: 0.50 0.15 200;
         --chart-5: 0.70 0.20 300;
-
-        /* Canvas Studio tokens */
-        --canvas-chrome: 0.96 0 0;
-        --canvas-chrome-fg: 0.25 0 0;
-        --canvas-border: 0.86 0 0;
-        --canvas-hover: 0.91 0 0;
-        --canvas-accent: 0.42 0.12 150;
     }
 
     .dark {
@@ -63,13 +56,6 @@
         --chart-3: 0.65 0.18 80;
         --chart-4: 0.50 0.15 200;
         --chart-5: 0.70 0.20 300;
-
-        /* Canvas Studio tokens - always light for canvas chrome */
-        --canvas-chrome: 0.20 0.02 150;
-        --canvas-chrome-fg: 0.85 0.01 150;
-        --canvas-border: 0.28 0.03 150;
-        --canvas-hover: 0.26 0.03 150;
-        --canvas-accent: 0.55 0.15 150;
     }
 
     * {
