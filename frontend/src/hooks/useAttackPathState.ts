@@ -1,52 +1,18 @@
 import { useState, useCallback } from 'react';
-import { ExternalBlob } from '../backend';
 
-export type IconType =
-  | 'attacker'
-  | 'phishing'
-  | 'computer'
-  | 'server'
-  | 'domain'
-  | 'firewall'
-  | 'cloudserver'
-  | 'multipleservers'
-  | 'multiplecomputers'
-  | 'router'
-  | 'user'
-  | 'multipleusers'
-  | 'email'
-  | 'file'
-  | 'pdf'
-  | 'word'
-  | 'excel'
-  | 'ppt'
-  | 'zip'
-  | 'exe'
-  | 'dll'
-  | 'script'
-  | 'csv'
-  | 'c2'
-  | 'scheduledtask'
-  | 'backdoor'
-  | 'powershell'
-  | 'javascript'
-  | 'webbrowser';
+export interface Position {
+  x: number;
+  y: number;
+}
 
 export interface CanvasIcon {
   id: string;
-  type: IconType;
-  x: number;
-  y: number;
+  iconType: string;
+  position: Position;
   name: string;
-  width?: number;
-  height?: number;
-  rotation?: number;
-  // labelPosition is set once when the icon is first placed and never changes on drag
-  labelX?: number;
-  labelY?: number;
 }
 
-export interface Connection {
+export interface CanvasConnection {
   id: string;
   sourceId: string;
   targetId: string;
@@ -55,403 +21,321 @@ export interface Connection {
   rotation?: number;
 }
 
-export interface DrawingPath {
+export interface FreehandDrawing {
   id: string;
-  type: 'freehand' | 'line' | 'arrow';
-  points: { x: number; y: number }[];
+  points: Position[];
   color: string;
   strokeWidth: number;
 }
 
-export interface TextLabel {
+export interface CanvasLine {
   id: string;
-  text: string;
-  x: number;
-  y: number;
+  startPosition: Position;
+  endPosition: Position;
   color: string;
+  strokeWidth: number;
+  isArrow: boolean;
+}
+
+export interface CanvasTextLabel {
+  id: string;
+  content: string;
+  position: Position;
   fontSize: number;
+  color: string;
+  fontWeight: string;
 }
 
 export interface CanvasImage {
   id: string;
-  blob: ExternalBlob;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  url: string;
+  position: Position;
+  size: { width: number; height: number };
   name: string;
   description: string;
 }
 
-export interface SelectedElements {
-  icons: Set<string>;
-  textLabels: Set<string>;
-  images: Set<string>;
+export interface CanvasBoxShape {
+  id: string;
+  position: Position;
+  dimensions: { width: number; height: number };
+  strokeColor: string;
+  strokeWidth: number;
 }
 
-interface AttackPathState {
-  icons: CanvasIcon[];
-  connections: Connection[];
-  drawings: DrawingPath[];
-  textLabels: TextLabel[];
-  images: CanvasImage[];
-  selectedElements: SelectedElements;
+export interface CanvasDottedConnection {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  color: string;
+  strokeWidth: number;
 }
 
-type HistoryEntry = Omit<AttackPathState, 'selectedElements'>;
+export type ToolType = 'select' | 'draw' | 'line' | 'arrow' | 'text' | 'eraser' | 'connect' | 'box' | 'dottedConnector';
+
+type HistoryEntry =
+  | { type: 'addIcon'; iconId: string }
+  | { type: 'moveIcon'; iconId: string; prevPosition: Position }
+  | { type: 'addConnection'; connectionId: string }
+  | { type: 'addDrawing'; drawingId: string }
+  | { type: 'removeDrawing'; drawing: FreehandDrawing }
+  | { type: 'addLine'; lineId: string }
+  | { type: 'addTextLabel'; labelId: string }
+  | { type: 'moveTextLabel'; labelId: string; prevPosition: Position }
+  | { type: 'addImage'; imageId: string }
+  | { type: 'removeIcon'; icon: CanvasIcon }
+  | { type: 'removeConnection'; connection: CanvasConnection }
+  | { type: 'addBoxShape'; boxId: string }
+  | { type: 'removeBoxShape'; box: CanvasBoxShape }
+  | { type: 'addDottedConnection'; dottedConnectionId: string }
+  | { type: 'removeDottedConnection'; dottedConnection: CanvasDottedConnection };
 
 export function useAttackPathState() {
-  const emptySelected: SelectedElements = {
-    icons: new Set(),
-    textLabels: new Set(),
-    images: new Set(),
-  };
-
-  const [state, setState] = useState<AttackPathState>({
-    icons: [],
-    connections: [],
-    drawings: [],
-    textLabels: [],
-    images: [],
-    selectedElements: emptySelected,
-  });
-
+  const [icons, setIcons] = useState<CanvasIcon[]>([]);
+  const [connections, setConnections] = useState<CanvasConnection[]>([]);
+  const [freehandDrawings, setFreehandDrawings] = useState<FreehandDrawing[]>([]);
+  const [lines, setLines] = useState<CanvasLine[]>([]);
+  const [textLabels, setTextLabels] = useState<CanvasTextLabel[]>([]);
+  const [images, setImages] = useState<CanvasImage[]>([]);
+  const [boxShapes, setBoxShapes] = useState<CanvasBoxShape[]>([]);
+  const [dottedConnections, setDottedConnections] = useState<CanvasDottedConnection[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
 
-  const pushHistory = useCallback((current: AttackPathState) => {
-    setHistory(prev => [
-      ...prev.slice(-49),
-      {
-        icons: current.icons,
-        connections: current.connections,
-        drawings: current.drawings,
-        textLabels: current.textLabels,
-        images: current.images,
-      },
-    ]);
+  const pushHistory = useCallback((entry: HistoryEntry) => {
+    setHistory(prev => [...prev, entry]);
   }, []);
 
-  const onAddIcon = useCallback(
-    (type: IconType, x: number, y: number, name: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          icons: [
-            ...prev.icons,
-            {
-              id: `icon-${Date.now()}-${Math.random()}`,
-              type,
-              x,
-              y,
-              name,
-              width: 56,
-              height: 56,
-              rotation: 0,
-              // Label position is fixed at the drop point and never changes
-              labelX: x + 28,
-              labelY: y + 56 + 10,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
+  const addIcon = useCallback((icon: CanvasIcon) => {
+    setIcons(prev => [...prev, icon]);
+    pushHistory({ type: 'addIcon', iconId: icon.id });
+  }, [pushHistory]);
 
-  const onMoveIcon = useCallback(
-    (id: string, x: number, y: number) => {
-      // Only update the icon image position (x, y); labelX/labelY stay unchanged
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon =>
-          icon.id === id ? { ...icon, x, y } : icon
-        ),
-      }));
-    },
-    []
-  );
-
-  const onResizeIcon = useCallback(
-    (id: string, width: number, height: number) => {
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon =>
-          icon.id === id ? { ...icon, width, height } : icon
-        ),
-      }));
-    },
-    []
-  );
-
-  const onRotateIcon = useCallback(
-    (id: string, rotation: number) => {
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon =>
-          icon.id === id ? { ...icon, rotation } : icon
-        ),
-      }));
-    },
-    []
-  );
-
-  const onRemoveIcon = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          icons: prev.icons.filter(icon => icon.id !== id),
-          connections: prev.connections.filter(
-            conn => conn.sourceId !== id && conn.targetId !== id
-          ),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddConnection = useCallback(
-    (sourceId: string, targetId: string, connectionType: string, color: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          connections: [
-            ...prev.connections,
-            {
-              id: `conn-${Date.now()}`,
-              sourceId,
-              targetId,
-              connectionType,
-              color,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onRemoveConnection = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          connections: prev.connections.filter(conn => conn.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddDrawing = useCallback(
-    (
-      type: 'freehand' | 'line' | 'arrow',
-      points: { x: number; y: number }[],
-      color: string,
-      strokeWidth: number
-    ) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          drawings: [
-            ...prev.drawings,
-            {
-              id: `drawing-${Date.now()}-${Math.random()}`,
-              type,
-              points,
-              color,
-              strokeWidth,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onRemoveDrawing = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          drawings: prev.drawings.filter(d => d.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddTextLabel = useCallback(
-    (text: string, x: number, y: number, color: string, fontSize: number) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          textLabels: [
-            ...prev.textLabels,
-            {
-              id: `text-${Date.now()}-${Math.random()}`,
-              text,
-              x,
-              y,
-              color,
-              fontSize,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onMoveTextLabel = useCallback(
-    (id: string, x: number, y: number) => {
-      setState(prev => ({
-        ...prev,
-        textLabels: prev.textLabels.map(label =>
-          label.id === id ? { ...label, x, y } : label
-        ),
-      }));
-    },
-    []
-  );
-
-  const onRemoveTextLabel = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          textLabels: prev.textLabels.filter(label => label.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddImage = useCallback(
-    async (file: File, x: number, y: number, name: string, description: string) => {
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const blob = ExternalBlob.fromBytes(bytes);
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          images: [
-            ...prev.images,
-            {
-              id: `image-${Date.now()}-${Math.random()}`,
-              blob,
-              x,
-              y,
-              width: 400,
-              height: 300,
-              name,
-              description,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onMoveImage = useCallback(
-    (id: string, x: number, y: number) => {
-      setState(prev => ({
-        ...prev,
-        images: prev.images.map(img =>
-          img.id === id ? { ...img, x, y } : img
-        ),
-      }));
-    },
-    []
-  );
-
-  const onResizeImage = useCallback(
-    (id: string, width: number, height: number) => {
-      setState(prev => ({
-        ...prev,
-        images: prev.images.map(img =>
-          img.id === id ? { ...img, width, height } : img
-        ),
-      }));
-    },
-    []
-  );
-
-  const onRemoveImage = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          images: prev.images.filter(img => img.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onSetSelectedElements = useCallback(
-    (selected: SelectedElements) => {
-      setState(prev => ({ ...prev, selectedElements: selected }));
-    },
-    []
-  );
-
-  const onUndo = useCallback(() => {
-    setHistory(prev => {
-      if (prev.length === 0) return prev;
-      const last = prev[prev.length - 1];
-      setState(current => ({
-        ...last,
-        selectedElements: current.selectedElements,
-      }));
-      return prev.slice(0, -1);
-    });
-  }, []);
-
-  const onClear = useCallback(() => {
-    setState(prev => {
-      pushHistory(prev);
-      return {
-        icons: [],
-        connections: [],
-        drawings: [],
-        textLabels: [],
-        images: [],
-        selectedElements: emptySelected,
-      };
+  const updateIconPosition = useCallback((iconId: string, newPosition: Position) => {
+    setIcons(prev => {
+      const icon = prev.find(i => i.id === iconId);
+      if (icon) {
+        pushHistory({ type: 'moveIcon', iconId, prevPosition: { ...icon.position } });
+      }
+      return prev.map(i => i.id === iconId ? { ...i, position: newPosition } : i);
     });
   }, [pushHistory]);
 
+  const removeIcon = useCallback((iconId: string) => {
+    setIcons(prev => {
+      const icon = prev.find(i => i.id === iconId);
+      if (icon) pushHistory({ type: 'removeIcon', icon });
+      return prev.filter(i => i.id !== iconId);
+    });
+    setConnections(prev => prev.filter(c => c.sourceId !== iconId && c.targetId !== iconId));
+    setDottedConnections(prev => prev.filter(c => c.sourceId !== iconId && c.targetId !== iconId));
+  }, [pushHistory]);
+
+  const addConnection = useCallback((connection: CanvasConnection) => {
+    setConnections(prev => [...prev, connection]);
+    pushHistory({ type: 'addConnection', connectionId: connection.id });
+  }, [pushHistory]);
+
+  const removeConnection = useCallback((connectionId: string) => {
+    setConnections(prev => {
+      const conn = prev.find(c => c.id === connectionId);
+      if (conn) pushHistory({ type: 'removeConnection', connection: conn });
+      return prev.filter(c => c.id !== connectionId);
+    });
+  }, [pushHistory]);
+
+  const updateConnectionRotation = useCallback((connectionId: string, rotation: number) => {
+    setConnections(prev => prev.map(c => c.id === connectionId ? { ...c, rotation } : c));
+  }, []);
+
+  const addFreehandDrawing = useCallback((drawing: FreehandDrawing) => {
+    setFreehandDrawings(prev => [...prev, drawing]);
+    pushHistory({ type: 'addDrawing', drawingId: drawing.id });
+  }, [pushHistory]);
+
+  const onRemoveDrawing = useCallback((drawingId: string) => {
+    setFreehandDrawings(prev => {
+      const drawing = prev.find(d => d.id === drawingId);
+      if (drawing) pushHistory({ type: 'removeDrawing', drawing });
+      return prev.filter(d => d.id !== drawingId);
+    });
+  }, [pushHistory]);
+
+  const addLine = useCallback((line: CanvasLine) => {
+    setLines(prev => [...prev, line]);
+    pushHistory({ type: 'addLine', lineId: line.id });
+  }, [pushHistory]);
+
+  const addTextLabel = useCallback((label: CanvasTextLabel) => {
+    setTextLabels(prev => [...prev, label]);
+    pushHistory({ type: 'addTextLabel', labelId: label.id });
+  }, [pushHistory]);
+
+  const updateTextLabelPosition = useCallback((labelId: string, newPosition: Position) => {
+    setTextLabels(prev => {
+      const label = prev.find(l => l.id === labelId);
+      if (label) {
+        pushHistory({ type: 'moveTextLabel', labelId, prevPosition: { ...label.position } });
+      }
+      return prev.map(l => l.id === labelId ? { ...l, position: newPosition } : l);
+    });
+  }, [pushHistory]);
+
+  const addImage = useCallback((image: CanvasImage) => {
+    setImages(prev => [...prev, image]);
+    pushHistory({ type: 'addImage', imageId: image.id });
+  }, [pushHistory]);
+
+  const updateImagePosition = useCallback((imageId: string, newPosition: Position) => {
+    setImages(prev => prev.map(img => img.id === imageId ? { ...img, position: newPosition } : img));
+  }, []);
+
+  // Box shape methods
+  const addBoxShape = useCallback((box: CanvasBoxShape) => {
+    setBoxShapes(prev => [...prev, box]);
+    pushHistory({ type: 'addBoxShape', boxId: box.id });
+  }, [pushHistory]);
+
+  const removeBoxShape = useCallback((boxId: string) => {
+    setBoxShapes(prev => {
+      const box = prev.find(b => b.id === boxId);
+      if (box) pushHistory({ type: 'removeBoxShape', box });
+      return prev.filter(b => b.id !== boxId);
+    });
+  }, [pushHistory]);
+
+  // Dotted connection methods
+  const addDottedConnection = useCallback((conn: CanvasDottedConnection) => {
+    setDottedConnections(prev => [...prev, conn]);
+    pushHistory({ type: 'addDottedConnection', dottedConnectionId: conn.id });
+  }, [pushHistory]);
+
+  const removeDottedConnection = useCallback((connId: string) => {
+    setDottedConnections(prev => {
+      const conn = prev.find(c => c.id === connId);
+      if (conn) pushHistory({ type: 'removeDottedConnection', dottedConnection: conn });
+      return prev.filter(c => c.id !== connId);
+    });
+  }, [pushHistory]);
+
+  const undo = useCallback(() => {
+    setHistory(prev => {
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      const newHistory = prev.slice(0, -1);
+
+      switch (last.type) {
+        case 'addIcon':
+          setIcons(icons => icons.filter(i => i.id !== last.iconId));
+          break;
+        case 'moveIcon':
+          setIcons(icons => icons.map(i => i.id === last.iconId ? { ...i, position: last.prevPosition } : i));
+          break;
+        case 'removeIcon':
+          setIcons(icons => [...icons, last.icon]);
+          break;
+        case 'addConnection':
+          setConnections(conns => conns.filter(c => c.id !== last.connectionId));
+          break;
+        case 'removeConnection':
+          setConnections(conns => [...conns, last.connection]);
+          break;
+        case 'addDrawing':
+          setFreehandDrawings(drawings => drawings.filter(d => d.id !== last.drawingId));
+          break;
+        case 'removeDrawing':
+          setFreehandDrawings(drawings => [...drawings, last.drawing]);
+          break;
+        case 'addLine':
+          setLines(ls => ls.filter(l => l.id !== last.lineId));
+          break;
+        case 'addTextLabel':
+          setTextLabels(labels => labels.filter(l => l.id !== last.labelId));
+          break;
+        case 'moveTextLabel':
+          setTextLabels(labels => labels.map(l => l.id === last.labelId ? { ...l, position: last.prevPosition } : l));
+          break;
+        case 'addImage':
+          setImages(imgs => imgs.filter(img => img.id !== last.imageId));
+          break;
+        case 'addBoxShape':
+          setBoxShapes(boxes => boxes.filter(b => b.id !== last.boxId));
+          break;
+        case 'removeBoxShape':
+          setBoxShapes(boxes => [...boxes, last.box]);
+          break;
+        case 'addDottedConnection':
+          setDottedConnections(conns => conns.filter(c => c.id !== last.dottedConnectionId));
+          break;
+        case 'removeDottedConnection':
+          setDottedConnections(conns => [...conns, last.dottedConnection]);
+          break;
+      }
+
+      return newHistory;
+    });
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setIcons([]);
+    setConnections([]);
+    setFreehandDrawings([]);
+    setLines([]);
+    setTextLabels([]);
+    setImages([]);
+    setBoxShapes([]);
+    setDottedConnections([]);
+    setHistory([]);
+  }, []);
+
+  const loadState = useCallback((state: {
+    icons: CanvasIcon[];
+    connections: CanvasConnection[];
+    freehandDrawings: FreehandDrawing[];
+    lines: CanvasLine[];
+    textLabels: CanvasTextLabel[];
+    images: CanvasImage[];
+    boxShapes?: CanvasBoxShape[];
+    dottedConnections?: CanvasDottedConnection[];
+  }) => {
+    setIcons(state.icons);
+    setConnections(state.connections);
+    setFreehandDrawings(state.freehandDrawings);
+    setLines(state.lines);
+    setTextLabels(state.textLabels);
+    setImages(state.images);
+    setBoxShapes(state.boxShapes ?? []);
+    setDottedConnections(state.dottedConnections ?? []);
+    setHistory([]);
+  }, []);
+
   return {
-    ...state,
-    onAddIcon,
-    onMoveIcon,
-    onResizeIcon,
-    onRotateIcon,
-    onRemoveIcon,
-    onAddConnection,
-    onRemoveConnection,
-    onAddDrawing,
+    icons,
+    connections,
+    freehandDrawings,
+    lines,
+    textLabels,
+    images,
+    boxShapes,
+    dottedConnections,
+    addIcon,
+    updateIconPosition,
+    removeIcon,
+    addConnection,
+    removeConnection,
+    updateConnectionRotation,
+    addFreehandDrawing,
     onRemoveDrawing,
-    onAddTextLabel,
-    onMoveTextLabel,
-    onRemoveTextLabel,
-    onAddImage,
-    onMoveImage,
-    onResizeImage,
-    onRemoveImage,
-    onSetSelectedElements,
-    onUndo,
-    onClear,
+    addLine,
+    addTextLabel,
+    updateTextLabelPosition,
+    addImage,
+    updateImagePosition,
+    addBoxShape,
+    removeBoxShape,
+    addDottedConnection,
+    removeDottedConnection,
+    undo,
+    clearAll,
+    loadState,
   };
 }

@@ -31,6 +31,15 @@ export const Connection = IDL.Record({
   'targetId' : IDL.Text,
 });
 export const Position = IDL.Record({ 'x' : IDL.Float64, 'y' : IDL.Float64 });
+export const BoxShape = IDL.Record({
+  'id' : IDL.Text,
+  'title' : IDL.Text,
+  'color' : IDL.Text,
+  'borderWidth' : IDL.Float64,
+  'position' : Position,
+  'borderColor' : IDL.Text,
+  'dimensions' : IDL.Record({ 'height' : IDL.Float64, 'width' : IDL.Float64 }),
+});
 export const Line = IDL.Record({
   'color' : IDL.Text,
   'endPosition' : Position,
@@ -66,6 +75,7 @@ export const Image = IDL.Record({
   'position' : Position,
 });
 export const DiagramState = IDL.Record({
+  'boxShapes' : IDL.Vec(BoxShape),
   'lines' : IDL.Vec(Line),
   'lastModified' : IDL.Int,
   'connections' : IDL.Vec(Connection),
@@ -165,6 +175,18 @@ export const idlFactory = ({ IDL }) => {
     'targetId' : IDL.Text,
   });
   const Position = IDL.Record({ 'x' : IDL.Float64, 'y' : IDL.Float64 });
+  const BoxShape = IDL.Record({
+    'id' : IDL.Text,
+    'title' : IDL.Text,
+    'color' : IDL.Text,
+    'borderWidth' : IDL.Float64,
+    'position' : Position,
+    'borderColor' : IDL.Text,
+    'dimensions' : IDL.Record({
+      'height' : IDL.Float64,
+      'width' : IDL.Float64,
+    }),
+  });
   const Line = IDL.Record({
     'color' : IDL.Text,
     'endPosition' : Position,
@@ -200,6 +222,7 @@ export const idlFactory = ({ IDL }) => {
     'position' : Position,
   });
   const DiagramState = IDL.Record({
+    'boxShapes' : IDL.Vec(BoxShape),
     'lines' : IDL.Vec(Line),
     'lastModified' : IDL.Int,
     'connections' : IDL.Vec(Connection),

@@ -2,107 +2,79 @@ import React from 'react';
 
 export type IconType =
   | 'attacker'
-  | 'phishing'
   | 'computer'
   | 'server'
-  | 'domain'
-  | 'firewall'
   | 'cloudserver'
   | 'multipleservers'
-  | 'multiplecomputers'
-  | 'router'
-  | 'user'
   | 'multipleusers'
+  | 'router'
+  | 'firewall'
+  | 'domain'
   | 'email'
-  | 'file'
-  | 'pdf'
-  | 'word'
-  | 'excel'
-  | 'ppt'
-  | 'zip'
-  | 'exe'
-  | 'dll'
-  | 'script'
-  | 'csv'
-  | 'c2'
-  | 'scheduledtask'
-  | 'backdoor'
+  | 'phishing'
   | 'powershell'
-  | 'javascript'
-  | 'webbrowser';
+  | 'backdoor'
+  | 'scheduledtask'
+  | 'dll'
+  | 'exe'
+  | 'script'
+  | 'webbrowser'
+  | 'excel'
+  | 'word'
+  | 'pdf'
+  | 'zip'
+  | 'c2';
+
+const iconMap: Record<IconType, string> = {
+  attacker: '/assets/attacker.png',
+  computer: '/assets/Computer.png',
+  server: '/assets/server icon.png',
+  cloudserver: '/assets/Cloud Server.png',
+  multipleservers: '/assets/Multiple Server Icon.png',
+  multipleusers: '/assets/multiple users icon.png',
+  router: '/assets/Router Device Icon.jpg',
+  firewall: '/assets/Firewall.png',
+  domain: '/assets/Domain.png',
+  email: '/assets/email.png',
+  phishing: '/assets/phishing email icon-2.jpg',
+  powershell: '/assets/powershell-2.png',
+  backdoor: '/assets/backdoor-1.jpg',
+  scheduledtask: '/assets/Scheduled Task.jpg',
+  dll: '/assets/dll-1.png',
+  exe: '/assets/exe.png',
+  script: '/assets/script-1.png',
+  webbrowser: '/assets/web browser.png',
+  excel: '/assets/excel.png',
+  word: '/assets/word.png',
+  pdf: '/assets/pdf.png',
+  zip: '/assets/zip.png',
+  c2: '/assets/Command and Control.png',
+};
 
 interface AttackPathIconProps {
-  type: IconType;
+  iconType: IconType;
   size?: number;
   className?: string;
   label?: string;
-  source?: 'toolbar' | 'canvas';
+  showLabel?: boolean;
 }
 
-const iconImageMap: Record<IconType, string> = {
-  attacker: '/assets/generated/icon-attacker.dim_64x64.png',
-  phishing: '/assets/phishing email icon-2.jpg',
-  computer: '/assets/generated/icon-computer.dim_64x64.png',
-  server: '/assets/generated/icon-server.dim_64x64.png',
-  domain: '/assets/generated/icon-domain.dim_64x64.png',
-  firewall: '/assets/generated/firewall.dim_256x256.png',
-  cloudserver: '/assets/generated/cloud-server.dim_256x256.png',
-  multipleservers: '/assets/generated/multiple-servers.dim_128x128.png',
-  multiplecomputers: '/assets/generated/multiple-computers-icon.dim_128x128.png',
-  router: '/assets/generated/router-device-icon.dim_256x256.jpg',
-  user: '/assets/generated/user-single.dim_128x128.png',
-  multipleusers: '/assets/generated/multiple-users-icon.dim_128x128.png',
-  email: '/assets/generated/icon-email.dim_64x64.png',
-  file: '/assets/generated/icon-file.dim_64x64.png',
-  pdf: '/assets/generated/pdf-icon.dim_128x128.png',
-  word: '/assets/generated/word-icon.dim_64x64.png',
-  excel: '/assets/generated/excel-icon.dim_64x64.png',
-  ppt: '/assets/generated/ppt-icon.dim_128x128.png',
-  zip: '/assets/generated/zip-icon.dim_128x128.png',
-  exe: '/assets/generated/exe-icon.dim_128x128.png',
-  dll: '/assets/generated/dll-icon.dim_128x128.png',
-  script: '/assets/generated/script-icon.dim_64x64.png',
-  csv: '/assets/generated/csv-icon.dim_128x128.png',
-  c2: '/assets/generated/c2-icon.dim_128x128.png',
-  scheduledtask: '/assets/generated/scheduled-task.dim_256x256.jpg',
-  backdoor: '/assets/backdoor-1.jpg',
-  powershell: '/assets/powershell-2.png',
-  javascript: '/assets/generated/script-icon.dim_64x64.png',
-  webbrowser: '/assets/generated/web-browser.dim_256x256.png',
-};
-
-export default function AttackPathIcon({ type, size = 40, className = '', label, source }: AttackPathIconProps) {
-  const imgSrc = iconImageMap[type];
+export default function AttackPathIcon({
+  iconType,
+  size = 48,
+  className = '',
+}: AttackPathIconProps) {
+  const src = iconMap[iconType] ?? iconMap['computer'];
 
   return (
-    <div
-      className={`flex flex-col items-center justify-center gap-1 ${className}`}
-      draggable={source === 'toolbar'}
-      style={{ userSelect: 'none' }}
-    >
-      <img
-        src={imgSrc}
-        alt={type}
-        width={size}
-        height={size}
-        style={{ objectFit: 'contain', display: 'block' }}
-        draggable={false}
-      />
-      {label && (
-        <span
-          style={{
-            fontSize: Math.max(10, size * 0.28),
-            color: '#1e293b',
-            fontWeight: 500,
-            textAlign: 'center',
-            maxWidth: size * 1.5,
-            wordBreak: 'break-word',
-            lineHeight: 1.2,
-          }}
-        >
-          {label}
-        </span>
-      )}
-    </div>
+    <img
+      src={src}
+      alt={iconType}
+      width={size}
+      height={size}
+      className={`object-contain ${className}`}
+      draggable={false}
+      style={{ width: size, height: size }}
+    />
   );
 }

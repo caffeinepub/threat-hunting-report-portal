@@ -1,78 +1,197 @@
 {
   "kind": "build_request",
-  "title": "Icon-only drag, centered text labels, and drawing layer ordering",
+  "title": "Interactive Canvas App with Drawing, Shapes, Icons, and PNG Export",
+  "projectName": "Canvas Studio",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+      "text": "Create a full-screen white canvas workspace as the primary working area, occupying the majority of the viewport with a clean, minimal UI surrounding it.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "I should be able to drag the icon image in the canvas only and not include the text",
-          "should only the icon image move while the text label stays in place"
+          "just a clean blank white canvas",
+          "White canvas as the main workspace"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking and dragging an icon image on the canvas moves only the image element.",
-        "The text label associated with the icon remains at its original canvas position while the icon image is being dragged.",
-        "Releasing the drag leaves the icon image at the new position while the text label stays where it was."
+        "The canvas renders with a solid white background",
+        "The canvas fills the available workspace area",
+        "The canvas is visually distinct from the surrounding UI chrome"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "text": "Implement a freehand drawing tool that allows users to draw freely on the canvas by clicking and dragging, with support for selecting stroke color and stroke width.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "I should be able to modify the text label into center",
-          "centered vertically"
+          "draw freehand",
+          "Freehand drawing tool"
         ]
       },
       "acceptanceCriteria": [
-        "Each text label is rendered so that it is vertically centered relative to the icon image it belongs to.",
-        "Vertical centering is maintained regardless of the icon's position on the canvas."
+        "Clicking and dragging on the canvas draws a freehand stroke",
+        "Stroke color can be changed via a color picker",
+        "Stroke width can be adjusted"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+      "text": "Implement a shapes tool that allows users to draw and place the following shapes on the canvas: rectangle, circle, triangle, arrow, line, star, diamond, and hexagon. Each shape should be draggable and resizable after placement.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "when I upload an Image in canvas I should be able to draw and overwrite icons",
-          "appear on top of the uploaded image"
+          "add shapes",
+          "Shapes: rectangle, circle, triangle, arrow, line, and more"
         ]
       },
       "acceptanceCriteria": [
-        "Uploaded background images are always rendered below all other canvas elements (icons, drawings, text labels, connections).",
-        "Freehand drawings drawn after uploading an image appear visually on top of the uploaded image.",
-        "Icons added to the canvas are always displayed above any uploaded background image.",
-        "The draw and erase tools operate on elements layered above the uploaded image."
+        "Users can select a shape type from the toolbar",
+        "Shapes include at minimum: rectangle, circle, triangle, arrow, line, star, diamond, hexagon",
+        "Placed shapes can be selected, moved, and resized",
+        "Shape fill color and border color are configurable"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement a text tool that allows users to click anywhere on the canvas to place an editable text label, with support for font size and color customization.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "place text",
+          "Text tool for placing text on the canvas"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking on the canvas in text mode places a text input at that location",
+        "Typed text is rendered on the canvas",
+        "Text labels can be moved by dragging",
+        "Font size and color are configurable"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "All canvas elements (shapes, text labels, icons, freehand drawings) must be individually selectable and draggable to reposition them anywhere on the canvas.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "drag & drop elements",
+          "Drag & drop to move and reposition elements"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking an element selects it and shows selection handles",
+        "Selected elements can be dragged to a new position",
+        "Dragging does not accidentally trigger drawing or other tools"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Implement a built-in icon library panel that allows users to browse and pick from a set of categorized icons (e.g., arrows, symbols, emojis, common UI icons) and place them on the canvas as draggable elements.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-5",
+          "msg-6"
+        ],
+        "quotes": [
+          "users be able to pick from a built-in icon library",
+          "Built-in icon library for picking and placing icons"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A toolbar button opens an icon picker panel",
+        "Icons are organized into categories or searchable",
+        "Clicking an icon places it on the canvas",
+        "Placed icons can be moved, resized, and deleted"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement a Save as PNG button that exports the current canvas content as a PNG image file and triggers a browser download.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "save as PNG",
+          "Save/export canvas as PNG"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A 'Save as PNG' button is present in the toolbar or header",
+        "Clicking it captures the full canvas content including all elements",
+        "The PNG file is downloaded to the user's device",
+        "The white background is preserved in the exported image"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Add an undo action (keyboard shortcut Ctrl+Z and a toolbar button) that reverts the last canvas operation, supporting at least 20 steps of history.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Ctrl+Z undoes the most recent canvas action",
+        "An undo button in the toolbar triggers the same behavior",
+        "At least 20 undo steps are supported"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Design and apply a clean, minimal creative visual theme for the application: a light neutral background for the app chrome (not the canvas), a slim left or top toolbar with clearly labeled icon buttons, subtle shadows and borders, and a sans-serif typography system. The canvas itself must remain pure white.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app chrome uses a light neutral color palette distinct from white",
+        "The toolbar buttons are clearly recognizable with icons and tooltips",
+        "Typography is consistent and uses a clean sans-serif font",
+        "The canvas area is pure white with no tinting"
       ]
     }
   ],
   "constraints": [
-    "Do not change the backend schema or Motoko actor.",
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+    "The canvas background must be pure white",
+    "Do not use blue & purple as primary theme colors",
+    "All canvas state and tools must be frontend-only; no backend persistence required for this build"
   ],
   "nonGoals": [
-    "Moving text labels when the icon is dragged.",
-    "Allowing uploaded images to be layered above drawings or icons.",
-    "Horizontal centering of text labels.",
-    "Any changes to connection labels or attack path coloring."
+    "Saving canvas state to the backend",
+    "User authentication or login flow changes",
+    "Real-time collaboration or multiplayer",
+    "PDF export (PNG only)",
+    "Image upload from local device"
   ],
   "imageRequirements": {
     "required": [],

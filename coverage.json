@@ -1,48 +1,134 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T05:06:53.527Z",
+  "generatedAt": "2026-02-27T07:57:53.393Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 9,
+    "implemented": 5,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+        "summary": "Create a full-screen white canvas workspace as the primary working area, occupying the majority of the viewport with a clean, minimal UI surrounding it.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/pages/CanvasStudioPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/Layout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx",
-          "frontend/src/hooks/useAttackPathState.ts"
+          "frontend/src/pages/CanvasStudioPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/Layout.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+        "summary": "Implement a freehand drawing tool that allows users to draw freely on the canvas by clicking and dragging, with support for selecting stroke color and stroke width.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasWorkspace.tsx",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/pages/CanvasStudioPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/pages/CanvasStudioPage.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+        "summary": "Implement a shapes tool that allows users to draw and place the following shapes on the canvas: rectangle, circle, triangle, arrow, line, star, diamond, and hexagon. Each shape should be draggable and resizable after placement.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/components/CanvasWorkspace.tsx",
+          "frontend/src/utils/shapeRenderer.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Implement a text tool that allows users to click anywhere on the canvas to place an editable text label, with support for font size and color customization.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/components/CanvasWorkspace.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-5",
+        "summary": "All canvas elements (shapes, text labels, icons, freehand drawings) must be individually selectable and draggable to reposition them anywhere on the canvas.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasWorkspace.tsx",
+          "frontend/src/components/CanvasToolbar.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Implement a built-in icon library panel that allows users to browse and pick from a set of categorized icons (e.g., arrows, symbols, emojis, common UI icons) and place them on the canvas as draggable elements.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/components/IconLibraryPanel.tsx",
+          "frontend/src/data/iconLibrary.ts",
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/components/CanvasWorkspace.tsx",
+          "frontend/src/pages/CanvasStudioPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AttackPathCanvas.tsx"
+          "frontend/src/data/iconLibrary.ts",
+          "frontend/src/pages/CanvasStudioPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Implement a Save as PNG button that exports the current canvas content as a PNG image file and triggers a browser download.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/canvasExport.ts",
+          "frontend/src/components/CanvasToolbar.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/canvasExport.ts"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Add an undo action (keyboard shortcut Ctrl+Z and a toolbar button) that reverts the last canvas operation, supporting at least 20 steps of history.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/useCanvasDrawing.ts",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/components/CanvasWorkspace.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Design and apply a clean, minimal creative visual theme for the application: a light neutral background for the app chrome (not the canvas), a slim left or top toolbar with clearly labeled icon buttons, subtle shadows and borders, and a sans-serif typography system. The canvas itself must remain pure white.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js",
+          "frontend/src/components/CanvasToolbar.tsx",
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/pages/CanvasStudioPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js",
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/pages/CanvasStudioPage.tsx"
         ]
       }
     ]
@@ -52,9 +138,18 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/AttackPathCanvas.tsx",
-    "frontend/src/hooks/useAttackPathState.ts",
-    "frontend/src/pages/AttackPathPage.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/canvas/CanvasToolbar.tsx",
+    "frontend/src/components/canvas/CanvasWorkspace.tsx",
+    "frontend/src/components/canvas/IconLibraryPanel.tsx",
+    "frontend/src/data/iconLibrary.ts",
+    "frontend/src/hooks/useCanvasState.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/CanvasStudioPage.tsx",
+    "frontend/src/utils/canvasExport.ts",
+    "frontend/src/utils/shapeRenderer.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -21,6 +21,7 @@ export interface Icon {
     position: Position;
 }
 export interface DiagramState {
+    boxShapes: Array<BoxShape>;
     lines: Array<Line>;
     lastModified: bigint;
     connections: Array<Connection>;
@@ -35,6 +36,18 @@ export interface TextLabel {
     fontWeight: string;
     position: Position;
     fontSize: number;
+}
+export interface BoxShape {
+    id: string;
+    title: string;
+    color: string;
+    borderWidth: number;
+    position: Position;
+    borderColor: string;
+    dimensions: {
+        height: number;
+        width: number;
+    };
 }
 export interface FreehandDrawing {
     color: string;

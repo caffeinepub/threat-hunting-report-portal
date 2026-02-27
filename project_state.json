@@ -1,35 +1,48 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Network/canvas diagram tool with icon management, drawing tools, and image upload support. Features include draggable icon images (text labels stay fixed), vertically centered text labels, and drawings/icons always rendering on top of uploaded background images.",
-  "architectural_notes": [
-    "Canvas layering: uploaded background images are always behind drawings/icons",
-    "Icon drag behavior: only the icon image moves; text label position is independent"
-  ],
+  "summary": "A canvas application with a white background, freehand drawing, shapes (rectangle, circle, triangle, arrow, line, and more), text tool, drag & drop, built-in icon library, and save as PNG export.",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-when-dragging-an-icon-on-the-canvas-only-the-icon-image-should-move-the-text-label-must-remain-fixed-in-its-original-position-and-must-not-follow-the-icon-image-during-the-drag-operation",
-      "title": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+      "id": "feature-create-a-full-screen-white-canvas-workspace-as-the-primary-working-area-occupying-the-majority-of-the-viewport-with-a-clean-minimal-ui-surrounding-it",
+      "title": "Create a full-screen white canvas workspace as the primary working area, occupying the majority of the viewport with a clean, minimal UI surrounding it.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-text-labels-on-the-canvas-must-be-centered-vertically-relative-to-the-icon-s-position",
-      "title": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "id": "feature-implement-a-freehand-drawing-tool-that-allows-users-to-draw-freely-on-the-canvas-by-clicking-and-dragging-with-support-for-selecting-stroke-color-and-stroke-width",
+      "title": "Implement a freehand drawing tool that allows users to draw freely on the canvas by clicking and dragging, with support for selecting stroke color and stroke width.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-all-drawings-freehand-shapes-lines-arrows-and-icons-placed-on-the-canvas-must-always-render-on-top-of-any-uploaded-background-image-the-uploaded-image-must-remain-the-bottom-most-layer",
-      "title": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+      "id": "feature-implement-a-built-in-icon-library-panel-that-allows-users-to-browse-and-pick-from-a-set-of-categorized-icons-e-g-arrows-symbols-emojis-common-ui-icons-and-place-them-on-the-canvas-as-draggable-elements",
+      "title": "Implement a built-in icon library panel that allows users to browse and pick from a set of categorized icons (e.g., arrows, symbols, emojis, common UI icons) and place them on the canvas as draggable elements.",
       "reqIds": [
-        "REQ-3"
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-save-as-png-button-that-exports-the-current-canvas-content-as-a-png-image-file-and-triggers-a-browser-download",
+      "title": "Implement a Save as PNG button that exports the current canvas content as a PNG image file and triggers a browser download.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-and-apply-a-clean-minimal-creative-visual-theme-for-the-application-a-light-neutral-background-for-the-app-chrome-not-the-canvas-a-slim-left-or-top-toolbar-with-clearly-labeled-icon-buttons-subtle-shadows-and-borders-and-a-sans-serif-typography-system-the-canvas-itself-must-remain-pure-white",
+      "title": "Design and apply a clean, minimal creative visual theme for the application: a light neutral background for the app chrome (not the canvas), a slim left or top toolbar with clearly labeled icon buttons, subtle shadows and borders, and a sans-serif typography system. The canvas itself must remain pure white.",
+      "reqIds": [
+        "REQ-9"
       ],
       "version": 1
     }
@@ -37,25 +50,81 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Drag only the icon image on canvas; text label stays fixed in place",
+      "summary": "White canvas workspace as the main area",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Center text label vertically relative to the icon's position",
+      "summary": "Freehand drawing tool",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Drawings and icons always render on top of uploaded background images",
+      "summary": "Shapes tool (rectangle, circle, triangle, arrow, line, and more)",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Text tool for placing text on the canvas",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Drag & drop to move and reposition elements",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Built-in icon library for picking and placing icons",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Save/export canvas as PNG",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Implement a shapes tool that allows users to draw and place the following shapes on the canvas: rectangle, circle, triangle, arrow, line, star, diamond, and hexagon. Each shape should be draggable and resizable after placement.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Implement a text tool that allows users to click anywhere on the canvas to place an editable text label, with support for font size and color customization.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "All canvas elements (shapes, text labels, icons, freehand drawings) must be individually selectable and draggable to reposition them anywhere on the canvas.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add an undo action (keyboard shortcut Ctrl+Z and a toolbar button) that reverts the last canvas operation, supporting at least 20 steps of history.",
+      "reqIds": [
+        "REQ-8"
+      ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Icon-only drag, centered text labels, and drawing layer ordering",
+  "projectName": "Canvas App",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

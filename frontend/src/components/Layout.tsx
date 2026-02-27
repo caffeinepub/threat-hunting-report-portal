@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Shield, FileText, Plus, Network } from 'lucide-react';
+import { Shield, FileText, Plus, Network, PenTool } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LoginButton from './LoginButton';
 import { useGetCallerUserProfile } from '../hooks/useGetCallerUserProfile';
@@ -8,10 +8,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isAttackPathPage = location.pathname === '/attack-path';
+  const isCanvasStudioPage = location.pathname === '/canvas-studio';
+  const isFullWidthPage = isAttackPathPage || isCanvasStudioPage;
   const { data: userProfile } = useGetCallerUserProfile();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -35,6 +37,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Link to="/attack-path">
                   <Network className="h-4 w-4 mr-2" />
                   Attack Path
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/canvas-studio">
+                  <PenTool className="h-4 w-4 mr-2" />
+                  Canvas Studio
                 </Link>
               </Button>
               <Button size="sm" asChild>
@@ -66,27 +74,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main className={isAttackPathPage ? 'w-full' : 'container mx-auto px-4 py-8'}>
+      <main className={isFullWidthPage ? 'flex-1 w-full overflow-hidden' : 'container mx-auto px-4 py-8'}>
         {children}
       </main>
 
-      <footer className="border-t border-border mt-16 py-8 bg-card/30">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>
-            © {new Date().getFullYear()} Threat Hunt Portal. Built with ❤️ using{' '}
-            <a
-              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
-                typeof window !== 'undefined' ? window.location.hostname : 'threat-hunt-portal'
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              caffeine.ai
-            </a>
-          </p>
-        </div>
-      </footer>
+      {!isFullWidthPage && (
+        <footer className="border-t border-border mt-16 py-8 bg-card/30">
+          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+            <p>
+              © {new Date().getFullYear()} Threat Hunt Portal. Built with ❤️ using{' '}
+              <a
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
+                  typeof window !== 'undefined' ? window.location.hostname : 'threat-hunt-portal'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                caffeine.ai
+              </a>
+            </p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

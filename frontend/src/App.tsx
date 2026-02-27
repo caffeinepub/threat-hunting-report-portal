@@ -9,6 +9,7 @@ import ReportListPage from './pages/ReportListPage';
 import CreateReportPage from './pages/CreateReportPage';
 import ReportDetailPage from './pages/ReportDetailPage';
 import AttackPathPage from './pages/AttackPathPage';
+import CanvasStudioPage from './pages/CanvasStudioPage';
 import { useGetCallerUserProfile } from './hooks/useGetCallerUserProfile';
 
 const rootRoute = createRootRoute({
@@ -43,7 +44,13 @@ const attackPathRoute = createRoute({
   component: AttackPathPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, createRoute_, detailRoute, attackPathRoute]);
+const canvasStudioRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/canvas-studio',
+  component: CanvasStudioPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, createRoute_, detailRoute, attackPathRoute, canvasStudioRoute]);
 
 const router = createRouter({ routeTree });
 
@@ -59,7 +66,6 @@ function AppContent() {
 
   const isAuthenticated = !!identity;
 
-  // Show loading while initializing
   if (isInitializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -71,12 +77,10 @@ function AppContent() {
     );
   }
 
-  // Show login page if not authenticated
   if (!isAuthenticated) {
     return <LoginPage />;
   }
 
-  // Show profile setup if authenticated but no profile
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
   return (

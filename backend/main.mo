@@ -3,6 +3,7 @@ import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import List "mo:core/List";
 
 
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -10,6 +11,7 @@ import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 
+// Migration must be called before actor definition
 
 actor {
   include MixinStorage();
@@ -74,6 +76,20 @@ actor {
     description : Text;
   };
 
+  // Box Shape Types
+  public type BoxShape = {
+    id : Text;
+    position : Position;
+    dimensions : {
+      width : Float;
+      height : Float;
+    };
+    color : Text;
+    borderColor : Text;
+    borderWidth : Float;
+    title : Text;
+  };
+
   // Complete Diagram State (Updated)
   public type DiagramState = {
     icons : [Icon];
@@ -82,6 +98,7 @@ actor {
     lines : [Line];
     textLabels : [TextLabel];
     images : [Image];
+    boxShapes : [BoxShape]; // New field for box shapes
     lastModified : Int;
   };
 
