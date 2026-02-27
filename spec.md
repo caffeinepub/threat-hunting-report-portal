@@ -1,12 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Add resizing and rotation capabilities to image and text elements on the attack path canvas via a Free Transform tool.
+**Goal:** Extend the eraser tool to erase all diagram element types and extend the free transform tool to support moving and resizing icon elements in AttackPathCanvas.
 
 **Planned changes:**
-- When an uploaded image element is selected on the canvas, display 8 drag handles (corners and edge midpoints) to allow resizing; dimensions update in real time and are persisted in element state (width/height).
-- When a text element is selected on the canvas, display 8 drag handles to allow resizing the text box; text wraps within the new dimensions and width/height are stored in state.
-- When the Free Transform tool is active and a text or image element is selected, display a rotation handle above the bounding box; dragging it rotates the element around its center, with the angle stored in element state and applied via CSS/SVG transform.
-- Resize and rotation state (width, height, rotation) are preserved when the diagram is saved and reloaded.
+- Update the eraser tool so that clicking or dragging over any diagram element (icons, text labels, freehand drawings, lines/arrows, and image elements) removes it from the diagram state
+- Update the free transform tool so that clicking an icon displays a bounding box with resize handles, allowing the user to drag to move the icon or drag handles to resize it, consistent with existing free transform behavior for images and text labels
 
-**User-visible outcome:** Users can resize uploaded images and text boxes by dragging handles, and rotate them using the Free Transform tool on the attack path canvas.
+**User-visible outcome:** Users can erase any element in the diagram using the eraser tool, and can move and resize icon elements using the free transform tool.

@@ -1,77 +1,61 @@
 {
   "kind": "build_request",
-  "title": "Resizable images, resizable text, and rotation via Free Transform tool",
-  "projectName": "Threat Hunting Portal",
+  "title": "Extend eraser tool to erase all elements and free transform tool to move/resize icons",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
+      "text": "Extend the eraser tool (button 7 in the toolbar, tool type 'eraser') in AttackPathCanvas.tsx so that it can erase all diagram element types: icons (DiagramIcon), text labels (TextLabel), freehand drawings (FreehandDrawing), lines/arrows (Line/Connection), and image elements (Image). When the eraser is active and a user clicks or drags over any of these elements, they should be removed from the diagram state.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "the uploaded image should be resizable in the diagram"
+          "The eraser should also be able to erase everything in the diagram (icons, text, tools)"
         ]
       },
       "acceptanceCriteria": [
-        "Selecting an uploaded image on the canvas shows 8 resize handles around it.",
-        "Dragging a corner or edge handle resizes the image element.",
-        "The image visually updates during the drag operation.",
-        "Resize state is persisted as part of the diagram element (width/height)."
+        "Eraser tool removes icons/attack path nodes when clicked or dragged over them",
+        "Eraser tool removes text labels when clicked or dragged over them",
+        "Eraser tool removes freehand drawings when clicked or dragged over them",
+        "Eraser tool removes line and arrow connections when clicked or dragged over them",
+        "Eraser tool removes image elements when clicked or dragged over them",
+        "All other toolbar tools remain unaffected"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
+      "text": "Extend the free transform tool (button 8 in the toolbar, tool type 'freeTransform') in AttackPathCanvas.tsx to support selecting, moving, and resizing icon elements (DiagramIcon/AttackPathIcon) in the diagram. When the free transform tool is active, clicking an icon should show selection handles that allow the user to drag to move the icon and drag corner/edge handles to resize it, consistent with how images and text labels already support free transform.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "the add text function I should be able to resize"
+          "The free transform tool should also able move and resize the icons in the diagram"
         ]
       },
       "acceptanceCriteria": [
-        "Selecting a text element on the canvas shows 8 resize handles around the text box.",
-        "Dragging a handle resizes the text box in real time.",
-        "Text wraps within the new dimensions of the text box.",
-        "Width and height are stored on the TextLabel element in useAttackPathState."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "the free transform tool should able to rotate the text in the diagram"
-        ]
-      },
-      "acceptanceCriteria": [
-        "With the Free Transform tool active, selecting a text or image element shows a rotation handle.",
-        "Dragging the rotation handle rotates the element around its center in real time.",
-        "Rotation angle is stored on the element in useAttackPathState (TextLabel and Image types).",
-        "The rotated transform is correctly applied via CSS transform or SVG transform attribute.",
-        "Rotation is preserved when the diagram is saved and reloaded."
+        "Activating the free transform tool and clicking an icon displays a selection bounding box with resize handles",
+        "Dragging an icon while free transform is active moves it to the new position",
+        "Dragging a corner or edge handle resizes the icon proportionally or freely",
+        "Icon position and size changes are persisted to diagram state",
+        "Deselecting (clicking elsewhere) hides the handles",
+        "Existing free transform behavior for images and text labels is not broken"
       ]
     }
   ],
   "constraints": [
-    "All canvas interaction logic must remain in frontend/src/components/AttackPathCanvas.tsx and frontend/src/hooks/useAttackPathState.ts.",
-    "Do not modify files listed in frontend.immutablePaths.",
-    "Backend schema changes are only permitted if element state (width, height, rotation) cannot be serialized within the existing DiagramState types."
+    "Only modify behavior for toolbar button 7 (eraser) and button 8 (free transform) as identified by the selected XPath elements",
+    "Do not alter the backend data model or CRUD operations",
+    "Do not edit any files listed in frontend.immutablePaths"
   ],
   "nonGoals": [
-    "Rotation of icon/connector elements (only text and uploaded image elements are in scope).",
-    "Locking aspect ratio by default (only when Shift is held).",
-    "Adding new toolbar buttons beyond what already exists."
+    "Adding new toolbar tools or buttons",
+    "Changing the visual design of the toolbar",
+    "Modifying undo/redo history behavior beyond what is needed to support these changes",
+    "Backend changes"
   ],
   "imageRequirements": {
     "required": [],
