@@ -1,15 +1,13 @@
-import Map "mo:core/Map";
 import Nat "mo:core/Nat";
+import Map "mo:core/Map";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
-
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
-
 
 actor {
   include MixinStorage();

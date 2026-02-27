@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-change-the-attack-path-diagram-canvas-background-color-to-white",
-      "featureTitle": "Change the attack path diagram canvas background color to white.",
+      "featureId": "feature-uploaded-images-placed-on-the-attack-path-canvas-must-be-resizable-when-an-image-element-is-selected-display-8-drag-handles-corners-and-edge-midpoints-that-allow-the-user-to-resize-the-image-by-dragging-the-image-dimensions-must-update-in-real-time-during-the-drag-and-the-aspect-ratio-should-optionally-be-constrained-e-g-holding-shift",
+      "featureTitle": "Uploaded images placed on the attack path canvas must be resizable. When an image element is selected, display 8 drag handles (corners and edge midpoints) that allow the user to resize the image by dragging. The image dimensions must update in real time during the drag and the aspect ratio should optionally be constrained (e.g., holding Shift).",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -22,10 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-remove-text-labels-from-icons-after-they-are-dragged-and-placed-onto-the-attack-path-diagram-canvas-icons-on-the-canvas-must-display-the-icon-image-only-with-no-label-text-rendered-beneath-or-beside-them",
-      "featureTitle": "Remove text labels from icons after they are dragged and placed onto the attack path diagram canvas. Icons on the canvas must display the icon image only, with no label text rendered beneath or beside them.",
+      "featureId": "feature-text-elements-added-via-the-add-text-toolbar-button-must-be-resizable-when-a-text-element-is-selected-display-8-drag-handles-that-allow-the-user-to-resize-the-text-box-the-text-should-wrap-within-the-resized-box-and-the-element-dimensions-must-be-stored-in-state",
+      "featureTitle": "Text elements added via the 'Add Text' toolbar button must be resizable. When a text element is selected, display 8 drag handles that allow the user to resize the text box. The text should wrap within the resized box and the element dimensions must be stored in state.",
       "files": [
-        "frontend/src/components/AttackPathCanvas.tsx"
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -38,6 +40,27 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-the-free-transform-tool-must-support-rotating-both-text-elements-and-uploaded-image-elements-on-the-attack-path-canvas-when-the-free-transform-tool-is-active-and-an-element-text-or-image-is-selected-display-a-rotation-handle-e-g-above-the-bounding-box-that-the-user-can-drag-to-rotate-the-element-around-its-center-the-rotation-angle-must-be-stored-in-element-state-and-applied-as-a-css-svg-transform",
+      "featureTitle": "The Free Transform tool must support rotating both text elements and uploaded image elements on the attack path canvas. When the Free Transform tool is active and an element (text or image) is selected, display a rotation handle (e.g., above the bounding box) that the user can drag to rotate the element around its center. The rotation angle must be stored in element state and applied as a CSS/SVG transform.",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

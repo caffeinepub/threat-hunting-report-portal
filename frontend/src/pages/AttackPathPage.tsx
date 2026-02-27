@@ -1,148 +1,162 @@
 import React, { useState } from 'react';
-import AttackPathCanvas from '../components/AttackPathCanvas';
+import AttackPathCanvas, { ToolType } from '../components/AttackPathCanvas';
 import AttackPathToolbar from '../components/AttackPathToolbar';
 import DiagramSidebar from '../components/DiagramSidebar';
 import SaveDiagramDialog from '../components/SaveDiagramDialog';
+import LoadDiagramDialog from '../components/LoadDiagramDialog';
 import { useAttackPathState } from '../hooks/useAttackPathState';
 import { useSaveDiagramState } from '../hooks/useSaveDiagramState';
-import { DiagramState, NamedDiagram } from '../backend';
+import { ExternalBlob, NamedDiagram, DiagramState } from '../backend';
 
 export default function AttackPathPage() {
-  const state = useAttackPathState();
-  const saveMutation = useSaveDiagramState();
-  const [activeTool, setActiveTool] = useState('select');
-  const [drawColor, setDrawColor] = useState('#ef4444');
-  const [strokeWidth, setStrokeWidth] = useState(3);
-  const [textColor, setTextColor] = useState('#1e293b');
-  const [fontSize, setFontSize] = useState(16);
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [activeTool, setActiveTool] = useState<ToolType>('select');
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
 
-  const handleSave = async (name: string) => {
-    const diagramState: DiagramState = {
-      icons: state.icons.map(icon => ({
+  const diagramState = useAttackPathState();
+  const saveMutation = useSaveDiagramState();
+
+  const handleSave = () => {
+    setSaveDialogOpen(true);
+  };
+
+  const handleSaveConfirm = async (name: string) => {
+    const s = diagramState.state;
+
+    const diagramStatePayload: DiagramState = {
+      icons: s.icons.map(icon => ({
         id: icon.id,
-        iconType: icon.type,
-        position: { x: icon.x, y: icon.y },
+        iconType: icon.iconType,
+        position: { x: icon.position.x, y: icon.position.y },
         name: icon.name,
       })),
-      connections: state.connections.map(conn => ({
+      connections: s.connections.map(conn => ({
         sourceId: conn.sourceId,
         targetId: conn.targetId,
         connectionType: conn.connectionType,
         color: conn.color,
       })),
-      freehandDrawings: state.drawings
-        .filter(d => d.type === 'freehand')
-        .map(d => ({
-          points: d.points,
-          color: d.color,
-          strokeWidth: d.strokeWidth,
-        })),
-      lines: state.drawings
-        .filter(d => d.type === 'line' || d.type === 'arrow')
-        .map(d => ({
-          startPosition: d.points[0] ?? { x: 0, y: 0 },
-          endPosition: d.points[1] ?? { x: 0, y: 0 },
-          color: d.color,
-          strokeWidth: d.strokeWidth,
-          isArrow: d.type === 'arrow',
-        })),
-      textLabels: state.textLabels.map(label => ({
-        content: label.text,
-        position: { x: label.x, y: label.y },
+      freehandDrawings: s.freehandDrawings.map(d => ({
+        points: d.points.map(p => ({ x: p.x, y: p.y })),
+        color: d.color,
+        strokeWidth: d.strokeWidth,
+      })),
+      lines: s.lines.map(l => ({
+        startPosition: { x: l.startPosition.x, y: l.startPosition.y },
+        endPosition: { x: l.endPosition.x, y: l.endPosition.y },
+        color: l.color,
+        strokeWidth: l.strokeWidth,
+        isArrow: l.isArrow,
+      })),
+      textLabels: s.textLabels.map(label => ({
+        content: label.content,
+        position: { x: label.position.x, y: label.position.y },
         fontSize: label.fontSize,
         color: label.color,
-        fontWeight: '500',
+        fontWeight: label.fontWeight,
       })),
-      images: state.images.map(img => ({
+      images: s.images.map(img => ({
         id: img.id,
-        file: img.blob,
-        position: { x: img.x, y: img.y },
+        file: ExternalBlob.fromURL(img.url),
+        position: { x: img.position.x, y: img.position.y },
         size: { width: img.width, height: img.height },
         name: img.name,
         description: img.description,
       })),
       lastModified: BigInt(Date.now()),
     };
-    await saveMutation.mutateAsync({ name, state: diagramState });
-    setShowSaveDialog(false);
+
+    await saveMutation.mutateAsync({ name, state: diagramStatePayload });
+    setSaveDialogOpen(false);
+  };
+
+  const handleLoad = () => {
+    setLoadDialogOpen(true);
   };
 
   const handleLoadDiagram = (diagram: NamedDiagram) => {
-    state.onClear();
-    const s = diagram.state;
-    s.icons.forEach(icon => {
-      state.onAddIcon(icon.iconType as any, icon.position.x, icon.position.y, icon.name);
-    });
-    s.textLabels.forEach(label => {
-      state.onAddTextLabel(label.content, label.position.x, label.position.y, label.color, label.fontSize);
-    });
+    diagramState.loadDiagram(diagram.state);
+    setLoadDialogOpen(false);
   };
 
-  return (
-    <div className="flex h-full w-full overflow-hidden">
-      {/* Left sidebar: saved diagrams */}
-      <DiagramSidebar onLoadDiagram={handleLoadDiagram} />
+  const handleAddImage = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const url = e.target?.result as string;
+      diagramState.addImage(url, { x: 200, y: 200 }, file.name, '');
+    };
+    reader.readAsDataURL(file);
+  };
 
-      {/* Middle: toolbar */}
+  const { state } = diagramState;
+
+  return (
+    <div className="flex h-full w-full overflow-hidden bg-white">
+      {/* Left Toolbar */}
       <AttackPathToolbar
         activeTool={activeTool}
-        onToolChange={setActiveTool}
-        drawColor={drawColor}
-        onDrawColorChange={setDrawColor}
-        strokeWidth={strokeWidth}
-        onStrokeWidthChange={setStrokeWidth}
-        textColor={textColor}
-        onTextColorChange={setTextColor}
-        fontSize={fontSize}
-        onFontSizeChange={setFontSize}
-        onUndo={state.onUndo}
-        onClear={state.onClear}
-        onSave={() => setShowSaveDialog(true)}
-        onAddImage={(file: File) => state.onAddImage(file, 100, 100, file.name, '')}
+        onToolChange={(tool) => setActiveTool(tool as ToolType)}
+        onSave={handleSave}
+        onLoad={handleLoad}
+        onUndo={diagramState.undo}
+        onRedo={diagramState.redo}
+        onClear={diagramState.clearDiagram}
+        onAddImage={handleAddImage}
+        canUndo={diagramState.canUndo}
+        canRedo={diagramState.canRedo}
       />
 
-      {/* Right: canvas */}
-      <div className="flex-1 relative overflow-hidden">
+      {/* Main Canvas */}
+      <div className="flex-1 overflow-hidden">
         <AttackPathCanvas
+          activeTool={activeTool}
+          drawColor="#ef4444"
+          strokeWidth={2}
           icons={state.icons}
           connections={state.connections}
-          drawings={state.drawings}
+          freehandDrawings={state.freehandDrawings}
           textLabels={state.textLabels}
           images={state.images}
-          selectedElements={state.selectedElements}
-          activeTool={activeTool}
-          drawColor={drawColor}
-          strokeWidth={strokeWidth}
-          textColor={textColor}
-          fontSize={fontSize}
-          onAddIcon={state.onAddIcon}
-          onMoveIcon={state.onMoveIcon}
-          onResizeIcon={state.onResizeIcon}
-          onRotateIcon={state.onRotateIcon}
-          onRemoveIcon={state.onRemoveIcon}
-          onAddConnection={state.onAddConnection}
-          onRemoveConnection={state.onRemoveConnection}
-          onAddDrawing={state.onAddDrawing}
-          onRemoveDrawing={state.onRemoveDrawing}
-          onAddTextLabel={state.onAddTextLabel}
-          onMoveTextLabel={state.onMoveTextLabel}
-          onRemoveTextLabel={state.onRemoveTextLabel}
-          onAddImage={state.onAddImage}
-          onMoveImage={state.onMoveImage}
-          onResizeImage={state.onResizeImage}
-          onRemoveImage={state.onRemoveImage}
-          onSetSelectedElements={state.onSetSelectedElements}
-          onUndo={state.onUndo}
+          lines={state.lines}
+          onAddIcon={diagramState.addIcon}
+          onUpdateIconPosition={diagramState.updateIconPosition}
+          onUpdateIconPositionImmediate={diagramState.updateIconPositionImmediate}
+          onUpdateIconRotation={diagramState.updateIconRotation}
+          onUpdateIconRotationImmediate={diagramState.updateIconRotationImmediate}
+          onUpdateIconSize={diagramState.updateIconSize}
+          onUpdateIconSizeImmediate={diagramState.updateIconSizeImmediate}
+          onDeleteIcon={diagramState.deleteIcon}
+          onAddConnection={diagramState.addConnection}
+          onDeleteConnection={diagramState.deleteConnection}
+          onAddFreehandDrawing={diagramState.addFreehandDrawing}
+          onAddLine={diagramState.addLine}
+          onAddTextLabel={diagramState.addTextLabel}
+          onUpdateTextLabel={diagramState.updateTextLabel}
+          onUpdateTextLabelImmediate={diagramState.updateTextLabelImmediate}
+          onDeleteTextLabel={diagramState.deleteTextLabel}
+          onAddImage={(url, position, name) => diagramState.addImage(url, position, name ?? '', '')}
+          onUpdateImage={diagramState.updateImage}
+          onUpdateImageImmediate={diagramState.updateImageImmediate}
+          onDeleteImage={diagramState.deleteImage}
         />
       </div>
 
-      {/* Save dialog */}
+      {/* Right Sidebar */}
+      <DiagramSidebar onLoadDiagram={handleLoadDiagram} />
+
+      {/* Save Dialog */}
       <SaveDiagramDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
-        onSave={handleSave}
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        onSave={handleSaveConfirm}
         isSaving={saveMutation.isPending}
+      />
+
+      {/* Load Dialog */}
+      <LoadDiagramDialog
+        open={loadDialogOpen}
+        onOpenChange={setLoadDialogOpen}
+        onLoadDiagram={handleLoadDiagram}
       />
     </div>
   );

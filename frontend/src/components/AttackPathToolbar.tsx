@@ -1,8 +1,7 @@
 import AttackPathIcon, { IconType } from './AttackPathIcon';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Save, FolderOpen, Move, Trash2, Image, MousePointer } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pencil, Minus, ArrowRight, Eraser, Type, Undo, Redo, Save, FolderOpen, Move, Trash2, Image, MousePointer } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -40,37 +39,28 @@ const iconTypes: { type: IconType; label: string }[] = [
 interface AttackPathToolbarProps {
   activeTool: string;
   onToolChange: (tool: string) => void;
-  drawColor: string;
-  onDrawColorChange: (color: string) => void;
-  strokeWidth: number;
-  onStrokeWidthChange: (width: number) => void;
-  textColor: string;
-  onTextColorChange: (color: string) => void;
-  fontSize: number;
-  onFontSizeChange: (size: number) => void;
   onUndo: () => void;
+  onRedo: () => void;
   onClear: () => void;
   onSave: () => void;
+  onLoad: () => void;
   onAddImage: (file: File) => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export default function AttackPathToolbar({
   activeTool,
   onToolChange,
-  drawColor,
-  onDrawColorChange,
-  strokeWidth,
-  onStrokeWidthChange,
-  textColor,
-  onTextColorChange,
-  fontSize,
-  onFontSizeChange,
   onUndo,
+  onRedo,
   onClear,
   onSave,
+  onLoad,
   onAddImage,
+  canUndo = false,
+  canRedo = false,
 }: AttackPathToolbarProps) {
-  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -96,7 +86,7 @@ export default function AttackPathToolbar({
       setIsUploading(true);
       onAddImage(file);
       toast.success('Image added successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to add image');
     } finally {
       setIsUploading(false);
@@ -117,9 +107,6 @@ export default function AttackPathToolbar({
       {label}
     </Button>
   );
-
-  const showDrawOptions = activeTool === 'draw' || activeTool === 'line' || activeTool === 'arrow';
-  const showTextOptions = activeTool === 'text';
 
   return (
     <div className="w-56 flex-shrink-0 border-r border-border bg-card overflow-y-auto p-3 space-y-4">
@@ -156,7 +143,7 @@ export default function AttackPathToolbar({
       <div className="space-y-1.5">
         {toolBtn('select', 'Select / Move', MousePointer)}
         {toolBtn('connect', 'Connect Icons', ArrowRight)}
-        {toolBtn('draw', 'Freehand Draw', Pencil)}
+        {toolBtn('pen', 'Freehand Draw', Pencil)}
         {toolBtn('line', 'Draw Line', Minus)}
         {toolBtn('arrow', 'Draw Arrow', ArrowRight)}
         {toolBtn('text', 'Add Text', Type)}
@@ -182,77 +169,6 @@ export default function AttackPathToolbar({
         />
       </div>
 
-      {showDrawOptions && (
-        <>
-          <Separator />
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Draw Options</h3>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Color</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={drawColor}
-                  onChange={(e) => onDrawColorChange(e.target.value)}
-                  className="w-8 h-8 rounded cursor-pointer border border-border"
-                />
-                <span className="text-xs text-muted-foreground">{drawColor}</span>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Stroke Width: {strokeWidth}px</label>
-              <input
-                type="range"
-                min={1}
-                max={10}
-                value={strokeWidth}
-                onChange={(e) => onStrokeWidthChange(Number(e.target.value))}
-                className="w-full"
-              />
-            </div>
-          </div>
-        </>
-      )}
-
-      {showTextOptions && (
-        <>
-          <Separator />
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Text Options</h3>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Font Size</label>
-              <Select
-                value={String(fontSize)}
-                onValueChange={(val) => onFontSizeChange(Number(val))}
-              >
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {fontSizes.map((size) => (
-                    <SelectItem key={size} value={String(size)}>
-                      {size}px
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Text Color</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={textColor}
-                  onChange={(e) => onTextColorChange(e.target.value)}
-                  className="w-8 h-8 rounded cursor-pointer border border-border"
-                />
-                <span className="text-xs text-muted-foreground">{textColor}</span>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
       <Separator />
 
       <div className="space-y-1.5">
@@ -261,9 +177,21 @@ export default function AttackPathToolbar({
           size="sm"
           className="w-full justify-start"
           onClick={onUndo}
+          disabled={!canUndo}
         >
           <Undo className="h-4 w-4 mr-2" />
           Undo
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+          onClick={onRedo}
+          disabled={!canRedo}
+        >
+          <Redo className="h-4 w-4 mr-2" />
+          Redo
         </Button>
 
         <Button
@@ -274,6 +202,16 @@ export default function AttackPathToolbar({
         >
           <Save className="h-4 w-4 mr-2" />
           Save Diagram
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+          onClick={onLoad}
+        >
+          <FolderOpen className="h-4 w-4 mr-2" />
+          Load Diagram
         </Button>
 
         <Button

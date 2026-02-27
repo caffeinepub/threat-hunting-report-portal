@@ -1,10 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Update the attack path diagram canvas to have a white background and remove text labels from icons placed on the canvas.
+**Goal:** Add resizing and rotation capabilities to image and text elements on the attack path canvas via a Free Transform tool.
 
 **Planned changes:**
-- Change the attack path diagram canvas background color to white (#ffffff) in `AttackPathCanvas.tsx`
-- Remove text labels from icons rendered on the diagram canvas (icons in the toolbar sidebar are unaffected)
+- When an uploaded image element is selected on the canvas, display 8 drag handles (corners and edge midpoints) to allow resizing; dimensions update in real time and are persisted in element state (width/height).
+- When a text element is selected on the canvas, display 8 drag handles to allow resizing the text box; text wraps within the new dimensions and width/height are stored in state.
+- When the Free Transform tool is active and a text or image element is selected, display a rotation handle above the bounding box; dragging it rotates the element around its center, with the angle stored in element state and applied via CSS/SVG transform.
+- Resize and rotation state (width, height, rotation) are preserved when the diagram is saved and reloaded.
 
-**User-visible outcome:** The diagram canvas displays with a white background, and icons placed on the canvas show only the icon image without any label text beneath or beside them.
+**User-visible outcome:** Users can resize uploaded images and text boxes by dragging handles, and rotate them using the Free Transform tool on the attack path canvas.

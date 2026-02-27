@@ -1,46 +1,21 @@
 import { useState, useCallback } from 'react';
-import { ExternalBlob } from '../backend';
+import { IconType } from '../components/AttackPathIcon';
+import type { DiagramState, TextLabel as BackendTextLabel, Image as BackendImage } from '../backend';
 
-export type IconType =
-  | 'attacker'
-  | 'phishing'
-  | 'computer'
-  | 'server'
-  | 'domain'
-  | 'firewall'
-  | 'cloudserver'
-  | 'multipleservers'
-  | 'multiplecomputers'
-  | 'router'
-  | 'user'
-  | 'multipleusers'
-  | 'email'
-  | 'file'
-  | 'pdf'
-  | 'word'
-  | 'excel'
-  | 'ppt'
-  | 'zip'
-  | 'exe'
-  | 'dll'
-  | 'script'
-  | 'csv'
-  | 'c2'
-  | 'scheduledtask'
-  | 'backdoor'
-  | 'powershell'
-  | 'javascript'
-  | 'webbrowser';
+export type { IconType };
 
-export interface CanvasIcon {
-  id: string;
-  type: IconType;
+export interface Position {
   x: number;
   y: number;
+}
+
+export interface PlacedIcon {
+  id: string;
+  iconType: IconType;
+  position: Position;
   name: string;
-  width?: number;
-  height?: number;
-  rotation?: number;
+  size: number;
+  rotation: number;
 }
 
 export interface Connection {
@@ -49,385 +24,413 @@ export interface Connection {
   targetId: string;
   connectionType: string;
   color: string;
-  rotation?: number;
 }
 
-export interface DrawingPath {
-  id: string;
-  type: 'freehand' | 'line' | 'arrow';
-  points: { x: number; y: number }[];
+export interface FreehandDrawing {
+  points: Position[];
   color: string;
   strokeWidth: number;
 }
 
-export interface TextLabel {
-  id: string;
-  text: string;
-  x: number;
-  y: number;
+export interface LineElement {
+  startPosition: Position;
+  endPosition: Position;
   color: string;
-  fontSize: number;
+  strokeWidth: number;
+  isArrow: boolean;
 }
 
-export interface CanvasImage {
+export interface TextLabel {
   id: string;
-  blob: ExternalBlob;
-  x: number;
-  y: number;
+  content: string;
+  position: Position;
+  fontSize: number;
+  color: string;
+  fontWeight: string;
+  width: number;
+  height: number;
+  rotation: number;
+}
+
+export interface ImageElement {
+  id: string;
+  url: string;
+  position: Position;
   width: number;
   height: number;
   name: string;
   description: string;
+  rotation: number;
 }
 
-export interface SelectedElements {
-  icons: Set<string>;
-  textLabels: Set<string>;
-  images: Set<string>;
-}
-
-interface AttackPathState {
-  icons: CanvasIcon[];
+export interface DiagramStateLocal {
+  icons: PlacedIcon[];
   connections: Connection[];
-  drawings: DrawingPath[];
+  freehandDrawings: FreehandDrawing[];
+  lines: LineElement[];
   textLabels: TextLabel[];
-  images: CanvasImage[];
-  selectedElements: SelectedElements;
+  images: ImageElement[];
 }
 
-type HistoryEntry = Omit<AttackPathState, 'selectedElements'>;
+const DEFAULT_TEXT_WIDTH = 160;
+const DEFAULT_TEXT_HEIGHT = 60;
+const DEFAULT_IMAGE_WIDTH = 150;
+const DEFAULT_IMAGE_HEIGHT = 150;
 
-export function useAttackPathState() {
-  const emptySelected: SelectedElements = {
-    icons: new Set(),
-    textLabels: new Set(),
-    images: new Set(),
-  };
-
-  const [state, setState] = useState<AttackPathState>({
+function createEmptyState(): DiagramStateLocal {
+  return {
     icons: [],
     connections: [],
-    drawings: [],
+    freehandDrawings: [],
+    lines: [],
     textLabels: [],
     images: [],
-    selectedElements: emptySelected,
-  });
+  };
+}
 
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+export function useAttackPathState() {
+  const [state, setState] = useState<DiagramStateLocal>(createEmptyState());
+  const [history, setHistory] = useState<DiagramStateLocal[]>([createEmptyState()]);
+  const [historyIndex, setHistoryIndex] = useState(0);
 
-  const pushHistory = useCallback((current: AttackPathState) => {
-    setHistory(prev => [
-      ...prev.slice(-49),
-      {
-        icons: current.icons,
-        connections: current.connections,
-        drawings: current.drawings,
-        textLabels: current.textLabels,
-        images: current.images,
-      },
-    ]);
-  }, []);
-
-  const onAddIcon = useCallback(
-    (type: IconType, x: number, y: number, name: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          icons: [
-            ...prev.icons,
-            {
-              id: `icon-${Date.now()}-${Math.random()}`,
-              type,
-              x,
-              y,
-              name,
-              width: 56,
-              height: 56,
-              rotation: 0,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onMoveIcon = useCallback(
-    (id: string, x: number, y: number) => {
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon => (icon.id === id ? { ...icon, x, y } : icon)),
-      }));
-    },
-    []
-  );
-
-  const onResizeIcon = useCallback(
-    (id: string, width: number, height: number) => {
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon => (icon.id === id ? { ...icon, width, height } : icon)),
-      }));
-    },
-    []
-  );
-
-  const onRotateIcon = useCallback(
-    (id: string, rotation: number) => {
-      setState(prev => ({
-        ...prev,
-        icons: prev.icons.map(icon => (icon.id === id ? { ...icon, rotation } : icon)),
-      }));
-    },
-    []
-  );
-
-  const onRemoveIcon = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          icons: prev.icons.filter(icon => icon.id !== id),
-          connections: prev.connections.filter(
-            conn => conn.sourceId !== id && conn.targetId !== id
-          ),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddConnection = useCallback(
-    (sourceId: string, targetId: string, connectionType: string, color: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          connections: [
-            ...prev.connections,
-            {
-              id: `conn-${Date.now()}`,
-              sourceId,
-              targetId,
-              connectionType,
-              color,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onRemoveConnection = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          connections: prev.connections.filter(conn => conn.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddDrawing = useCallback(
-    (type: 'freehand' | 'line' | 'arrow', points: { x: number; y: number }[], color: string, strokeWidth: number) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          drawings: [
-            ...prev.drawings,
-            {
-              id: `drawing-${Date.now()}-${Math.random()}`,
-              type,
-              points,
-              color,
-              strokeWidth,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onRemoveDrawing = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          drawings: prev.drawings.filter(d => d.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddTextLabel = useCallback(
-    (text: string, x: number, y: number, color: string, fontSize: number) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          textLabels: [
-            ...prev.textLabels,
-            {
-              id: `text-${Date.now()}-${Math.random()}`,
-              text,
-              x,
-              y,
-              color,
-              fontSize,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onMoveTextLabel = useCallback(
-    (id: string, x: number, y: number) => {
-      setState(prev => ({
-        ...prev,
-        textLabels: prev.textLabels.map(label => (label.id === id ? { ...label, x, y } : label)),
-      }));
-    },
-    []
-  );
-
-  const onRemoveTextLabel = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          textLabels: prev.textLabels.filter(label => label.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onAddImage = useCallback(
-    async (file: File, x: number, y: number, name: string, description: string) => {
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const blob = ExternalBlob.fromBytes(bytes);
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          images: [
-            ...prev.images,
-            {
-              id: `image-${Date.now()}-${Math.random()}`,
-              blob,
-              x,
-              y,
-              width: 200,
-              height: 200,
-              name,
-              description,
-            },
-          ],
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onMoveImage = useCallback(
-    (id: string, x: number, y: number) => {
-      setState(prev => ({
-        ...prev,
-        images: prev.images.map(img => (img.id === id ? { ...img, x, y } : img)),
-      }));
-    },
-    []
-  );
-
-  const onResizeImage = useCallback(
-    (id: string, width: number, height: number) => {
-      setState(prev => ({
-        ...prev,
-        images: prev.images.map(img => (img.id === id ? { ...img, width, height } : img)),
-      }));
-    },
-    []
-  );
-
-  const onRemoveImage = useCallback(
-    (id: string) => {
-      setState(prev => {
-        pushHistory(prev);
-        return {
-          ...prev,
-          images: prev.images.filter(img => img.id !== id),
-        };
-      });
-    },
-    [pushHistory]
-  );
-
-  const onSetSelectedElements = useCallback(
-    (selected: SelectedElements) => {
-      setState(prev => ({ ...prev, selectedElements: selected }));
-    },
-    []
-  );
-
-  const onUndo = useCallback(() => {
+  const pushHistory = useCallback((newState: DiagramStateLocal) => {
     setHistory(prev => {
-      if (prev.length === 0) return prev;
-      const last = prev[prev.length - 1];
-      setState(current => ({
-        ...last,
-        selectedElements: current.selectedElements,
-      }));
-      return prev.slice(0, -1);
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+      return newHistory;
     });
+    setHistoryIndex(prev => prev + 1);
+    setState(newState);
+  }, [historyIndex]);
+
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setState(history[newIndex]);
+    }
+  }, [history, historyIndex]);
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setState(history[newIndex]);
+    }
+  }, [history, historyIndex]);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
+
+  const addIcon = useCallback((iconType: IconType, position: Position) => {
+    const newIcon: PlacedIcon = {
+      id: `icon-${Date.now()}-${Math.random()}`,
+      iconType,
+      position,
+      name: iconType,
+      size: 64,
+      rotation: 0,
+    };
+    const newState = { ...state, icons: [...state.icons, newIcon] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateIconPosition = useCallback((id: string, position: Position) => {
+    const newState = {
+      ...state,
+      icons: state.icons.map(icon => icon.id === id ? { ...icon, position } : icon),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateIconPositionImmediate = useCallback((id: string, position: Position) => {
+    setState(prev => ({
+      ...prev,
+      icons: prev.icons.map(icon => icon.id === id ? { ...icon, position } : icon),
+    }));
   }, []);
 
-  const onClear = useCallback(() => {
-    setState(prev => {
-      pushHistory(prev);
-      return {
-        icons: [],
-        connections: [],
-        drawings: [],
-        textLabels: [],
-        images: [],
-        selectedElements: emptySelected,
-      };
-    });
+  const updateIconRotation = useCallback((id: string, rotation: number) => {
+    const newState = {
+      ...state,
+      icons: state.icons.map(icon => icon.id === id ? { ...icon, rotation } : icon),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateIconRotationImmediate = useCallback((id: string, rotation: number) => {
+    setState(prev => ({
+      ...prev,
+      icons: prev.icons.map(icon => icon.id === id ? { ...icon, rotation } : icon),
+    }));
+  }, []);
+
+  const updateIconSize = useCallback((id: string, size: number) => {
+    const newState = {
+      ...state,
+      icons: state.icons.map(icon => icon.id === id ? { ...icon, size } : icon),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateIconSizeImmediate = useCallback((id: string, size: number) => {
+    setState(prev => ({
+      ...prev,
+      icons: prev.icons.map(icon => icon.id === id ? { ...icon, size } : icon),
+    }));
+  }, []);
+
+  const deleteIcon = useCallback((id: string) => {
+    const newState = {
+      ...state,
+      icons: state.icons.filter(icon => icon.id !== id),
+      connections: state.connections.filter(c => c.sourceId !== id && c.targetId !== id),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const addConnection = useCallback((sourceId: string, targetId: string, color: string = '#ef4444') => {
+    const newConnection: Connection = {
+      id: `conn-${Date.now()}-${Math.random()}`,
+      sourceId,
+      targetId,
+      connectionType: 'arrow',
+      color,
+    };
+    const newState = { ...state, connections: [...state.connections, newConnection] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const deleteConnection = useCallback((id: string) => {
+    const newState = {
+      ...state,
+      connections: state.connections.filter(c => c.id !== id),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const addFreehandDrawing = useCallback((drawing: FreehandDrawing) => {
+    const newState = { ...state, freehandDrawings: [...state.freehandDrawings, drawing] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const addLine = useCallback((line: LineElement) => {
+    const newState = { ...state, lines: [...state.lines, line] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const addTextLabel = useCallback((content: string, position: Position, fontSize: number = 16, color: string = '#1e293b', fontWeight: string = 'normal') => {
+    const newLabel: TextLabel = {
+      id: `text-${Date.now()}-${Math.random()}`,
+      content,
+      position,
+      fontSize,
+      color,
+      fontWeight,
+      width: DEFAULT_TEXT_WIDTH,
+      height: DEFAULT_TEXT_HEIGHT,
+      rotation: 0,
+    };
+    const newState = { ...state, textLabels: [...state.textLabels, newLabel] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateTextLabel = useCallback((id: string, updates: Partial<TextLabel>) => {
+    const newState = {
+      ...state,
+      textLabels: state.textLabels.map(label => label.id === id ? { ...label, ...updates } : label),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateTextLabelImmediate = useCallback((id: string, updates: Partial<TextLabel>) => {
+    setState(prev => ({
+      ...prev,
+      textLabels: prev.textLabels.map(label => label.id === id ? { ...label, ...updates } : label),
+    }));
+  }, []);
+
+  const deleteTextLabel = useCallback((id: string) => {
+    const newState = {
+      ...state,
+      textLabels: state.textLabels.filter(label => label.id !== id),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const addImage = useCallback((url: string, position: Position, name: string = '', description: string = '') => {
+    const newImage: ImageElement = {
+      id: `img-${Date.now()}-${Math.random()}`,
+      url,
+      position,
+      width: DEFAULT_IMAGE_WIDTH,
+      height: DEFAULT_IMAGE_HEIGHT,
+      name,
+      description,
+      rotation: 0,
+    };
+    const newState = { ...state, images: [...state.images, newImage] };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateImage = useCallback((id: string, updates: Partial<ImageElement>) => {
+    const newState = {
+      ...state,
+      images: state.images.map(img => img.id === id ? { ...img, ...updates } : img),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const updateImageImmediate = useCallback((id: string, updates: Partial<ImageElement>) => {
+    setState(prev => ({
+      ...prev,
+      images: prev.images.map(img => img.id === id ? { ...img, ...updates } : img),
+    }));
+  }, []);
+
+  const deleteImage = useCallback((id: string) => {
+    const newState = {
+      ...state,
+      images: state.images.filter(img => img.id !== id),
+    };
+    pushHistory(newState);
+  }, [state, pushHistory]);
+
+  const clearDiagram = useCallback(() => {
+    const empty = createEmptyState();
+    pushHistory(empty);
   }, [pushHistory]);
 
+  const loadDiagram = useCallback((backendState: DiagramState) => {
+    const loaded: DiagramStateLocal = {
+      icons: backendState.icons.map(icon => ({
+        id: icon.id,
+        iconType: icon.iconType as IconType,
+        position: { x: icon.position.x, y: icon.position.y },
+        name: icon.name,
+        size: 64,
+        rotation: 0,
+      })),
+      connections: backendState.connections.map((conn, idx) => ({
+        id: `conn-loaded-${idx}`,
+        sourceId: conn.sourceId,
+        targetId: conn.targetId,
+        connectionType: conn.connectionType,
+        color: conn.color,
+      })),
+      freehandDrawings: backendState.freehandDrawings.map(d => ({
+        points: d.points.map(p => ({ x: p.x, y: p.y })),
+        color: d.color,
+        strokeWidth: d.strokeWidth,
+      })),
+      lines: backendState.lines.map(l => ({
+        startPosition: { x: l.startPosition.x, y: l.startPosition.y },
+        endPosition: { x: l.endPosition.x, y: l.endPosition.y },
+        color: l.color,
+        strokeWidth: l.strokeWidth,
+        isArrow: l.isArrow,
+      })),
+      textLabels: backendState.textLabels.map((label, idx) => ({
+        id: `text-loaded-${idx}`,
+        content: label.content,
+        position: { x: label.position.x, y: label.position.y },
+        fontSize: label.fontSize,
+        color: label.color,
+        fontWeight: label.fontWeight,
+        width: DEFAULT_TEXT_WIDTH,
+        height: DEFAULT_TEXT_HEIGHT,
+        rotation: 0,
+      })),
+      images: backendState.images.map(img => ({
+        id: img.id,
+        url: img.file.getDirectURL(),
+        position: { x: img.position.x, y: img.position.y },
+        width: img.size.width || DEFAULT_IMAGE_WIDTH,
+        height: img.size.height || DEFAULT_IMAGE_HEIGHT,
+        name: img.name,
+        description: img.description,
+        rotation: 0,
+      })),
+    };
+    const empty = createEmptyState();
+    setHistory([empty, loaded]);
+    setHistoryIndex(1);
+    setState(loaded);
+  }, []);
+
+  const serializeForBackend = useCallback((): DiagramState => {
+    return {
+      icons: state.icons.map(icon => ({
+        id: icon.id,
+        iconType: icon.iconType,
+        position: { x: icon.position.x, y: icon.position.y },
+        name: icon.name,
+      })),
+      connections: state.connections.map(conn => ({
+        sourceId: conn.sourceId,
+        targetId: conn.targetId,
+        connectionType: conn.connectionType,
+        color: conn.color,
+      })),
+      freehandDrawings: state.freehandDrawings.map(d => ({
+        points: d.points.map(p => ({ x: p.x, y: p.y })),
+        color: d.color,
+        strokeWidth: d.strokeWidth,
+      })),
+      lines: state.lines.map(l => ({
+        startPosition: { x: l.startPosition.x, y: l.startPosition.y },
+        endPosition: { x: l.endPosition.x, y: l.endPosition.y },
+        color: l.color,
+        strokeWidth: l.strokeWidth,
+        isArrow: l.isArrow,
+      })),
+      textLabels: state.textLabels.map(label => ({
+        content: label.content,
+        position: { x: label.position.x, y: label.position.y },
+        fontSize: label.fontSize,
+        color: label.color,
+        fontWeight: label.fontWeight,
+      })),
+      images: state.images.map(img => ({
+        id: img.id,
+        file: { getDirectURL: () => img.url, getBytes: async () => new Uint8Array(), withUploadProgress: () => ({ getDirectURL: () => img.url, getBytes: async () => new Uint8Array(), withUploadProgress: () => ({} as any), static: {} as any }) } as any,
+        position: { x: img.position.x, y: img.position.y },
+        size: { width: img.width, height: img.height },
+        name: img.name,
+        description: img.description,
+      })),
+      lastModified: BigInt(Date.now()),
+    };
+  }, [state]);
+
   return {
-    ...state,
-    onAddIcon,
-    onMoveIcon,
-    onResizeIcon,
-    onRotateIcon,
-    onRemoveIcon,
-    onAddConnection,
-    onRemoveConnection,
-    onAddDrawing,
-    onRemoveDrawing,
-    onAddTextLabel,
-    onMoveTextLabel,
-    onRemoveTextLabel,
-    onAddImage,
-    onMoveImage,
-    onResizeImage,
-    onRemoveImage,
-    onSetSelectedElements,
-    onUndo,
-    onClear,
+    state,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    addIcon,
+    updateIconPosition,
+    updateIconPositionImmediate,
+    updateIconRotation,
+    updateIconRotationImmediate,
+    updateIconSize,
+    updateIconSizeImmediate,
+    deleteIcon,
+    addConnection,
+    deleteConnection,
+    addFreehandDrawing,
+    addLine,
+    addTextLabel,
+    updateTextLabel,
+    updateTextLabelImmediate,
+    deleteTextLabel,
+    addImage,
+    updateImage,
+    updateImageImmediate,
+    deleteImage,
+    clearDiagram,
+    loadDiagram,
+    serializeForBackend,
   };
 }
