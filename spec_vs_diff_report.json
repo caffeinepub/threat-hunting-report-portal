@@ -1,19 +1,18 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T13:49:17.396Z",
-  "summary": "Both REQ-1 and REQ-2 appear to be implemented in the diff. REQ-1 is addressed via useSaveDiagramState with cache invalidation, useGetAllDiagrams with staleTime:0 and refetchOnMount, and proper wiring in AttackPathPage/DiagramSidebar/LoadDiagramDialog. REQ-2 is addressed in AttackPathToolbar where the draggable attribute and onDragStart handler are scoped to the img element only, not the button or label text.",
+  "generatedAt": "2026-02-27T14:54:10.202Z",
+  "summary": "The diff implements REQ-1 by applying draggable={true} and drag event handlers exclusively to the <img> thumbnail element, and setting draggable={false} on the parent container and sibling overlay elements in both DiagramSidebar.tsx and LoadDiagramDialog.tsx. The AttackPathToolbar icon drag-and-drop (existing functionality) also only has draggable on the <img> element. The implementation covers all acceptance criteria.",
   "missing_requirements": [],
   "hallucinated_features": [],
-  "confidence": 0.88,
+  "confidence": 0.95,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/components/AttackPathCanvas.tsx",
     "frontend/src/components/AttackPathToolbar.tsx",
     "frontend/src/components/DiagramSidebar.tsx",
     "frontend/src/components/LoadDiagramDialog.tsx",
-    "frontend/src/hooks/useGetAllDiagrams.ts",
-    "frontend/src/hooks/useSaveDiagramState.ts",
+    "frontend/src/hooks/useAttackPathState.ts",
     "frontend/src/pages/AttackPathPage.tsx",
     "project_state.json"
   ]

@@ -1,56 +1,37 @@
 {
   "kind": "build_request",
-  "title": "Fix save/load diagram persistence and restrict icon drag to image only",
+  "title": "Fix drag-and-drop in save diagram so only the thumbnail preview image is draggable",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "fix the save diagram and appear on loadout"
-        ]
-      },
-      "acceptanceCriteria": [
-        "After saving a diagram via SaveDiagramDialog, the diagram appears in DiagramSidebar and LoadDiagramDialog immediately without a page reload.",
-        "Loading a saved diagram from the sidebar/dialog restores all icons, connections, drawings, lines, text labels, and images correctly.",
-        "The useSaveDiagramState mutation correctly invalidates the allDiagrams and diagramState caches on success so the list refreshes.",
-        "No data is lost between save and load operations."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
+      "text": "In the AttackPathToolbar (and any related save diagram UI), fix drag-and-drop so that only the thumbnail preview image of a saved diagram is draggable onto the canvas. The surrounding element (labels, borders, background, buttons) must not be draggable. Apply draggable={true} and drag event handlers exclusively to the <img> thumbnail element, and set draggable={false} on the parent container and all sibling elements.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-recent-5",
+          "msg-recent-7"
         ],
         "quotes": [
-          "only drag the icon image not the label"
+          "I'm referring to dragging a thumbnail preview of the diagram itself",
+          "fix the save diagram function and I should only drag the image icon to canvas"
         ]
       },
       "acceptanceCriteria": [
-        "Dragging a toolbar icon button initiates the drag using only the icon image as the drag source/ghost, not the label text.",
-        "The label text beneath the icon is not draggable and does not appear in the drag ghost image.",
-        "Dropping the dragged icon onto the canvas places the correct icon type at the drop position.",
-        "All toolbar icon buttons exhibit this behavior consistently, not just the third button in div[7]."
+        "Dragging the thumbnail preview image of a diagram initiates a drag event and allows it to be dropped onto the canvas.",
+        "Dragging the label, border, background, or any non-thumbnail part of the diagram element does not initiate a drag.",
+        "The drag-and-drop canvas drop behavior works correctly when the thumbnail is dragged onto the AttackPathCanvas.",
+        "No regression in existing toolbar icon drag-and-drop functionality."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Preserve all existing diagram state types and backend data models."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding new diagram element types.",
-    "Changing the visual design or layout of the toolbar.",
-    "Modifying undo/redo behavior.",
-    "Changing authentication or user profile logic."
+    "Changing how diagrams are saved or loaded from the backend.",
+    "Redesigning the toolbar or sidebar layout.",
+    "Adding new drag-and-drop targets beyond the existing canvas."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,146 +1,139 @@
 import React, { useState } from 'react';
-import { Trash2, FolderOpen, LayoutGrid } from 'lucide-react';
+import { Trash2, FolderOpen, Network, GitBranch, Image as ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGetAllDiagrams } from '../hooks/useGetAllDiagrams';
 import { useDeleteDiagramState } from '../hooks/useDeleteDiagramState';
 import { NamedDiagram } from '../backend';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 interface DiagramSidebarProps {
   onLoad: (diagram: NamedDiagram) => void;
 }
 
-const DiagramSidebar: React.FC<DiagramSidebarProps> = ({ onLoad }) => {
+export default function DiagramSidebar({ onLoad }: DiagramSidebarProps) {
   const { data: diagrams = [], isLoading } = useGetAllDiagrams();
   const deleteMutation = useDeleteDiagramState();
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-  const handleDeleteClick = (index: number) => {
-    setDeleteIndex(index);
-    setConfirmOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (deleteIndex === null) return;
-    try {
-      await deleteMutation.mutateAsync(BigInt(deleteIndex));
-    } catch (err) {
-      console.error('Delete failed:', err);
-    } finally {
-      setConfirmOpen(false);
-      setDeleteIndex(null);
+  const handleDelete = (index: number) => {
+    if (confirmDeleteId === index) {
+      deleteMutation.mutate(BigInt(index));
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(index);
     }
   };
 
   const formatDate = (lastModified: bigint) => {
-    const ms = Number(lastModified) / 1_000_000;
-    return new Date(ms).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    const date = new Date(Number(lastModified));
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  return (
-    <div className="flex flex-col h-full bg-sidebar border-l border-border overflow-hidden">
-      {/* Header */}
-      <div className="px-3 py-2 border-b border-border flex items-center gap-2">
-        <LayoutGrid size={14} className="text-muted-foreground" />
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Saved Diagrams
-        </h2>
+  const handleDragStart = (e: React.DragEvent<HTMLImageElement>, diagram: NamedDiagram) => {
+    e.dataTransfer.setData('diagramState', JSON.stringify(diagram));
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+        Loading diagrams...
       </div>
+    );
+  }
 
-      <div className="flex-1 overflow-y-auto px-2 py-2">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : diagrams.length === 0 ? (
-          <div className="text-center py-8 px-2">
-            <LayoutGrid size={24} className="mx-auto mb-2 text-muted-foreground opacity-40" />
-            <p className="text-xs text-muted-foreground">No saved diagrams yet.</p>
-            <p className="text-[10px] text-muted-foreground mt-1 opacity-70">
-              Use Save to store your diagram.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {diagrams.map((diagram, index) => (
+  if (diagrams.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-32 text-muted-foreground text-sm gap-2">
+        <Network className="w-8 h-8 opacity-40" />
+        <span>No saved diagrams</span>
+      </div>
+    );
+  }
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-2 space-y-2">
+        {diagrams.map((diagram, index) => (
+          <div
+            key={index}
+            draggable={false}
+            className="rounded-lg border border-border bg-card overflow-hidden group"
+          >
+            {/* Thumbnail — only this element is draggable */}
+            <div className="relative bg-muted/30 flex items-center justify-center h-24 overflow-hidden border-b border-border">
+              <img
+                src="/assets/generated/hero-banner.dim_1200x400.png"
+                alt={`${diagram.name} preview`}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, diagram)}
+                className="w-full h-full object-cover opacity-60 cursor-grab active:cursor-grabbing select-none"
+                style={{ pointerEvents: 'auto' }}
+                title="Drag onto canvas to load this diagram"
+              />
+              {/* Overlay showing diagram stats */}
               <div
-                key={index}
-                className="rounded-md border border-border bg-card p-2 flex flex-col gap-1.5"
+                draggable={false}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-1 pointer-events-none"
               >
-                <div className="flex items-start justify-between gap-1">
-                  <span className="text-xs font-medium text-foreground truncate flex-1">
-                    {diagram.name}
+                <div className="flex gap-3 text-xs font-medium text-foreground/80 bg-background/70 rounded px-2 py-1">
+                  <span className="flex items-center gap-1">
+                    <Network className="w-3 h-3" />
+                    {diagram.state.icons.length} icons
                   </span>
-                </div>
-
-                <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
-                  <span>{diagram.state.icons.length} icons</span>
-                  <span>{diagram.state.connections.length} connections</span>
-                  {diagram.state.textLabels.length > 0 && (
-                    <span>{diagram.state.textLabels.length} labels</span>
+                  <span className="flex items-center gap-1">
+                    <GitBranch className="w-3 h-3" />
+                    {diagram.state.connections.length} conn
+                  </span>
+                  {diagram.state.images.length > 0 && (
+                    <span className="flex items-center gap-1">
+                      <ImageIcon className="w-3 h-3" />
+                      {diagram.state.images.length}
+                    </span>
                   )}
                 </div>
-
-                <div className="text-[10px] text-muted-foreground opacity-70">
-                  {formatDate(diagram.state.lastModified)}
-                </div>
-
-                <div className="flex gap-1 mt-0.5">
-                  <button
-                    onClick={() => onLoad(diagram)}
-                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded text-[10px] bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                  >
-                    <FolderOpen size={10} />
-                    Load
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(index)}
-                    disabled={deleteMutation.isPending}
-                    className="flex items-center justify-center px-2 py-1 rounded text-[10px] bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors disabled:opacity-50"
-                  >
-                    <Trash2 size={10} />
-                  </button>
-                </div>
+                <span className="text-[10px] text-muted-foreground bg-background/60 rounded px-1">
+                  drag to canvas
+                </span>
               </div>
-            ))}
+            </div>
+
+            {/* Card body — not draggable */}
+            <div draggable={false} className="p-2">
+              <p
+                draggable={false}
+                className="text-xs font-semibold text-foreground truncate mb-1"
+                title={diagram.name}
+              >
+                {diagram.name}
+              </p>
+              <p draggable={false} className="text-[10px] text-muted-foreground mb-2">
+                {formatDate(diagram.state.lastModified)}
+              </p>
+              <div draggable={false} className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 h-6 text-[10px] px-1"
+                  onClick={() => onLoad(diagram)}
+                >
+                  <FolderOpen className="w-3 h-3 mr-1" />
+                  Load
+                </Button>
+                <Button
+                  size="sm"
+                  variant={confirmDeleteId === index ? 'destructive' : 'ghost'}
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleDelete(index)}
+                  title={confirmDeleteId === index ? 'Click again to confirm delete' : 'Delete diagram'}
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
           </div>
-        )}
+        ))}
       </div>
-
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Diagram</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this diagram? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    </ScrollArea>
   );
-};
-
-export default DiagramSidebar;
+}

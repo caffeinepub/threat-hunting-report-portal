@@ -1,11 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Fix diagram save/load persistence so saved diagrams appear immediately in the sidebar and dialogs, and restrict toolbar icon drag-and-drop to the icon image only (not the text label).
+**Goal:** Fix drag-and-drop in the save diagram UI so that only the thumbnail preview image is draggable onto the canvas.
 
 **Planned changes:**
-- After saving a diagram via SaveDiagramDialog, invalidate the `allDiagrams` and `diagramState` caches so the diagram appears immediately in DiagramSidebar and LoadDiagramDialog without a page reload.
-- Ensure loading a saved diagram correctly restores all icons, connections, drawings, lines, text labels, and images.
-- In AttackPathToolbar, move the `draggable` attribute and `onDragStart` handler from the button/container element to the icon image element only, so only the image is draggable and the text label beneath it is not.
+- Set `draggable={true}` and attach drag event handlers exclusively to the `<img>` thumbnail element within saved diagram items in the AttackPathToolbar (and any related save diagram UI).
+- Set `draggable={false}` on the parent container and all sibling elements (labels, borders, backgrounds, buttons) to prevent unintended drag initiation.
 
-**User-visible outcome:** Users can save a diagram and see it immediately in the diagram list without reloading the page. When dragging toolbar icons onto the canvas, only the icon image acts as the drag source, not the label text.
+**User-visible outcome:** Users can drag only the thumbnail preview image of a saved diagram onto the canvas; clicking or interacting with the surrounding label, border, or buttons does not trigger a drag.

@@ -2,12 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-save-diagram-functionality-so-that-when-a-user-saves-a-diagram-it-is-correctly-persisted-to-the-backend-and-reappears-when-the-diagram-list-loadout-sidebar-is-opened-or-refreshed-the-saved-diagram-should-appear-in-diagramsidebar-and-loaddiagramdialog-after-saving-without-requiring-a-page-reload",
-      "featureTitle": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
+      "featureId": "feature-in-the-attackpathtoolbar-and-any-related-save-diagram-ui-fix-drag-and-drop-so-that-only-the-thumbnail-preview-image-of-a-saved-diagram-is-draggable-onto-the-canvas-the-surrounding-element-labels-borders-background-buttons-must-not-be-draggable-apply-draggable-true-and-drag-event-handlers-exclusively-to-the-img-thumbnail-element-and-set-draggable-false-on-the-parent-container-and-all-sibling-elements",
+      "featureTitle": "In the AttackPathToolbar (and any related save diagram UI), fix drag-and-drop so that only the thumbnail preview image of a saved diagram is draggable onto the canvas. The surrounding element (labels, borders, background, buttons) must not be draggable. Apply draggable={true} and drag event handlers exclusively to the <img> thumbnail element, and set draggable={false} on the parent container and all sibling elements.",
       "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/components/AttackPathToolbar.tsx",
         "frontend/src/components/DiagramSidebar.tsx",
-        "frontend/src/components/LoadDiagramDialog.tsx",
-        "frontend/src/hooks/useSaveDiagramState.ts"
+        "frontend/src/components/LoadDiagramDialog.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -20,26 +21,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-the-attackpathtoolbar-restrict-drag-and-drop-behavior-on-icon-buttons-so-that-only-the-icon-image-element-is-draggable-not-the-text-label-beneath-it-the-draggable-attribute-and-drag-event-handlers-ondragstart-should-be-scoped-to-the-icon-image-element-only-not-the-entire-button-or-label-text-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-7-button-3-is-one-such-toolbar-icon-button",
-      "featureTitle": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
-      "files": [
-        "frontend/src/components/AttackPathToolbar.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
       ],
       "confidence": "high"
     }

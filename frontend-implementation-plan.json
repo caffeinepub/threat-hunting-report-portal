@@ -1,54 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix save/load diagram persistence and restrict icon drag to image only",
+  "title": "Fix drag-and-drop in save diagram so only the thumbnail preview image is draggable",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the save diagram functionality so that saved diagrams immediately appear in DiagramSidebar and LoadDiagramDialog without requiring a page reload",
+      "summary": "Fix drag-and-drop in AttackPathToolbar and related save diagram UI so that only the thumbnail preview image is draggable onto the canvas, not the surrounding container or UI elements",
       "acceptanceCriteria": [
-        "After saving a diagram via SaveDiagramDialog, the diagram appears in DiagramSidebar and LoadDiagramDialog immediately without a page reload.",
-        "Loading a saved diagram from the sidebar/dialog restores all icons, connections, drawings, lines, text labels, and images correctly.",
-        "The useSaveDiagramState mutation correctly invalidates the allDiagrams and diagramState caches on success so the list refreshes.",
-        "No data is lost between save and load operations."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useSaveDiagramState.ts",
-          "operation": "modify",
-          "description": "Update the mutation's onSuccess callback to invalidate both the 'allDiagrams' query key (used by DiagramSidebar and LoadDiagramDialog) and the 'diagramState' query key. Ensure queryClient.invalidateQueries is called with both keys to trigger immediate refetch of the diagram list."
-        },
-        {
-          "path": "frontend/src/components/SaveDiagramDialog.tsx",
-          "operation": "modify",
-          "description": "After the save mutation succeeds, ensure the dialog closes and any local UI state is updated to reflect the newly saved diagram. Verify that the mutation's onSuccess handler properly triggers the sidebar and load dialog to refresh their lists."
-        },
-        {
-          "path": "frontend/src/components/DiagramSidebar.tsx",
-          "operation": "modify",
-          "description": "Ensure the useGetAllDiagrams hook is properly configured to refetch when its query is invalidated. Verify that the component displays the updated list immediately after a save operation without requiring manual refresh or page reload."
-        },
-        {
-          "path": "frontend/src/components/LoadDiagramDialog.tsx",
-          "operation": "modify",
-          "description": "Ensure the useGetAllDiagrams hook is properly configured to refetch when its query is invalidated. Verify that the dialog displays the updated list immediately after a save operation, showing the newly saved diagram in the list."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Restrict drag-and-drop behavior on toolbar icon buttons so that only the icon image element is draggable, not the text label beneath it",
-      "acceptanceCriteria": [
-        "Dragging a toolbar icon button initiates the drag using only the icon image as the drag source/ghost, not the label text.",
-        "The label text beneath the icon is not draggable and does not appear in the drag ghost image.",
-        "Dropping the dragged icon onto the canvas places the correct icon type at the drop position.",
-        "All toolbar icon buttons exhibit this behavior consistently, not just the third button in div[7]."
+        "Dragging the thumbnail preview image of a diagram initiates a drag event and allows it to be dropped onto the canvas.",
+        "Dragging the label, border, background, or any non-thumbnail part of the diagram element does not initiate a drag.",
+        "The drag-and-drop canvas drop behavior works correctly when the thumbnail is dragged onto the AttackPathCanvas.",
+        "No regression in existing toolbar icon drag-and-drop functionality."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AttackPathToolbar.tsx",
           "operation": "modify",
-          "description": "Refactor the icon button rendering so that the draggable attribute and onDragStart handler are applied only to the <img> element, not to the parent button or label text. Wrap the image in a container div if needed, and ensure the text label (beneath the icon) has no drag handlers. Verify that the drag ghost shows only the icon image, and that all toolbar icon buttons behave consistently."
+          "description": "Modify the saved diagram rendering logic to set draggable={false} on the parent container and all non-thumbnail elements (labels, borders, buttons). Apply draggable={true} and drag event handlers (onDragStart, onDragEnd) exclusively to the <img> element that displays the diagram thumbnail preview. Ensure the drag data transfer includes the diagram state so it can be dropped onto the AttackPathCanvas."
+        },
+        {
+          "path": "frontend/src/components/DiagramSidebar.tsx",
+          "operation": "modify",
+          "description": "If the sidebar also displays draggable diagram thumbnails, apply the same fix: set draggable={false} on parent containers and non-thumbnail elements, and draggable={true} with drag handlers only on the <img> thumbnail element. Ensure consistency with the AttackPathToolbar drag-and-drop behavior."
+        },
+        {
+          "path": "frontend/src/components/LoadDiagramDialog.tsx",
+          "operation": "modify",
+          "description": "If the load diagram dialog displays draggable thumbnails, apply the same pattern: set draggable={false} on the container and non-thumbnail UI elements, and draggable={true} with drag handlers exclusively on the <img> thumbnail element to allow dragging the preview onto the canvas."
+        },
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Review the onDrop handler to ensure it correctly receives and processes diagram state from dragged thumbnail images. Verify that the drop behavior works when only the <img> element is draggable, and that no regression occurs for existing icon drag-and-drop functionality."
         }
       ]
     }

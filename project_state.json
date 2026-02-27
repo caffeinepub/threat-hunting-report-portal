@@ -1,47 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Diagram tool project with save/load functionality and icon drag behavior fixes in progress.",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [
-    "Save diagram does not persist correctly or reappear on loadout",
-    "Dragging a toolbar icon also drags the label text beneath it"
+    "Save diagram: entire diagram element is draggable instead of only the thumbnail preview image"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-fix-the-save-diagram-functionality-so-that-when-a-user-saves-a-diagram-it-is-correctly-persisted-to-the-backend-and-reappears-when-the-diagram-list-loadout-sidebar-is-opened-or-refreshed-the-saved-diagram-should-appear-in-diagramsidebar-and-loaddiagramdialog-after-saving-without-requiring-a-page-reload",
-      "title": "Fix the save diagram functionality so that when a user saves a diagram, it is correctly persisted to the backend and reappears when the diagram list (loadout/sidebar) is opened or refreshed. The saved diagram should appear in DiagramSidebar and LoadDiagramDialog after saving without requiring a page reload.",
+      "id": "feature-in-the-attackpathtoolbar-and-any-related-save-diagram-ui-fix-drag-and-drop-so-that-only-the-thumbnail-preview-image-of-a-saved-diagram-is-draggable-onto-the-canvas-the-surrounding-element-labels-borders-background-buttons-must-not-be-draggable-apply-draggable-true-and-drag-event-handlers-exclusively-to-the-img-thumbnail-element-and-set-draggable-false-on-the-parent-container-and-all-sibling-elements",
+      "title": "In the AttackPathToolbar (and any related save diagram UI), fix drag-and-drop so that only the thumbnail preview image of a saved diagram is draggable onto the canvas. The surrounding element (labels, borders, background, buttons) must not be draggable. Apply draggable={true} and drag event handlers exclusively to the <img> thumbnail element, and set draggable={false} on the parent container and all sibling elements.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-in-the-attackpathtoolbar-restrict-drag-and-drop-behavior-on-icon-buttons-so-that-only-the-icon-image-element-is-draggable-not-the-text-label-beneath-it-the-draggable-attribute-and-drag-event-handlers-ondragstart-should-be-scoped-to-the-icon-image-element-only-not-the-entire-button-or-label-text-the-selected-element-at-xpath-html-1-body-1-div-1-div-1-main-1-div-1-div-1-div-7-button-3-is-one-such-toolbar-icon-button",
-      "title": "In the AttackPathToolbar, restrict drag-and-drop behavior on icon buttons so that only the icon image element is draggable, not the text label beneath it. The draggable attribute and drag event handlers (onDragStart) should be scoped to the icon image element only, not the entire button or label text. The selected element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[7]/button[3] is one such toolbar icon button.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Fix save diagram so it persists and appears on loadout",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Restrict drag behavior to icon image only, not the label",
-      "reqIds": [],
-      "status": "pending"
-    }
-  ],
-  "gameProjectType": "none",
-  "projectName": "Fix save/load diagram persistence and restrict icon drag to image only",
+  "new_feature_requests": [],
+  "projectName": "Fix drag-and-drop in save diagram so only the thumbnail preview image is draggable",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

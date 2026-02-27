@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import AttackPathConnector from './AttackPathConnector';
+import { NamedDiagram } from '../backend';
 import {
   PlacedIcon,
   TextLabel,
@@ -8,6 +9,7 @@ import {
   FreehandDrawing,
   LineElement,
   Position,
+  DiagramStateLocal,
 } from '../hooks/useAttackPathState';
 
 export type ToolType =
@@ -20,26 +22,22 @@ export type ToolType =
   | 'text'
   | 'eraser'
   | 'freeTransform'
-  | 'image';
-
-// Re-export canvas element types
-export type CanvasIcon = PlacedIcon;
-export type CanvasTextLabel = TextLabel;
-export type CanvasImage = ImageElement;
-export type CanvasConnection = Connection;
-export type CanvasFreehandDrawing = FreehandDrawing;
-export type CanvasLine = LineElement;
+  | 'image'
+  | 'connector';
 
 // Icon image map
 const ICON_IMAGE_MAP: Record<string, string> = {
   user: '/assets/generated/user-icon.dim_128x128.png',
   multipleusers: '/assets/multiple users icon.png',
+  multiuser: '/assets/multiple users icon.png',
   email: '/assets/email.png',
   attacker: '/assets/attacker.png',
   computer: '/assets/Computer.png',
   multiplecomputers: '/assets/multiple computer.png',
+  multicomputer: '/assets/multiple computer.png',
   server: '/assets/server icon.png',
   multipleservers: '/assets/Multiple Server Icon.png',
+  multiserver: '/assets/Multiple Server Icon.png',
   domain: '/assets/Domain.png',
   file: '/assets/generated/icon-file.dim_64x64.png',
   exe: '/assets/exe.png',
@@ -54,6 +52,7 @@ const ICON_IMAGE_MAP: Record<string, string> = {
   backdoor: '/assets/backdoor-1.jpg',
   phishing: '/assets/phishing email icon-2.jpg',
   cloudserver: '/assets/Cloud Server.png',
+  cloud: '/assets/Cloud Server.png',
   firewall: '/assets/Firewall.png',
   router: '/assets/Router Device Icon.jpg',
   scheduledtask: '/assets/Scheduled Task.jpg',
@@ -61,6 +60,10 @@ const ICON_IMAGE_MAP: Record<string, string> = {
   javascript: '/assets/script.png',
   webbrowser: '/assets/web browser.png',
 };
+
+function getIconSrc(iconType: string): string {
+  return ICON_IMAGE_MAP[iconType] ?? '/assets/attacker.png';
+}
 
 type HandlePosition = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se';
 
@@ -86,32 +89,7 @@ interface RotateState {
 }
 
 const HANDLE_SIZE = 8;
-const ROTATION_HANDLE_OFFSET = 28;
 const ERASER_RADIUS = 16;
-
-function getHandlePositions(x: number, y: number, w: number, h: number) {
-  return {
-    nw: { cx: x,         cy: y },
-    n:  { cx: x + w / 2, cy: y },
-    ne: { cx: x + w,     cy: y },
-    w:  { cx: x,         cy: y + h / 2 },
-    e:  { cx: x + w,     cy: y + h / 2 },
-    sw: { cx: x,         cy: y + h },
-    s:  { cx: x + w / 2, cy: y + h },
-    se: { cx: x + w,     cy: y + h },
-  };
-}
-
-function getCursorForHandle(handle: HandlePosition): string {
-  const map: Record<HandlePosition, string> = {
-    nw: 'nw-resize', n: 'n-resize', ne: 'ne-resize',
-    w: 'w-resize', e: 'e-resize',
-    sw: 'sw-resize', s: 's-resize', se: 'se-resize',
-  };
-  return map[handle];
-}
-
-// ── Hit detection helpers ────────────────────────────────────────────────────
 
 function pointNearSegment(
   px: number, py: number,
@@ -157,128 +135,60 @@ function pointNearPolyline(
 
 interface AttackPathCanvasProps {
   activeTool: ToolType;
-  drawColor?: string;
-  strokeWidth?: number;
-  icons: CanvasIcon[];
-  connections: CanvasConnection[];
-  freehandDrawings: CanvasFreehandDrawing[];
-  textLabels: CanvasTextLabel[];
-  images: CanvasImage[];
-  lines: CanvasLine[];
-  onAddIcon: (iconType: string, position: Position) => void;
-  onUpdateIconPosition: (id: string, position: Position) => void;
-  onUpdateIconPositionImmediate: (id: string, position: Position) => void;
-  onUpdateIconRotation: (id: string, rotation: number) => void;
-  onUpdateIconRotationImmediate: (id: string, rotation: number) => void;
-  onUpdateIconSize: (id: string, width: number, height: number) => void;
-  onUpdateIconSizeImmediate: (id: string, width: number, height: number) => void;
-  onDeleteIcon: (id: string) => void;
-  onAddConnection: (sourceId: string, targetId: string, color?: string) => void;
-  onDeleteConnection: (id: string) => void;
-  onAddFreehandDrawing: (drawing: CanvasFreehandDrawing) => void;
-  onDeleteFreehandDrawing: (index: number) => void;
-  onAddLine: (line: CanvasLine) => void;
-  onDeleteLine: (index: number) => void;
-  onAddTextLabel: (content: string, position: Position) => void;
-  onUpdateTextLabel: (id: string, updates: Partial<CanvasTextLabel>) => void;
-  onUpdateTextLabelImmediate: (id: string, updates: Partial<CanvasTextLabel>) => void;
-  onDeleteTextLabel: (id: string) => void;
-  onAddImage: (url: string, position: Position, name?: string) => void;
-  onUpdateImage: (id: string, updates: Partial<CanvasImage>) => void;
-  onUpdateImageImmediate: (id: string, updates: Partial<CanvasImage>) => void;
-  onDeleteImage: (id: string) => void;
+  state: DiagramStateLocal;
+  onStateChange: (newState: DiagramStateLocal) => void;
+  onLoadDiagram?: (diagram: NamedDiagram) => void;
 }
 
 export default function AttackPathCanvas({
   activeTool,
-  drawColor = '#ef4444',
-  strokeWidth = 2,
-  icons,
-  connections,
-  freehandDrawings,
-  textLabels,
-  images,
-  lines,
-  onAddIcon,
-  onUpdateIconPosition,
-  onUpdateIconPositionImmediate,
-  onUpdateIconRotation,
-  onUpdateIconRotationImmediate,
-  onUpdateIconSize,
-  onUpdateIconSizeImmediate,
-  onDeleteIcon,
-  onAddConnection,
-  onDeleteConnection,
-  onAddFreehandDrawing,
-  onDeleteFreehandDrawing,
-  onAddLine,
-  onDeleteLine,
-  onAddTextLabel,
-  onUpdateTextLabel,
-  onUpdateTextLabelImmediate,
-  onDeleteTextLabel,
-  onAddImage,
-  onUpdateImage,
-  onUpdateImageImmediate,
-  onDeleteImage,
+  state,
+  onStateChange,
+  onLoadDiagram,
 }: AttackPathCanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Selection
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [selectedConnId, setSelectedConnId] = useState<string | null>(null);
   const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
-  // Free transform selection (tracks which element has transform handles)
-  const [transformIconId, setTransformIconId] = useState<string | null>(null);
-  const [transformTextId, setTransformTextId] = useState<string | null>(null);
-  const [transformImageId, setTransformImageId] = useState<string | null>(null);
-
-  // Dragging icons
   const [draggingIconId, setDraggingIconId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });
 
-  // Dragging text labels
   const [draggingTextId, setDraggingTextId] = useState<string | null>(null);
   const [textDragOffset, setTextDragOffset] = useState<Position>({ x: 0, y: 0 });
 
-  // Dragging images
   const [draggingImageId, setDraggingImageId] = useState<string | null>(null);
   const [imageDragOffset, setImageDragOffset] = useState<Position>({ x: 0, y: 0 });
 
-  // Resizing
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
-
-  // Rotating
   const [rotateState, setRotateState] = useState<RotateState | null>(null);
 
-  // Connecting
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
 
-  // Freehand drawing
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPath, setCurrentPath] = useState<Position[]>([]);
 
-  // Line/arrow drawing
   const [lineStart, setLineStart] = useState<Position | null>(null);
   const [linePreview, setLinePreview] = useState<Position | null>(null);
 
-  // Text editing
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
+  const [editingIconLabelId, setEditingIconLabelId] = useState<string | null>(null);
 
-  // Eraser
   const [eraserPos, setEraserPos] = useState<Position | null>(null);
   const [isErasing, setIsErasing] = useState(false);
 
-  const getSVGPoint = useCallback((e: React.MouseEvent): Position => {
+  const [dragOver, setDragOver] = useState(false);
+
+  const getSVGPoint = useCallback((e: React.MouseEvent | MouseEvent): Position => {
     const svg = svgRef.current;
     if (!svg) return { x: 0, y: 0 };
     const rect = svg.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e as MouseEvent).clientX - rect.left,
+      y: (e as MouseEvent).clientY - rect.top,
     };
   }, []);
 
@@ -287,103 +197,98 @@ export default function AttackPathCanvas({
     setSelectedConnId(null);
     setSelectedTextId(null);
     setSelectedImageId(null);
-    setTransformIconId(null);
-    setTransformTextId(null);
-    setTransformImageId(null);
   }, []);
 
-  // Clear transform selection when tool changes away from freeTransform
   useEffect(() => {
-    if (activeTool !== 'freeTransform') {
-      setTransformIconId(null);
-      setTransformTextId(null);
-      setTransformImageId(null);
+    if (activeTool !== 'freeTransform' && activeTool !== 'select') {
+      clearSelection();
     }
-  }, [activeTool]);
+  }, [activeTool, clearSelection]);
 
-  // ── Eraser hit detection — removes any element type ──────────────────────
+  // ── Eraser ──────────────────────────────────────────────────────────────────
   const eraseAtPoint = useCallback((pt: Position) => {
     const px = pt.x;
     const py = pt.y;
 
-    // 1. Icons (bounding box centered on position)
-    for (let i = icons.length - 1; i >= 0; i--) {
-      const icon = icons[i];
+    for (let i = state.icons.length - 1; i >= 0; i--) {
+      const icon = state.icons[i];
       const rx = icon.position.x - icon.width / 2;
       const ry = icon.position.y - icon.height / 2;
       if (pointInRect(px, py, rx, ry, icon.width, icon.height, 4)) {
-        onDeleteIcon(icon.id);
+        onStateChange({
+          ...state,
+          icons: state.icons.filter((_, idx) => idx !== i),
+          connections: state.connections.filter(c => c.sourceId !== icon.id && c.targetId !== icon.id),
+        });
         return;
       }
     }
 
-    // 2. Images (bounding box from top-left position)
-    for (let i = images.length - 1; i >= 0; i--) {
-      const img = images[i];
+    for (let i = state.images.length - 1; i >= 0; i--) {
+      const img = state.images[i];
       if (pointInRect(px, py, img.position.x, img.position.y, img.width, img.height, 4)) {
-        onDeleteImage(img.id);
+        onStateChange({ ...state, images: state.images.filter((_, idx) => idx !== i) });
         return;
       }
     }
 
-    // 3. Text labels (bounding box from top-left position)
-    for (let i = textLabels.length - 1; i >= 0; i--) {
-      const lbl = textLabels[i];
+    for (let i = state.textLabels.length - 1; i >= 0; i--) {
+      const lbl = state.textLabels[i];
       if (pointInRect(px, py, lbl.position.x, lbl.position.y, lbl.width, lbl.height, 4)) {
-        onDeleteTextLabel(lbl.id);
+        onStateChange({ ...state, textLabels: state.textLabels.filter((_, idx) => idx !== i) });
         return;
       }
     }
 
-    // 4. Drawn lines / arrows
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i];
-      if (pointNearSegment(
-        px, py,
-        line.startPosition.x, line.startPosition.y,
-        line.endPosition.x, line.endPosition.y,
-        ERASER_RADIUS
-      )) {
-        onDeleteLine(i);
+    for (let i = state.lines.length - 1; i >= 0; i--) {
+      const line = state.lines[i];
+      if (pointNearSegment(px, py, line.startPosition.x, line.startPosition.y, line.endPosition.x, line.endPosition.y, ERASER_RADIUS)) {
+        onStateChange({ ...state, lines: state.lines.filter((_, idx) => idx !== i) });
         return;
       }
     }
 
-    // 5. Connections (arrows between icons)
-    for (let i = connections.length - 1; i >= 0; i--) {
-      const conn = connections[i];
-      const src = icons.find(ic => ic.id === conn.sourceId);
-      const tgt = icons.find(ic => ic.id === conn.targetId);
+    for (let i = state.connections.length - 1; i >= 0; i--) {
+      const conn = state.connections[i];
+      const src = state.icons.find(ic => ic.id === conn.sourceId);
+      const tgt = state.icons.find(ic => ic.id === conn.targetId);
       if (src && tgt) {
-        if (pointNearSegment(
-          px, py,
-          src.position.x, src.position.y,
-          tgt.position.x, tgt.position.y,
-          ERASER_RADIUS
-        )) {
-          onDeleteConnection(conn.id);
+        if (pointNearSegment(px, py, src.position.x, src.position.y, tgt.position.x, tgt.position.y, ERASER_RADIUS)) {
+          onStateChange({ ...state, connections: state.connections.filter((_, idx) => idx !== i) });
           return;
         }
       }
     }
 
-    // 6. Freehand drawings
-    for (let i = freehandDrawings.length - 1; i >= 0; i--) {
-      if (pointNearPolyline(px, py, freehandDrawings[i].points, ERASER_RADIUS)) {
-        onDeleteFreehandDrawing(i);
+    for (let i = state.freehandDrawings.length - 1; i >= 0; i--) {
+      if (pointNearPolyline(px, py, state.freehandDrawings[i].points, ERASER_RADIUS)) {
+        onStateChange({ ...state, freehandDrawings: state.freehandDrawings.filter((_, idx) => idx !== i) });
         return;
       }
     }
-  }, [
-    icons, images, textLabels, lines, connections, freehandDrawings,
-    onDeleteIcon, onDeleteImage, onDeleteTextLabel, onDeleteLine,
-    onDeleteConnection, onDeleteFreehandDrawing,
-  ]);
+  }, [state, onStateChange]);
 
-  // ── Drop handler ────────────────────────────────────────────────────────────
+  // ── Drop handler ─────────────────────────────────────────────────────────────
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const iconType = e.dataTransfer.getData('iconType') as string;
+    setDragOver(false);
+
+    // Check for diagram state drop (from sidebar/dialog thumbnail)
+    const diagramData = e.dataTransfer.getData('diagramState');
+    if (diagramData) {
+      try {
+        const namedDiagram: NamedDiagram = JSON.parse(diagramData);
+        if (onLoadDiagram) {
+          onLoadDiagram(namedDiagram);
+        }
+        return;
+      } catch {
+        // fall through to icon drop
+      }
+    }
+
+    // Icon drop
+    const iconType = e.dataTransfer.getData('iconType');
     if (!iconType) return;
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -391,11 +296,25 @@ export default function AttackPathCanvas({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
-    onAddIcon(iconType, position);
-  }, [onAddIcon]);
+    const newIcon: PlacedIcon = {
+      id: `icon-${Date.now()}-${Math.random()}`,
+      iconType,
+      position,
+      name: iconType,
+      width: 56,
+      height: 56,
+      rotation: 0,
+    };
+    onStateChange({ ...state, icons: [...state.icons, newIcon] });
+  }, [state, onStateChange, onLoadDiagram]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(false);
   }, []);
 
   // ── Mouse Down ──────────────────────────────────────────────────────────────
@@ -419,13 +338,25 @@ export default function AttackPathCanvas({
       return;
     }
     if (activeTool === 'text') {
-      onAddTextLabel('Text', pt);
+      const newLabel: TextLabel = {
+        id: `text-${Date.now()}-${Math.random()}`,
+        content: 'Text',
+        position: pt,
+        fontSize: 16,
+        color: '#1e293b',
+        fontWeight: 'normal',
+        width: 160,
+        height: 60,
+        rotation: 0,
+      };
+      onStateChange({ ...state, textLabels: [...state.textLabels, newLabel] });
+      setEditingTextId(newLabel.id);
       return;
     }
     if (activeTool === 'select' || activeTool === 'freeTransform') {
       clearSelection();
     }
-  }, [activeTool, getSVGPoint, onAddTextLabel, clearSelection, eraseAtPoint]);
+  }, [activeTool, getSVGPoint, state, onStateChange, clearSelection, eraseAtPoint]);
 
   // ── Mouse Move ──────────────────────────────────────────────────────────────
   const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
@@ -433,9 +364,7 @@ export default function AttackPathCanvas({
 
     if (activeTool === 'eraser') {
       setEraserPos(pt);
-      if (isErasing) {
-        eraseAtPoint(pt);
-      }
+      if (isErasing) eraseAtPoint(pt);
       return;
     }
 
@@ -450,23 +379,37 @@ export default function AttackPathCanvas({
     }
 
     if (draggingIconId) {
-      onUpdateIconPositionImmediate(draggingIconId, {
-        x: pt.x - dragOffset.x,
-        y: pt.y - dragOffset.y,
+      onStateChange({
+        ...state,
+        icons: state.icons.map(icon =>
+          icon.id === draggingIconId
+            ? { ...icon, position: { x: pt.x - dragOffset.x, y: pt.y - dragOffset.y } }
+            : icon
+        ),
       });
       return;
     }
 
     if (draggingTextId) {
-      onUpdateTextLabelImmediate(draggingTextId, {
-        position: { x: pt.x - textDragOffset.x, y: pt.y - textDragOffset.y },
+      onStateChange({
+        ...state,
+        textLabels: state.textLabels.map(lbl =>
+          lbl.id === draggingTextId
+            ? { ...lbl, position: { x: pt.x - textDragOffset.x, y: pt.y - textDragOffset.y } }
+            : lbl
+        ),
       });
       return;
     }
 
     if (draggingImageId) {
-      onUpdateImageImmediate(draggingImageId, {
-        position: { x: pt.x - imageDragOffset.x, y: pt.y - imageDragOffset.y },
+      onStateChange({
+        ...state,
+        images: state.images.map(img =>
+          img.id === draggingImageId
+            ? { ...img, position: { x: pt.x - imageDragOffset.x, y: pt.y - imageDragOffset.y } }
+            : img
+        ),
       });
       return;
     }
@@ -483,52 +426,66 @@ export default function AttackPathCanvas({
 
       if (handle.includes('e')) newW = Math.max(20, startWidth + dx);
       if (handle.includes('s')) newH = Math.max(20, startHeight + dy);
-      if (handle.includes('w')) {
-        newW = Math.max(20, startWidth - dx);
-        newX = startX + startWidth - newW;
-      }
-      if (handle.includes('n')) {
-        newH = Math.max(20, startHeight - dy);
-        newY = startY + startHeight - newH;
-      }
+      if (handle.includes('w')) { newW = Math.max(20, startWidth - dx); newX = startX + startWidth - newW; }
+      if (handle.includes('n')) { newH = Math.max(20, startHeight - dy); newY = startY + startHeight - newH; }
 
       if (resizeState.elementType === 'text') {
-        onUpdateTextLabelImmediate(resizeState.elementId, {
-          position: { x: newX, y: newY },
-          width: newW,
-          height: newH,
+        onStateChange({
+          ...state,
+          textLabels: state.textLabels.map(lbl =>
+            lbl.id === resizeState.elementId
+              ? { ...lbl, position: { x: newX, y: newY }, width: newW, height: newH }
+              : lbl
+          ),
         });
       } else if (resizeState.elementType === 'image') {
-        onUpdateImageImmediate(resizeState.elementId, {
-          position: { x: newX, y: newY },
-          width: newW,
-          height: newH,
+        onStateChange({
+          ...state,
+          images: state.images.map(img =>
+            img.id === resizeState.elementId
+              ? { ...img, position: { x: newX, y: newY }, width: newW, height: newH }
+              : img
+          ),
         });
       } else if (resizeState.elementType === 'icon') {
-        // For icons, position is center-based
-        onUpdateIconPositionImmediate(resizeState.elementId, {
-          x: newX + newW / 2,
-          y: newY + newH / 2,
+        onStateChange({
+          ...state,
+          icons: state.icons.map(icon =>
+            icon.id === resizeState.elementId
+              ? { ...icon, position: { x: newX + newW / 2, y: newY + newH / 2 }, width: newW, height: newH }
+              : icon
+          ),
         });
-        onUpdateIconSizeImmediate(resizeState.elementId, newW, newH);
       }
       return;
     }
 
     if (rotateState) {
-      const angle = Math.atan2(
-        pt.y - rotateState.centerY,
-        pt.x - rotateState.centerX
-      );
+      const angle = Math.atan2(pt.y - rotateState.centerY, pt.x - rotateState.centerX);
       const angleDeg = (angle * 180) / Math.PI;
       const newRotation = rotateState.initialRotation + (angleDeg - rotateState.startAngle);
 
       if (rotateState.elementType === 'text') {
-        onUpdateTextLabelImmediate(rotateState.elementId, { rotation: newRotation });
+        onStateChange({
+          ...state,
+          textLabels: state.textLabels.map(lbl =>
+            lbl.id === rotateState.elementId ? { ...lbl, rotation: newRotation } : lbl
+          ),
+        });
       } else if (rotateState.elementType === 'image') {
-        onUpdateImageImmediate(rotateState.elementId, { rotation: newRotation });
+        onStateChange({
+          ...state,
+          images: state.images.map(img =>
+            img.id === rotateState.elementId ? { ...img, rotation: newRotation } : img
+          ),
+        });
       } else if (rotateState.elementType === 'icon') {
-        onUpdateIconRotationImmediate(rotateState.elementId, newRotation);
+        onStateChange({
+          ...state,
+          icons: state.icons.map(icon =>
+            icon.id === rotateState.elementId ? { ...icon, rotation: newRotation } : icon
+          ),
+        });
       }
       return;
     }
@@ -538,9 +495,7 @@ export default function AttackPathCanvas({
     draggingTextId, textDragOffset,
     draggingImageId, imageDragOffset,
     resizeState, rotateState,
-    getSVGPoint, eraseAtPoint,
-    onUpdateIconPositionImmediate, onUpdateIconRotationImmediate, onUpdateIconSizeImmediate,
-    onUpdateTextLabelImmediate, onUpdateImageImmediate,
+    getSVGPoint, eraseAtPoint, state, onStateChange,
   ]);
 
   // ── Mouse Up ────────────────────────────────────────────────────────────────
@@ -553,190 +508,139 @@ export default function AttackPathCanvas({
     }
 
     if (isDrawing && (activeTool === 'pen' || activeTool === 'freehand') && currentPath.length > 1) {
-      onAddFreehandDrawing({ points: currentPath, color: drawColor, strokeWidth });
-      setIsDrawing(false);
-      setCurrentPath([]);
-      return;
+      onStateChange({
+        ...state,
+        freehandDrawings: [...state.freehandDrawings, { points: currentPath, color: '#000000', strokeWidth: 2 }],
+      });
     }
     setIsDrawing(false);
     setCurrentPath([]);
 
-    if (lineStart && (activeTool === 'line' || activeTool === 'arrow')) {
-      // Arrow and line tools always use black color
-      onAddLine({
-        startPosition: lineStart,
-        endPosition: pt,
-        color: '#000000',
-        strokeWidth,
-        isArrow: activeTool === 'arrow',
-      });
-      setLineStart(null);
-      setLinePreview(null);
-      return;
-    }
-
-    if (draggingIconId) {
-      const icon = icons.find(i => i.id === draggingIconId);
-      if (icon) onUpdateIconPosition(draggingIconId, icon.position);
-      setDraggingIconId(null);
-    }
-
-    if (draggingTextId) {
-      const label = textLabels.find(l => l.id === draggingTextId);
-      if (label) onUpdateTextLabel(draggingTextId, { position: label.position });
-      setDraggingTextId(null);
-    }
-
-    if (draggingImageId) {
-      const img = images.find(i => i.id === draggingImageId);
-      if (img) onUpdateImage(draggingImageId, { position: img.position });
-      setDraggingImageId(null);
-    }
-
-    if (resizeState) {
-      if (resizeState.elementType === 'text') {
-        const label = textLabels.find(l => l.id === resizeState.elementId);
-        if (label) onUpdateTextLabel(resizeState.elementId, { position: label.position, width: label.width, height: label.height });
-      } else if (resizeState.elementType === 'image') {
-        const img = images.find(i => i.id === resizeState.elementId);
-        if (img) onUpdateImage(resizeState.elementId, { position: img.position, width: img.width, height: img.height });
-      } else if (resizeState.elementType === 'icon') {
-        const icon = icons.find(i => i.id === resizeState.elementId);
-        if (icon) onUpdateIconSize(resizeState.elementId, icon.width, icon.height);
+    if (lineStart && (activeTool === 'line' || activeTool === 'arrow') && linePreview) {
+      const dx = linePreview.x - lineStart.x;
+      const dy = linePreview.y - lineStart.y;
+      if (Math.sqrt(dx * dx + dy * dy) > 5) {
+        onStateChange({
+          ...state,
+          lines: [...state.lines, {
+            startPosition: lineStart,
+            endPosition: linePreview,
+            color: '#000000',
+            strokeWidth: 2,
+            isArrow: activeTool === 'arrow',
+          }],
+        });
       }
-      setResizeState(null);
     }
+    setLineStart(null);
+    setLinePreview(null);
 
-    if (rotateState) {
-      if (rotateState.elementType === 'text') {
-        const label = textLabels.find(l => l.id === rotateState.elementId);
-        if (label) onUpdateTextLabel(rotateState.elementId, { rotation: label.rotation });
-      } else if (rotateState.elementType === 'image') {
-        const img = images.find(i => i.id === rotateState.elementId);
-        if (img) onUpdateImage(rotateState.elementId, { rotation: img.rotation });
-      } else if (rotateState.elementType === 'icon') {
-        const icon = icons.find(i => i.id === rotateState.elementId);
-        if (icon) onUpdateIconRotation(rotateState.elementId, icon.rotation);
-      }
-      setRotateState(null);
-    }
+    if (draggingIconId) setDraggingIconId(null);
+    if (draggingTextId) setDraggingTextId(null);
+    if (draggingImageId) setDraggingImageId(null);
+    if (resizeState) setResizeState(null);
+    if (rotateState) setRotateState(null);
   }, [
-    isDrawing, activeTool, currentPath, lineStart,
-    draggingIconId, draggingTextId, draggingImageId,
-    resizeState, rotateState,
-    icons, textLabels, images,
-    getSVGPoint,
-    onAddFreehandDrawing, onAddLine,
-    onUpdateIconPosition, onUpdateIconRotation, onUpdateIconSize,
-    onUpdateTextLabel, onUpdateImage,
-    drawColor, strokeWidth,
+    activeTool, isDrawing, currentPath, lineStart, linePreview,
+    draggingIconId, draggingTextId, draggingImageId, resizeState, rotateState,
+    getSVGPoint, state, onStateChange,
   ]);
 
-  const handleMouseLeave = useCallback(() => {
-    setEraserPos(null);
-    setIsErasing(false);
-  }, []);
-
   // ── Icon interaction ────────────────────────────────────────────────────────
-  const handleIconMouseDown = useCallback((e: React.MouseEvent, icon: CanvasIcon) => {
+  const handleIconMouseDown = useCallback((e: React.MouseEvent, icon: PlacedIcon) => {
     e.stopPropagation();
     const pt = getSVGPoint(e);
 
     if (activeTool === 'eraser') {
-      onDeleteIcon(icon.id);
+      onStateChange({
+        ...state,
+        icons: state.icons.filter(i => i.id !== icon.id),
+        connections: state.connections.filter(c => c.sourceId !== icon.id && c.targetId !== icon.id),
+      });
       return;
     }
-    if (activeTool === 'connect') {
+
+    if (activeTool === 'connect' || activeTool === 'connector') {
       if (!connectingFrom) {
         setConnectingFrom(icon.id);
       } else if (connectingFrom !== icon.id) {
-        onAddConnection(connectingFrom, icon.id, drawColor);
+        const exists = state.connections.some(c => c.sourceId === connectingFrom && c.targetId === icon.id);
+        if (!exists) {
+          onStateChange({
+            ...state,
+            connections: [...state.connections, {
+              id: `conn-${Date.now()}-${Math.random()}`,
+              sourceId: connectingFrom,
+              targetId: icon.id,
+              connectionType: 'arrow',
+              color: '#000000',
+            }],
+          });
+        }
         setConnectingFrom(null);
       }
       return;
     }
-    if (activeTool === 'select') {
-      clearSelection();
-      setSelectedIconId(icon.id);
-      setDraggingIconId(icon.id);
-      setDragOffset({ x: pt.x - icon.position.x, y: pt.y - icon.position.y });
-      return;
-    }
-    if (activeTool === 'freeTransform') {
-      setTransformIconId(icon.id);
-      setTransformTextId(null);
-      setTransformImageId(null);
-      setSelectedIconId(icon.id);
-      setDraggingIconId(icon.id);
-      setDragOffset({ x: pt.x - icon.position.x, y: pt.y - icon.position.y });
-    }
-  }, [activeTool, connectingFrom, getSVGPoint, onDeleteIcon, onAddConnection, clearSelection, drawColor]);
 
-  // ── Text label interaction ──────────────────────────────────────────────────
-  const handleTextMouseDown = useCallback((e: React.MouseEvent, label: CanvasTextLabel) => {
+    if (activeTool === 'select' || activeTool === 'freeTransform') {
+      setSelectedIconId(icon.id);
+      setDraggingIconId(icon.id);
+      setDragOffset({ x: pt.x - icon.position.x, y: pt.y - icon.position.y });
+    }
+  }, [activeTool, connectingFrom, state, onStateChange, getSVGPoint]);
+
+  const handleIconDoubleClick = useCallback((e: React.MouseEvent, icon: PlacedIcon) => {
+    e.stopPropagation();
+    setEditingIconLabelId(icon.id);
+  }, []);
+
+  // ── Text interaction ────────────────────────────────────────────────────────
+  const handleTextMouseDown = useCallback((e: React.MouseEvent, lbl: TextLabel) => {
     e.stopPropagation();
     const pt = getSVGPoint(e);
 
     if (activeTool === 'eraser') {
-      onDeleteTextLabel(label.id);
+      onStateChange({ ...state, textLabels: state.textLabels.filter(t => t.id !== lbl.id) });
       return;
     }
-    if (activeTool === 'select') {
-      clearSelection();
-      setSelectedTextId(label.id);
-      setDraggingTextId(label.id);
-      setTextDragOffset({ x: pt.x - label.position.x, y: pt.y - label.position.y });
-      return;
+    if (activeTool === 'select' || activeTool === 'freeTransform') {
+      setSelectedTextId(lbl.id);
+      setDraggingTextId(lbl.id);
+      setTextDragOffset({ x: pt.x - lbl.position.x, y: pt.y - lbl.position.y });
     }
-    if (activeTool === 'freeTransform') {
-      setTransformTextId(label.id);
-      setTransformIconId(null);
-      setTransformImageId(null);
-      setSelectedTextId(label.id);
-      setDraggingTextId(label.id);
-      setTextDragOffset({ x: pt.x - label.position.x, y: pt.y - label.position.y });
-    }
-  }, [activeTool, getSVGPoint, onDeleteTextLabel, clearSelection]);
+  }, [activeTool, state, onStateChange, getSVGPoint]);
+
+  const handleTextDoubleClick = useCallback((e: React.MouseEvent, lbl: TextLabel) => {
+    e.stopPropagation();
+    setEditingTextId(lbl.id);
+  }, []);
 
   // ── Image interaction ───────────────────────────────────────────────────────
-  const handleImageMouseDown = useCallback((e: React.MouseEvent, img: CanvasImage) => {
+  const handleImageMouseDown = useCallback((e: React.MouseEvent, img: ImageElement) => {
     e.stopPropagation();
     const pt = getSVGPoint(e);
 
     if (activeTool === 'eraser') {
-      onDeleteImage(img.id);
+      onStateChange({ ...state, images: state.images.filter(i => i.id !== img.id) });
       return;
     }
-    if (activeTool === 'select') {
-      clearSelection();
-      setSelectedImageId(img.id);
-      setDraggingImageId(img.id);
-      setImageDragOffset({ x: pt.x - img.position.x, y: pt.y - img.position.y });
-      return;
-    }
-    if (activeTool === 'freeTransform') {
-      setTransformImageId(img.id);
-      setTransformIconId(null);
-      setTransformTextId(null);
+    if (activeTool === 'select' || activeTool === 'freeTransform') {
       setSelectedImageId(img.id);
       setDraggingImageId(img.id);
       setImageDragOffset({ x: pt.x - img.position.x, y: pt.y - img.position.y });
     }
-  }, [activeTool, getSVGPoint, onDeleteImage, clearSelection]);
+  }, [activeTool, state, onStateChange, getSVGPoint]);
 
   // ── Connection interaction ──────────────────────────────────────────────────
   const handleConnectionClick = useCallback((connId: string) => {
     if (activeTool === 'eraser') {
-      onDeleteConnection(connId);
-      return;
-    }
-    if (activeTool === 'select') {
-      clearSelection();
+      onStateChange({ ...state, connections: state.connections.filter(c => c.id !== connId) });
+    } else {
       setSelectedConnId(connId);
     }
-  }, [activeTool, onDeleteConnection, clearSelection]);
+  }, [activeTool, state, onStateChange]);
 
-  // ── Free Transform handle interactions ─────────────────────────────────────
+  // ── Resize handles ──────────────────────────────────────────────────────────
   const handleResizeMouseDown = useCallback((
     e: React.MouseEvent,
     elementId: string,
@@ -749,17 +653,7 @@ export default function AttackPathCanvas({
   ) => {
     e.stopPropagation();
     const pt = getSVGPoint(e);
-    setResizeState({
-      elementId,
-      elementType,
-      handle,
-      startMouseX: pt.x,
-      startMouseY: pt.y,
-      startX,
-      startY,
-      startWidth,
-      startHeight,
-    });
+    setResizeState({ elementId, elementType, handle, startMouseX: pt.x, startMouseY: pt.y, startX, startY, startWidth, startHeight });
   }, [getSVGPoint]);
 
   const handleRotateMouseDown = useCallback((
@@ -772,196 +666,149 @@ export default function AttackPathCanvas({
   ) => {
     e.stopPropagation();
     const pt = getSVGPoint(e);
-    const startAngle = Math.atan2(pt.y - centerY, pt.x - centerX) * (180 / Math.PI);
-    setRotateState({
-      elementId,
-      elementType,
-      centerX,
-      centerY,
-      startAngle,
-      initialRotation,
-    });
+    const startAngle = (Math.atan2(pt.y - centerY, pt.x - centerX) * 180) / Math.PI;
+    setRotateState({ elementId, elementType, centerX, centerY, startAngle, initialRotation });
   }, [getSVGPoint]);
 
-  // ── Render free transform handles ──────────────────────────────────────────
-  function renderTransformHandles(
+  // ── Render handles ──────────────────────────────────────────────────────────
+  const renderHandles = (
     elementId: string,
     elementType: 'text' | 'image' | 'icon',
-    x: number,
-    y: number,
-    width: number,
-    height: number,
+    x: number, y: number, w: number, h: number,
     rotation: number,
-  ) {
-    const cx = x + width / 2;
-    const cy = y + height / 2;
-    const handles = getHandlePositions(x, y, width, height);
-    const rotHandleX = cx;
-    const rotHandleY = y - ROTATION_HANDLE_OFFSET;
+  ) => {
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    const handles: { handle: HandlePosition; hx: number; hy: number }[] = [
+      { handle: 'nw', hx: x, hy: y },
+      { handle: 'n', hx: cx, hy: y },
+      { handle: 'ne', hx: x + w, hy: y },
+      { handle: 'e', hx: x + w, hy: cy },
+      { handle: 'se', hx: x + w, hy: y + h },
+      { handle: 's', hx: cx, hy: y + h },
+      { handle: 'sw', hx: x, hy: y + h },
+      { handle: 'w', hx: x, hy: cy },
+    ];
 
     return (
-      <g transform={`rotate(${rotation}, ${cx}, ${cy})`} style={{ pointerEvents: 'all' }}>
-        {/* Selection border */}
-        <rect
-          x={x} y={y}
-          width={width} height={height}
-          fill="none"
-          stroke="#3b82f6"
-          strokeWidth={1.5}
-          strokeDasharray="4 2"
-          pointerEvents="none"
-        />
-        {/* Resize handles */}
-        {(Object.entries(handles) as [HandlePosition, { cx: number; cy: number }][]).map(([handle, pos]) => (
+      <g transform={`rotate(${rotation}, ${cx}, ${cy})`}>
+        <rect x={x - 1} y={y - 1} width={w + 2} height={h + 2}
+          fill="none" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 2" pointerEvents="none" />
+        {handles.map(({ handle, hx, hy }) => (
           <rect
             key={handle}
-            x={pos.cx - HANDLE_SIZE / 2}
-            y={pos.cy - HANDLE_SIZE / 2}
-            width={HANDLE_SIZE}
-            height={HANDLE_SIZE}
-            fill="white"
-            stroke="#3b82f6"
-            strokeWidth={1.5}
-            style={{ cursor: getCursorForHandle(handle) }}
-            onMouseDown={ev => handleResizeMouseDown(ev, elementId, elementType, handle, x, y, width, height)}
+            x={hx - HANDLE_SIZE / 2} y={hy - HANDLE_SIZE / 2}
+            width={HANDLE_SIZE} height={HANDLE_SIZE}
+            fill="white" stroke="#3b82f6" strokeWidth={1.5}
+            style={{ cursor: `${handle}-resize` }}
+            onMouseDown={(e) => handleResizeMouseDown(e, elementId, elementType, handle, x, y, w, h)}
           />
         ))}
-        {/* Rotation handle line */}
-        <line
-          x1={cx} y1={y}
-          x2={rotHandleX} y2={rotHandleY}
-          stroke="#3b82f6"
-          strokeWidth={1.5}
-          pointerEvents="none"
-        />
-        {/* Rotation handle circle */}
-        <circle
-          cx={rotHandleX}
-          cy={rotHandleY}
-          r={6}
-          fill="white"
-          stroke="#3b82f6"
-          strokeWidth={1.5}
+        <circle cx={cx} cy={y - 20} r={6} fill="#3b82f6" stroke="white" strokeWidth={1.5}
           style={{ cursor: 'grab' }}
-          onMouseDown={ev => handleRotateMouseDown(ev, elementId, elementType, cx, cy, rotation)}
-        />
+          onMouseDown={(e) => handleRotateMouseDown(e, elementId, elementType, cx, cy, rotation)} />
+        <line x1={cx} y1={y - 14} x2={cx} y2={y - 1} stroke="#3b82f6" strokeWidth={1.5} pointerEvents="none" />
       </g>
     );
-  }
+  };
 
-  // ── Cursor style ────────────────────────────────────────────────────────────
   const getCursor = () => {
-    if (activeTool === 'eraser') return 'none';
     if (activeTool === 'pen' || activeTool === 'freehand') return 'crosshair';
     if (activeTool === 'line' || activeTool === 'arrow') return 'crosshair';
     if (activeTool === 'text') return 'text';
-    if (activeTool === 'connect') return 'cell';
+    if (activeTool === 'eraser') return 'cell';
+    if (activeTool === 'connect' || activeTool === 'connector') return 'cell';
     return 'default';
   };
-
-  // Collect unique colors for arrowhead markers; always include black
-  const arrowColors = new Set<string>(['#000000']);
-  lines.forEach(l => { if (l.isArrow) arrowColors.add(l.color); });
-  connections.forEach(c => arrowColors.add(c.color));
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative overflow-hidden"
+      className="relative w-full h-full overflow-hidden"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
+      {dragOver && (
+        <div className="absolute inset-0 z-10 pointer-events-none border-4 border-dashed border-primary/60 bg-primary/5 flex items-center justify-center">
+          <span className="text-primary font-semibold text-lg bg-background/80 px-4 py-2 rounded-lg shadow">
+            Drop to load diagram
+          </span>
+        </div>
+      )}
+
       <svg
         ref={svgRef}
-        className="w-full h-full"
-        style={{ cursor: getCursor(), background: '#ffffff' }}
+        className="w-full h-full bg-background"
+        style={{ cursor: getCursor() }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={() => {
+          setIsErasing(false);
+          setEraserPos(null);
+          if (draggingIconId) setDraggingIconId(null);
+          if (draggingTextId) setDraggingTextId(null);
+          if (draggingImageId) setDraggingImageId(null);
+        }}
       >
+        {/* Grid */}
         <defs>
-          {Array.from(arrowColors).map(color => (
-            <marker
-              key={color}
-              id={`arrowhead-${color.replace('#', '')}`}
-              markerWidth="10"
-              markerHeight="7"
-              refX="9"
-              refY="3.5"
-              orient="auto"
-            >
-              <polygon points="0 0, 10 3.5, 0 7" fill={color} />
-            </marker>
-          ))}
+          <pattern id="canvas-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.3" className="text-border" />
+          </pattern>
         </defs>
+        <rect width="100%" height="100%" fill="url(#canvas-grid)" />
 
-        {/* ── Freehand drawings ── */}
-        {freehandDrawings.map((drawing, i) => (
-          <polyline
-            key={i}
-            points={drawing.points.map(p => `${p.x},${p.y}`).join(' ')}
-            fill="none"
-            stroke={drawing.color}
-            strokeWidth={drawing.strokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ cursor: activeTool === 'eraser' ? 'pointer' : 'default' }}
-          />
-        ))}
+        {/* Freehand drawings */}
+        {state.freehandDrawings.map((drawing, index) => {
+          if (drawing.points.length < 2) return null;
+          const d = drawing.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+          return (
+            <path key={index} d={d} fill="none"
+              stroke={drawing.color} strokeWidth={drawing.strokeWidth}
+              strokeLinecap="round" strokeLinejoin="round"
+              style={{ cursor: activeTool === 'eraser' ? 'cell' : 'pointer' }}
+            />
+          );
+        })}
 
-        {/* ── Freehand preview ── */}
-        {isDrawing && currentPath.length > 1 && (
-          <polyline
-            points={currentPath.map(p => `${p.x},${p.y}`).join(' ')}
-            fill="none"
-            stroke={drawColor}
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity={0.7}
-            pointerEvents="none"
-          />
-        )}
+        {/* Lines */}
+        {state.lines.map((line, index) => {
+          const dx = line.endPosition.x - line.startPosition.x;
+          const dy = line.endPosition.y - line.startPosition.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const ux = len > 0 ? dx / len : 0;
+          const uy = len > 0 ? dy / len : 0;
+          const arrowSize = 10;
+          return (
+            <g key={index} style={{ cursor: activeTool === 'eraser' ? 'cell' : 'pointer' }}>
+              <line
+                x1={line.startPosition.x} y1={line.startPosition.y}
+                x2={line.endPosition.x} y2={line.endPosition.y}
+                stroke="#000000" strokeWidth={line.strokeWidth} strokeLinecap="round"
+              />
+              {line.isArrow && len > 0 && (
+                <polygon
+                  points={`${line.endPosition.x},${line.endPosition.y} ${line.endPosition.x - ux * arrowSize - uy * arrowSize * 0.5},${line.endPosition.y - uy * arrowSize + ux * arrowSize * 0.5} ${line.endPosition.x - ux * arrowSize + uy * arrowSize * 0.5},${line.endPosition.y - uy * arrowSize - ux * arrowSize * 0.5}`}
+                  fill="#000000"
+                />
+              )}
+              <line
+                x1={line.startPosition.x} y1={line.startPosition.y}
+                x2={line.endPosition.x} y2={line.endPosition.y}
+                stroke="transparent" strokeWidth={12}
+              />
+            </g>
+          );
+        })}
 
-        {/* ── Drawn lines / arrows ── */}
-        {lines.map((line, i) => (
-          <line
-            key={i}
-            x1={line.startPosition.x}
-            y1={line.startPosition.y}
-            x2={line.endPosition.x}
-            y2={line.endPosition.y}
-            stroke={line.color}
-            strokeWidth={line.strokeWidth}
-            strokeLinecap="round"
-            markerEnd={line.isArrow ? `url(#arrowhead-${line.color.replace('#', '')})` : undefined}
-            style={{ cursor: activeTool === 'eraser' ? 'pointer' : 'default' }}
-          />
-        ))}
-
-        {/* ── Line / Arrow preview (always black) ── */}
-        {lineStart && linePreview && (
-          <line
-            x1={lineStart.x}
-            y1={lineStart.y}
-            x2={linePreview.x}
-            y2={linePreview.y}
-            stroke="#000000"
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            strokeDasharray="5 3"
-            markerEnd={activeTool === 'arrow' ? 'url(#arrowhead-000000)' : undefined}
-            opacity={0.7}
-            pointerEvents="none"
-          />
-        )}
-
-        {/* ── Connections between icons ── */}
-        {connections.map(conn => {
-          const src = icons.find(ic => ic.id === conn.sourceId);
-          const tgt = icons.find(ic => ic.id === conn.targetId);
+        {/* Connections */}
+        {state.connections.map((conn) => {
+          const src = state.icons.find(i => i.id === conn.sourceId);
+          const tgt = state.icons.find(i => i.id === conn.targetId);
           if (!src || !tgt) return null;
+          const isSelected = selectedConnId === conn.id;
           return (
             <AttackPathConnector
               key={conn.id}
@@ -970,219 +817,165 @@ export default function AttackPathCanvas({
               sourceY={src.position.y}
               targetX={tgt.position.x}
               targetY={tgt.position.y}
-              isSelected={selectedConnId === conn.id}
+              isSelected={isSelected}
               onClick={handleConnectionClick}
             />
           );
         })}
 
-        {/* ── Connector source highlight ── */}
-        {connectingFrom && (() => {
-          const icon = icons.find(ic => ic.id === connectingFrom);
-          if (!icon) return null;
+        {/* Images */}
+        {state.images.map((img) => {
+          const isSelected = selectedImageId === img.id;
+          const cx = img.position.x + img.width / 2;
+          const cy = img.position.y + img.height / 2;
           return (
-            <rect
-              x={icon.position.x - icon.width / 2 - 3}
-              y={icon.position.y - icon.height / 2 - 3}
-              width={icon.width + 6}
-              height={icon.height + 6}
-              fill="none"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              strokeDasharray="4 2"
-              pointerEvents="none"
-            />
-          );
-        })()}
-
-        {/* ── Images ── */}
-        {images.map(img => {
-          const isTransform = transformImageId === img.id;
-          const x = img.position.x;
-          const y = img.position.y;
-          const w = img.width;
-          const h = img.height;
-          const cx = x + w / 2;
-          const cy = y + h / 2;
-          return (
-            <g
-              key={img.id}
-              transform={`rotate(${img.rotation}, ${cx}, ${cy})`}
-            >
+            <g key={img.id}>
               <image
                 href={img.url}
-                x={x}
-                y={y}
-                width={w}
-                height={h}
-                style={{
-                  cursor: activeTool === 'select' || activeTool === 'freeTransform' ? 'move'
-                    : activeTool === 'eraser' ? 'pointer'
-                    : 'default',
-                }}
-                onMouseDown={ev => handleImageMouseDown(ev, img)}
+                x={img.position.x} y={img.position.y}
+                width={img.width} height={img.height}
+                transform={`rotate(${img.rotation}, ${cx}, ${cy})`}
+                style={{ cursor: activeTool === 'select' ? 'move' : activeTool === 'eraser' ? 'cell' : 'default' }}
+                onMouseDown={(e) => handleImageMouseDown(e, img)}
               />
-              {isTransform && renderTransformHandles(img.id, 'image', x, y, w, h, img.rotation)}
+              {isSelected && renderHandles(img.id, 'image', img.position.x, img.position.y, img.width, img.height, img.rotation)}
             </g>
           );
         })}
 
-        {/* ── Placed icons ── */}
-        {icons.map(icon => {
-          const isTransform = transformIconId === icon.id;
+        {/* Icons */}
+        {state.icons.map((icon) => {
           const isSelected = selectedIconId === icon.id;
-          const imgSrc = ICON_IMAGE_MAP[icon.iconType] ?? ICON_IMAGE_MAP['attacker'];
-          const x = icon.position.x - icon.width / 2;
-          const y = icon.position.y - icon.height / 2;
+          const isConnectingSource = connectingFrom === icon.id;
+          const ix = icon.position.x - icon.width / 2;
+          const iy = icon.position.y - icon.height / 2;
           const cx = icon.position.x;
           const cy = icon.position.y;
           return (
-            <g
-              key={icon.id}
-              transform={`rotate(${icon.rotation}, ${cx}, ${cy})`}
-            >
-              {/* Selection highlight */}
-              {isSelected && activeTool === 'select' && (
+            <g key={icon.id} transform={`rotate(${icon.rotation}, ${cx}, ${cy})`}>
+              {/* Selection/connecting highlight */}
+              {(isSelected || isConnectingSource) && (
                 <rect
-                  x={x - 3}
-                  y={y - 3}
-                  width={icon.width + 6}
-                  height={icon.height + 6}
+                  x={ix - 3} y={iy - 3}
+                  width={icon.width + 6} height={icon.height + 6}
                   fill="none"
-                  stroke="#3b82f6"
+                  stroke={isConnectingSource ? '#f59e0b' : '#3b82f6'}
                   strokeWidth={2}
-                  strokeDasharray="4 2"
+                  strokeDasharray={isConnectingSource ? '4 2' : 'none'}
+                  rx={4}
                   pointerEvents="none"
                 />
               )}
               <image
-                href={imgSrc}
-                x={x}
-                y={y}
-                width={icon.width}
-                height={icon.height}
-                style={{
-                  cursor: activeTool === 'select' || activeTool === 'freeTransform' ? 'move'
-                    : activeTool === 'connect' ? 'cell'
-                    : activeTool === 'eraser' ? 'pointer'
-                    : 'default',
-                }}
-                onMouseDown={ev => handleIconMouseDown(ev, icon)}
+                href={getIconSrc(icon.iconType)}
+                x={ix} y={iy}
+                width={icon.width} height={icon.height}
+                style={{ cursor: activeTool === 'select' ? 'move' : activeTool === 'eraser' ? 'cell' : activeTool === 'connect' || activeTool === 'connector' ? 'cell' : 'default' }}
+                onMouseDown={(e) => handleIconMouseDown(e, icon)}
+                onDoubleClick={(e) => handleIconDoubleClick(e, icon)}
               />
               {/* Icon label */}
-              <text
-                x={cx}
-                y={y + icon.height + 14}
-                textAnchor="middle"
-                fontSize={11}
-                fill="#1e293b"
-                pointerEvents="none"
-                style={{ userSelect: 'none' }}
-              >
-                {icon.name}
-              </text>
-              {isTransform && renderTransformHandles(icon.id, 'icon', x, y, icon.width, icon.height, icon.rotation)}
-            </g>
-          );
-        })}
-
-        {/* ── Text labels ── */}
-        {textLabels.map(label => {
-          const isTransform = transformTextId === label.id;
-          const isSelected = selectedTextId === label.id;
-          const x = label.position.x;
-          const y = label.position.y;
-          const w = label.width;
-          const h = label.height;
-          const cx = x + w / 2;
-          const cy = y + h / 2;
-          const isEditing = editingTextId === label.id;
-
-          return (
-            <g
-              key={label.id}
-              transform={`rotate(${label.rotation}, ${cx}, ${cy})`}
-            >
-              {isEditing ? (
-                <foreignObject x={x} y={y} width={Math.max(w, 80)} height={Math.max(h, 30)}>
+              {editingIconLabelId === icon.id ? (
+                <foreignObject x={ix - 10} y={iy + icon.height + 2} width={icon.width + 20} height={24}>
                   <input
-                    // @ts-ignore
-                    xmlns="http://www.w3.org/1999/xhtml"
                     autoFocus
-                    defaultValue={label.content}
-                    onBlur={e => {
-                      onUpdateTextLabel(label.id, { content: (e.target as HTMLInputElement).value });
-                      setEditingTextId(null);
+                    defaultValue={icon.name}
+                    className="w-full text-center text-xs bg-background border border-primary rounded px-1 outline-none"
+                    onBlur={(e) => {
+                      onStateChange({
+                        ...state,
+                        icons: state.icons.map(i => i.id === icon.id ? { ...i, name: e.target.value } : i),
+                      });
+                      setEditingIconLabelId(null);
                     }}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        onUpdateTextLabel(label.id, { content: (e.target as HTMLInputElement).value });
-                        setEditingTextId(null);
-                      }
-                    }}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: '1px solid #3b82f6',
-                      background: 'white',
-                      fontSize: label.fontSize,
-                      fontWeight: label.fontWeight,
-                      color: label.color,
-                      padding: '2px 4px',
-                      outline: 'none',
-                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                   />
                 </foreignObject>
               ) : (
-                <>
-                  {(isSelected || isTransform) && (
-                    <rect
-                      x={x - 2} y={y - 2}
-                      width={w + 4} height={h + 4}
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth={1}
-                      strokeDasharray="3 2"
-                      pointerEvents="none"
-                    />
-                  )}
-                  <text
-                    x={x + 4}
-                    y={y + label.fontSize + 4}
-                    fontSize={label.fontSize}
-                    fontWeight={label.fontWeight}
-                    fill={label.color}
-                    style={{
-                      cursor: activeTool === 'select' || activeTool === 'freeTransform' ? 'move'
-                        : activeTool === 'eraser' ? 'pointer'
-                        : 'default',
-                      userSelect: 'none',
-                    }}
-                    onMouseDown={ev => handleTextMouseDown(ev, label)}
-                    onDoubleClick={() => {
-                      if (activeTool === 'select') setEditingTextId(label.id);
-                    }}
-                  >
-                    {label.content}
-                  </text>
-                </>
+                <text
+                  x={cx} y={iy + icon.height + 14}
+                  textAnchor="middle" fontSize={11}
+                  fill="currentColor" className="text-foreground"
+                  style={{ cursor: 'text', userSelect: 'none' }}
+                  onDoubleClick={(e) => handleIconDoubleClick(e, icon)}
+                >
+                  {icon.name}
+                </text>
               )}
-              {isTransform && renderTransformHandles(label.id, 'text', x, y, w, h, label.rotation)}
+              {isSelected && renderHandles(icon.id, 'icon', ix, iy, icon.width, icon.height, icon.rotation)}
             </g>
           );
         })}
 
-        {/* ── Eraser cursor ── */}
-        {activeTool === 'eraser' && eraserPos && (
-          <circle
-            cx={eraserPos.x}
-            cy={eraserPos.y}
-            r={ERASER_RADIUS}
-            fill="rgba(239,68,68,0.12)"
-            stroke="#ef4444"
-            strokeWidth={1.5}
-            pointerEvents="none"
+        {/* Text Labels */}
+        {state.textLabels.map((lbl) => {
+          const isSelected = selectedTextId === lbl.id;
+          return (
+            <g key={lbl.id}>
+              {editingTextId === lbl.id ? (
+                <foreignObject x={lbl.position.x} y={lbl.position.y - lbl.fontSize} width={200} height={lbl.fontSize + 10}>
+                  <input
+                    autoFocus
+                    defaultValue={lbl.content}
+                    className="w-full bg-background border border-primary rounded px-1 outline-none text-foreground"
+                    style={{ fontSize: lbl.fontSize }}
+                    onBlur={(e) => {
+                      onStateChange({
+                        ...state,
+                        textLabels: state.textLabels.map(t => t.id === lbl.id ? { ...t, content: e.target.value } : t),
+                      });
+                      setEditingTextId(null);
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                  />
+                </foreignObject>
+              ) : (
+                <text
+                  x={lbl.position.x} y={lbl.position.y}
+                  fontSize={lbl.fontSize}
+                  fill={isSelected ? '#3b82f6' : lbl.color}
+                  fontWeight={lbl.fontWeight}
+                  style={{ cursor: activeTool === 'select' ? 'move' : activeTool === 'eraser' ? 'cell' : 'text', userSelect: 'none' }}
+                  onMouseDown={(e) => handleTextMouseDown(e, lbl)}
+                  onDoubleClick={(e) => handleTextDoubleClick(e, lbl)}
+                >
+                  {lbl.content}
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* Active freehand preview */}
+        {isDrawing && currentPath.length > 1 && (
+          <path
+            d={currentPath.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')}
+            fill="none" stroke="#000000" strokeWidth={2}
+            strokeLinecap="round" strokeLinejoin="round" pointerEvents="none"
           />
+        )}
+
+        {/* Active line/arrow preview */}
+        {lineStart && linePreview && (
+          <line
+            x1={lineStart.x} y1={lineStart.y}
+            x2={linePreview.x} y2={linePreview.y}
+            stroke="#000000" strokeWidth={2} strokeDasharray="4 2"
+            strokeLinecap="round" pointerEvents="none"
+          />
+        )}
+
+        {/* Eraser cursor */}
+        {activeTool === 'eraser' && eraserPos && (
+          <circle cx={eraserPos.x} cy={eraserPos.y} r={ERASER_RADIUS}
+            fill="none" stroke="#ef4444" strokeWidth={1.5} strokeDasharray="3 2" pointerEvents="none" />
+        )}
+
+        {/* Connecting mode hint */}
+        {connectingFrom && (
+          <text x={10} y={20} fontSize={12} fill="#f59e0b" pointerEvents="none">
+            Click another icon to connect…
+          </text>
         )}
       </svg>
     </div>

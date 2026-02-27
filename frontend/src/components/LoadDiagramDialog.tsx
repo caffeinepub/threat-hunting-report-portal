@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, Trash2, LayoutGrid } from 'lucide-react';
+import { Trash2, FolderOpen, Network, GitBranch, Image as ImageIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +7,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGetAllDiagrams } from '../hooks/useGetAllDiagrams';
 import { useDeleteDiagramState } from '../hooks/useDeleteDiagramState';
 import { NamedDiagram } from '../backend';
@@ -17,103 +19,139 @@ interface LoadDiagramDialogProps {
   onLoad: (diagram: NamedDiagram) => void;
 }
 
-const LoadDiagramDialog: React.FC<LoadDiagramDialogProps> = ({ open, onOpenChange, onLoad }) => {
+export default function LoadDiagramDialog({ open, onOpenChange, onLoad }: LoadDiagramDialogProps) {
   const { data: diagrams = [], isLoading } = useGetAllDiagrams();
   const deleteMutation = useDeleteDiagramState();
-
-  const formatDate = (lastModified: bigint) => {
-    const ms = Number(lastModified) / 1_000_000;
-    return new Date(ms).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<number | null>(null);
 
   const handleLoad = (diagram: NamedDiagram) => {
     onLoad(diagram);
     onOpenChange(false);
   };
 
-  const handleDelete = async (index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await deleteMutation.mutateAsync(BigInt(index));
-    } catch (err) {
-      console.error('Delete failed:', err);
+  const handleDelete = (index: number) => {
+    if (confirmDeleteId === index) {
+      deleteMutation.mutate(BigInt(index));
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(index);
     }
+  };
+
+  const formatDate = (lastModified: bigint) => {
+    const date = new Date(Number(lastModified));
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLImageElement>, diagram: NamedDiagram) => {
+    e.dataTransfer.setData('diagramState', JSON.stringify(diagram));
+    e.dataTransfer.effectAllowed = 'copy';
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FolderOpen size={18} />
-            Load Diagram
-          </DialogTitle>
+          <DialogTitle>Load Diagram</DialogTitle>
           <DialogDescription>
-            Select a saved diagram to load onto the canvas.
+            Click Load to open a diagram, or drag the thumbnail preview onto the canvas.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 max-h-80 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : diagrams.length === 0 ? (
-            <div className="text-center py-8">
-              <LayoutGrid size={32} className="mx-auto mb-3 text-muted-foreground opacity-40" />
-              <p className="text-sm text-muted-foreground">No saved diagrams found.</p>
-              <p className="text-xs text-muted-foreground mt-1 opacity-70">
-                Save a diagram first to load it here.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+            Loading diagrams...
+          </div>
+        ) : diagrams.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-32 text-muted-foreground text-sm gap-2">
+            <Network className="w-8 h-8 opacity-40" />
+            <span>No saved diagrams yet</span>
+          </div>
+        ) : (
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="grid grid-cols-2 gap-3 p-1">
               {diagrams.map((diagram, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer group"
-                  onClick={() => handleLoad(diagram)}
+                  draggable={false}
+                  className="rounded-lg border border-border bg-card overflow-hidden"
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{diagram.name}</p>
-                    <div className="flex gap-3 mt-0.5 text-xs text-muted-foreground">
-                      <span>{diagram.state.icons.length} icons</span>
-                      <span>{diagram.state.connections.length} connections</span>
-                      {diagram.state.textLabels.length > 0 && (
-                        <span>{diagram.state.textLabels.length} labels</span>
-                      )}
+                  {/* Thumbnail — only this <img> is draggable */}
+                  <div className="relative bg-muted/30 h-28 overflow-hidden border-b border-border">
+                    <img
+                      src="/assets/generated/hero-banner.dim_1200x400.png"
+                      alt={`${diagram.name} preview`}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStart(e, diagram)}
+                      className="w-full h-full object-cover opacity-50 cursor-grab active:cursor-grabbing select-none"
+                      title="Drag onto canvas to load this diagram"
+                    />
+                    {/* Stats overlay — not draggable */}
+                    <div
+                      draggable={false}
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-1 pointer-events-none"
+                    >
+                      <div className="flex gap-3 text-xs font-medium text-foreground/90 bg-background/75 rounded px-2 py-1">
+                        <span className="flex items-center gap-1">
+                          <Network className="w-3 h-3" />
+                          {diagram.state.icons.length} icons
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <GitBranch className="w-3 h-3" />
+                          {diagram.state.connections.length}
+                        </span>
+                        {diagram.state.images.length > 0 && (
+                          <span className="flex items-center gap-1">
+                            <ImageIcon className="w-3 h-3" />
+                            {diagram.state.images.length}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground bg-background/60 rounded px-1">
+                        drag to canvas
+                      </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 opacity-70">
+                  </div>
+
+                  {/* Card body — not draggable */}
+                  <div draggable={false} className="p-3">
+                    <p
+                      draggable={false}
+                      className="text-sm font-semibold text-foreground truncate mb-0.5"
+                      title={diagram.name}
+                    >
+                      {diagram.name}
+                    </p>
+                    <p draggable={false} className="text-xs text-muted-foreground mb-2">
                       {formatDate(diagram.state.lastModified)}
                     </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={(e) => handleDelete(index, e)}
-                      disabled={deleteMutation.isPending}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded text-destructive hover:bg-destructive/10 transition-all disabled:opacity-50"
-                      title="Delete diagram"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                    <div className="p-1.5 rounded text-primary">
-                      <FolderOpen size={14} />
+                    <div draggable={false} className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 h-7 text-xs"
+                        onClick={() => handleLoad(diagram)}
+                      >
+                        <FolderOpen className="w-3 h-3 mr-1" />
+                        Load
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={confirmDeleteId === index ? 'destructive' : 'ghost'}
+                        className="h-7 w-7 p-0"
+                        onClick={() => handleDelete(index)}
+                        title={confirmDeleteId === index ? 'Click again to confirm' : 'Delete'}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </ScrollArea>
+        )}
       </DialogContent>
     </Dialog>
   );
-};
-
-export default LoadDiagramDialog;
+}

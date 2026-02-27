@@ -341,6 +341,11 @@ export function useAttackPathState() {
     pushHistory(empty);
   }, [pushHistory]);
 
+  /** Load a local DiagramStateLocal directly (used by canvas onStateChange) */
+  const loadDiagramLocal = useCallback((newState: DiagramStateLocal) => {
+    pushHistory(newState);
+  }, [pushHistory]);
+
   const loadDiagram = useCallback((backendState: DiagramState) => {
     const loaded: DiagramStateLocal = {
       icons: backendState.icons.map(icon => ({
@@ -384,7 +389,7 @@ export function useAttackPathState() {
       })),
       images: backendState.images.map(img => ({
         id: img.id,
-        url: img.file.getDirectURL(),
+        url: img.file instanceof ExternalBlob ? img.file.getDirectURL() : '',
         position: { x: img.position.x, y: img.position.y },
         width: img.size.width || DEFAULT_IMAGE_WIDTH,
         height: img.size.height || DEFAULT_IMAGE_HEIGHT,
@@ -476,6 +481,7 @@ export function useAttackPathState() {
     deleteImage,
     clearDiagram,
     loadDiagram,
+    loadDiagramLocal,
     serializeForBackend,
   };
 }

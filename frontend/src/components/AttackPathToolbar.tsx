@@ -1,34 +1,50 @@
-import React, { useRef, useState } from 'react';
-import { Pencil, Minus, ArrowRight, Eraser, Type, MousePointer, RotateCcw, RotateCw, Save, FolderOpen, Move, Trash2, Image } from 'lucide-react';
+import React, { useRef } from 'react';
+import {
+  MousePointer2,
+  Pen,
+  Type,
+  Minus,
+  ArrowRight,
+  Link,
+  Eraser,
+  Save,
+  FolderOpen,
+  Undo2,
+  Redo2,
+  RotateCcw,
+  ImagePlus,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
 import { ToolType } from './AttackPathCanvas';
-import { toast } from 'sonner';
 
-const ICON_DEFINITIONS: { type: string; label: string; src: string }[] = [
-  { type: 'attacker', label: 'Attacker', src: '/assets/attacker.png' },
-  { type: 'computer', label: 'Computer', src: '/assets/Computer.png' },
-  { type: 'server', label: 'Server', src: '/assets/server icon.png' },
-  { type: 'multipleservers', label: 'Multi-Server', src: '/assets/Multiple Server Icon.png' },
-  { type: 'cloudserver', label: 'Cloud', src: '/assets/Cloud Server.png' },
-  { type: 'router', label: 'Router', src: '/assets/Router Device Icon.jpg' },
-  { type: 'firewall', label: 'Firewall', src: '/assets/Firewall.png' },
-  { type: 'domain', label: 'Domain', src: '/assets/Domain.png' },
-  { type: 'multiplecomputers', label: 'Multi-PC', src: '/assets/multiple computer.png' },
-  { type: 'multipleusers', label: 'Users', src: '/assets/multiple users icon.png' },
-  { type: 'email', label: 'Email', src: '/assets/email.png' },
-  { type: 'phishing', label: 'Phishing', src: '/assets/phishing email icon-2.jpg' },
-  { type: 'powershell', label: 'PowerShell', src: '/assets/powershell-2.png' },
-  { type: 'backdoor', label: 'Backdoor', src: '/assets/backdoor-1.jpg' },
-  { type: 'dll', label: 'DLL', src: '/assets/dll.png' },
-  { type: 'exe', label: 'EXE', src: '/assets/exe.png' },
-  { type: 'script', label: 'Script', src: '/assets/script.png' },
-  { type: 'scheduledtask', label: 'Sched. Task', src: '/assets/Scheduled Task.jpg' },
-  { type: 'c2', label: 'C2', src: '/assets/Command and Control.png' },
-  { type: 'webbrowser', label: 'Browser', src: '/assets/web browser.png' },
-  { type: 'word', label: 'Word', src: '/assets/word.png' },
-  { type: 'excel', label: 'Excel', src: '/assets/excel.png' },
-  { type: 'pdf', label: 'PDF', src: '/assets/pdf.png' },
-  { type: 'zip', label: 'ZIP', src: '/assets/zip.png' },
-  { type: 'ppt', label: 'PPT', src: '/assets/ppt.png' },
+const ICON_LIST = [
+  { iconType: 'attacker', label: 'Attacker', src: '/assets/attacker.png' },
+  { iconType: 'computer', label: 'Computer', src: '/assets/Computer.png' },
+  { iconType: 'server', label: 'Server', src: '/assets/server icon.png' },
+  { iconType: 'multiserver', label: 'Multi-Server', src: '/assets/Multiple Server Icon.png' },
+  { iconType: 'router', label: 'Router', src: '/assets/Router Device Icon.jpg' },
+  { iconType: 'firewall', label: 'Firewall', src: '/assets/Firewall.png' },
+  { iconType: 'domain', label: 'Domain', src: '/assets/Domain.png' },
+  { iconType: 'cloud', label: 'Cloud', src: '/assets/Cloud Server.png' },
+  { iconType: 'email', label: 'Email', src: '/assets/email.png' },
+  { iconType: 'phishing', label: 'Phishing', src: '/assets/phishing email icon-2.jpg' },
+  { iconType: 'powershell', label: 'PowerShell', src: '/assets/powershell-2.png' },
+  { iconType: 'backdoor', label: 'Backdoor', src: '/assets/backdoor-1.jpg' },
+  { iconType: 'exe', label: 'EXE', src: '/assets/exe.png' },
+  { iconType: 'dll', label: 'DLL', src: '/assets/dll.png' },
+  { iconType: 'script', label: 'Script', src: '/assets/script.png' },
+  { iconType: 'zip', label: 'ZIP', src: '/assets/zip.png' },
+  { iconType: 'pdf', label: 'PDF', src: '/assets/pdf.png' },
+  { iconType: 'word', label: 'Word', src: '/assets/word.png' },
+  { iconType: 'excel', label: 'Excel', src: '/assets/excel.png' },
+  { iconType: 'ppt', label: 'PPT', src: '/assets/ppt.png' },
+  { iconType: 'webbrowser', label: 'Browser', src: '/assets/web browser.png' },
+  { iconType: 'scheduledtask', label: 'Sched. Task', src: '/assets/Scheduled Task.jpg' },
+  { iconType: 'multicomputer', label: 'Multi-PC', src: '/assets/multiple computer.png' },
+  { iconType: 'multiuser', label: 'Multi-User', src: '/assets/multiple users icon.png' },
+  { iconType: 'c2', label: 'C2', src: '/assets/Command and Control.png' },
 ];
 
 interface AttackPathToolbarProps {
@@ -39,12 +55,12 @@ interface AttackPathToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   onClear: () => void;
-  onAddImage: (file: File) => void;
+  onImageUpload: (file: File) => void;
   canUndo: boolean;
   canRedo: boolean;
 }
 
-const AttackPathToolbar: React.FC<AttackPathToolbarProps> = ({
+export default function AttackPathToolbar({
   activeTool,
   onToolChange,
   onSave,
@@ -52,177 +68,148 @@ const AttackPathToolbar: React.FC<AttackPathToolbarProps> = ({
   onUndo,
   onRedo,
   onClear,
-  onAddImage,
+  onImageUpload,
   canUndo,
   canRedo,
-}) => {
+}: AttackPathToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
-  const handleDragStart = (e: React.DragEvent<HTMLImageElement>, iconType: string) => {
+  const tools: { type: ToolType; icon: React.ReactNode; label: string }[] = [
+    { type: 'select', icon: <MousePointer2 className="w-4 h-4" />, label: 'Select' },
+    { type: 'pen', icon: <Pen className="w-4 h-4" />, label: 'Freehand Draw' },
+    { type: 'text', icon: <Type className="w-4 h-4" />, label: 'Text' },
+    { type: 'line', icon: <Minus className="w-4 h-4" />, label: 'Line' },
+    { type: 'arrow', icon: <ArrowRight className="w-4 h-4" />, label: 'Arrow' },
+    { type: 'connector', icon: <Link className="w-4 h-4" />, label: 'Connector' },
+    { type: 'eraser', icon: <Eraser className="w-4 h-4" />, label: 'Eraser' },
+  ];
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onImageUpload(file);
+      e.target.value = '';
+    }
+  };
+
+  const handleIconDragStart = (e: React.DragEvent<HTMLImageElement>, iconType: string) => {
     e.dataTransfer.setData('iconType', iconType);
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const handleImageUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
-      toast.error('Please upload a PNG, JPG, or JPEG image');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
-      return;
-    }
-    try {
-      setIsUploading(true);
-      onAddImage(file);
-      toast.success('Image added successfully');
-    } catch {
-      toast.error('Failed to add image');
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  const toolButtons: { tool: ToolType; icon: React.ReactNode; label: string }[] = [
-    { tool: 'select', icon: <MousePointer size={15} />, label: 'Select' },
-    { tool: 'connect', icon: <ArrowRight size={15} />, label: 'Connect' },
-    { tool: 'pen', icon: <Pencil size={15} />, label: 'Draw' },
-    { tool: 'line', icon: <Minus size={15} />, label: 'Line' },
-    { tool: 'arrow', icon: <ArrowRight size={15} />, label: 'Arrow' },
-    { tool: 'text', icon: <Type size={15} />, label: 'Text' },
-    { tool: 'freeTransform', icon: <Move size={15} />, label: 'Transform' },
-    { tool: 'eraser', icon: <Eraser size={15} />, label: 'Eraser' },
-  ];
-
   return (
-    <div className="flex flex-col h-full bg-card border-r border-border overflow-hidden" style={{ width: '11rem' }}>
-      {/* Header */}
-      <div className="px-3 py-2 border-b border-border">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</h2>
-      </div>
+    <TooltipProvider>
+      <div className="flex flex-col h-full bg-card border-r border-border w-16 items-center py-3 gap-1 overflow-y-auto shrink-0">
+        {/* Drawing Tools */}
+        {tools.map((tool) => (
+          <Tooltip key={tool.type}>
+            <TooltipTrigger asChild>
+              <Button
+                variant={activeTool === tool.type ? 'default' : 'ghost'}
+                size="icon"
+                className="w-10 h-10"
+                onClick={() => onToolChange(tool.type)}
+              >
+                {tool.icon}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{tool.label}</TooltipContent>
+          </Tooltip>
+        ))}
 
-      {/* Drawing Tools */}
-      <div className="px-2 py-2 border-b border-border">
-        <div className="grid grid-cols-2 gap-1">
-          {toolButtons.map(({ tool, icon, label }) => (
-            <button
-              key={tool}
-              onClick={() => onToolChange(tool)}
-              title={label}
-              className={`flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs transition-colors ${
-                activeTool === tool
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              }`}
-            >
-              {icon}
-              <span className="text-[10px] leading-none">{label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+        <Separator className="my-1 w-10" />
 
-      {/* Action Buttons */}
-      <div className="px-2 py-2 border-b border-border">
-        <div className="grid grid-cols-2 gap-1">
-          <button
-            onClick={onUndo}
-            disabled={!canUndo}
-            title="Undo"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <RotateCcw size={15} />
-            <span className="text-[10px] leading-none">Undo</span>
-          </button>
-          <button
-            onClick={onRedo}
-            disabled={!canRedo}
-            title="Redo"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <RotateCw size={15} />
-            <span className="text-[10px] leading-none">Redo</span>
-          </button>
-          <button
-            onClick={onSave}
-            title="Save Diagram"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <Save size={15} />
-            <span className="text-[10px] leading-none">Save</span>
-          </button>
-          <button
-            onClick={onLoad}
-            title="Load Diagram"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <FolderOpen size={15} />
-            <span className="text-[10px] leading-none">Load</span>
-          </button>
-          <button
-            onClick={handleImageUploadClick}
-            disabled={isUploading}
-            title="Upload Image"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <Image size={15} />
-            <span className="text-[10px] leading-none">{isUploading ? 'Adding…' : 'Image'}</span>
-          </button>
-          <button
-            onClick={onClear}
-            title="Clear Canvas"
-            className="flex flex-col items-center gap-0.5 px-1 py-1.5 rounded text-xs text-destructive hover:bg-destructive/10 transition-colors"
-          >
-            <Trash2 size={15} />
-            <span className="text-[10px] leading-none">Clear</span>
-          </button>
-        </div>
+        {/* Action Buttons */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={onSave}>
+              <Save className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Save Diagram</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={onLoad}>
+              <FolderOpen className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Load Diagram</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={onUndo} disabled={!canUndo}>
+              <Undo2 className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Undo</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={onRedo} disabled={!canRedo}>
+              <Redo2 className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Redo</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={onClear}>
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Clear Canvas</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10" onClick={() => fileInputRef.current?.click()}>
+              <ImagePlus className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Upload Image</TooltipContent>
+        </Tooltip>
+
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/png,image/jpeg,image/jpg"
+          accept="image/*"
           className="hidden"
           onChange={handleFileChange}
         />
-      </div>
 
-      {/* Icons Section */}
-      <div className="px-2 py-2 flex-1 overflow-y-auto">
-        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-          Drag to Canvas
-        </p>
-        <div className="grid grid-cols-3 gap-1">
-          {ICON_DEFINITIONS.map((iconDef) => (
-            <div
-              key={iconDef.type}
-              className="flex flex-col items-center gap-0.5 p-1 rounded hover:bg-accent cursor-default"
-              title={iconDef.label}
-            >
-              {/* Only the image is draggable — not the label */}
-              <img
-                src={iconDef.src}
-                alt={iconDef.label}
-                draggable
-                onDragStart={(e) => handleDragStart(e, iconDef.type)}
-                className="w-8 h-8 object-contain cursor-grab active:cursor-grabbing select-none"
-              />
-              <span className="text-[9px] text-muted-foreground leading-none text-center truncate w-full pointer-events-none select-none">
-                {iconDef.label}
-              </span>
-            </div>
+        <Separator className="my-1 w-10" />
+
+        {/* Icon Grid — only the <img> inside each cell is draggable */}
+        <div className="flex flex-col gap-1 w-full px-1">
+          {ICON_LIST.map(({ iconType, label, src }) => (
+            <Tooltip key={iconType}>
+              <TooltipTrigger asChild>
+                <div
+                  draggable={false}
+                  className="flex flex-col items-center gap-0.5 cursor-default select-none"
+                >
+                  <img
+                    src={src}
+                    alt={label}
+                    draggable={true}
+                    onDragStart={(e) => handleIconDragStart(e, iconType)}
+                    className="w-10 h-10 object-contain rounded cursor-grab active:cursor-grabbing select-none hover:opacity-80 transition-opacity"
+                  />
+                  <span className="text-[9px] text-muted-foreground leading-tight text-center w-full truncate pointer-events-none">
+                    {label}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">{label}</TooltipContent>
+            </Tooltip>
           ))}
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
-};
-
-export default AttackPathToolbar;
+}
