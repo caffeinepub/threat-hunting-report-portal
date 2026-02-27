@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Network/canvas diagram tool with icon management, drawing tools, and image upload support. Features include draggable icon images (text labels stay fixed), vertically centered text labels, and drawings/icons always rendering on top of uploaded background images.",
+  "architectural_notes": [
+    "Canvas layering: uploaded background images are always behind drawings/icons",
+    "Icon drag behavior: only the icon image moves; text label position is independent"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-when-dragging-an-icon-on-the-canvas-only-the-icon-image-should-move-the-text-label-must-remain-fixed-in-its-original-position-and-must-not-follow-the-icon-image-during-the-drag-operation",
+      "title": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-text-labels-on-the-canvas-must-be-centered-vertically-relative-to-the-icon-s-position",
+      "title": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-all-drawings-freehand-shapes-lines-arrows-and-icons-placed-on-the-canvas-must-always-render-on-top-of-any-uploaded-background-image-the-uploaded-image-must-remain-the-bottom-most-layer",
+      "title": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Drag only the icon image on canvas; text label stays fixed in place",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Center text label vertically relative to the icon's position",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Drawings and icons always render on top of uploaded background images",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Icon-only drag, centered text labels, and drawing layer ordering",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

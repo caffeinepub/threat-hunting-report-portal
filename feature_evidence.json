@@ -1,0 +1,66 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-when-dragging-an-icon-on-the-canvas-only-the-icon-image-should-move-the-text-label-must-remain-fixed-in-its-original-position-and-must-not-follow-the-icon-image-during-the-drag-operation",
+      "featureTitle": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx",
+        "frontend/src/hooks/useAttackPathState.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-text-labels-on-the-canvas-must-be-centered-vertically-relative-to-the-icon-s-position",
+      "featureTitle": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-all-drawings-freehand-shapes-lines-arrows-and-icons-placed-on-the-canvas-must-always-render-on-top-of-any-uploaded-background-image-the-uploaded-image-must-remain-the-bottom-most-layer",
+      "featureTitle": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+      "files": [
+        "frontend/src/components/AttackPathCanvas.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

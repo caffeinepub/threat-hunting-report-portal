@@ -1,0 +1,33 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T05:06:53.524Z",
+  "summary": "The diff implements changes to support icon-only drag (REQ-1), fixed label positions, and layer ordering (REQ-3). However, REQ-2 (vertical centering of text labels relative to icon position) is not clearly implemented — the label is placed at a fixed offset below the icon at creation time (labelY: y + 56 + 10), which is a fixed offset, not dynamic vertical centering. REQ-3 layer ordering evidence is not visible in the truncated diff. REQ-1 appears implemented via labelX/labelY staying fixed on onMoveIcon.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "reason": "The diff shows label position is set once at creation (labelY: y + 56 + 10) and never updated. There is no evidence of dynamic vertical centering logic — the label is placed at a fixed pixel offset below the icon, not centered vertically relative to the icon image. No centering calculation is visible in the available code.",
+      "evidence": [
+        "frontend/src/hooks/useAttackPathState.ts"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "All drawings and icons must always render on top of uploaded background images; uploaded image must be the bottom-most layer.",
+      "reason": "The diff is truncated and the rendering order in AttackPathCanvas.tsx is not visible. There is no evidence in the visible diff portions showing that images are explicitly rendered before drawings/icons via z-index management or JSX rendering order placing images first.",
+      "evidence": [
+        "frontend/src/components/AttackPathCanvas.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.55,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/AttackPathCanvas.tsx",
+    "frontend/src/hooks/useAttackPathState.ts",
+    "frontend/src/pages/AttackPathPage.tsx",
+    "project_state.json"
+  ]
+}

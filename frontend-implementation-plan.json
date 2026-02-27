@@ -1,0 +1,60 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Icon-only drag, centered text labels, and drawing layer ordering",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Enable dragging only the icon image on the canvas while keeping the text label fixed at its original position",
+      "acceptanceCriteria": [
+        "Clicking and dragging an icon image on the canvas moves only the image element.",
+        "The text label associated with the icon remains at its original canvas position while the icon image is being dragged.",
+        "Releasing the drag leaves the icon image at the new position while the text label stays where it was."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Modify the handleMouseDown and handleMouseMove functions to distinguish between icon image dragging and text label positioning. When dragging an icon, update only the icon's position in the icons array while preserving the associated text label's position. Add logic to identify whether the mouse event target is an icon image element versus a text label element, and only allow dragging for icon images."
+        },
+        {
+          "path": "frontend/src/hooks/useAttackPathState.ts",
+          "operation": "modify",
+          "description": "Update the updateIconPosition function to ensure it only modifies the icon's position coordinates without affecting any associated text label positions. Verify that the Icon interface and state management support independent positioning of icon images and their labels."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Center text labels vertically relative to their associated icon positions on the canvas",
+      "acceptanceCriteria": [
+        "Each text label is rendered so that it is vertically centered relative to the icon image it belongs to.",
+        "Vertical centering is maintained regardless of the icon's position on the canvas."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Update the rendering logic for icon text labels to calculate vertical centering based on the icon image height. Adjust the y-coordinate of each text label to be vertically centered relative to its associated icon's y position. Apply CSS or inline styles (e.g., dominant-baseline or transform) to ensure proper vertical alignment of the text element itself."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Ensure all drawings, icons, and canvas elements render above any uploaded background image, keeping the image as the bottom-most layer",
+      "acceptanceCriteria": [
+        "Uploaded background images are always rendered below all other canvas elements (icons, drawings, text labels, connections).",
+        "Freehand drawings drawn after uploading an image appear visually on top of the uploaded image.",
+        "Icons added to the canvas are always displayed above any uploaded background image.",
+        "The draw and erase tools operate on elements layered above the uploaded image."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AttackPathCanvas.tsx",
+          "operation": "modify",
+          "description": "Restructure the rendering order in the canvas JSX to ensure uploaded images are rendered first (bottom layer), followed by connections/lines, freehand drawings, icons, and text labels in that order. Apply CSS z-index values or SVG/div ordering to enforce the layer hierarchy. Ensure that image elements have the lowest z-index or are rendered first in the DOM, and all interactive elements (icons, drawings, text) have higher z-index values or are rendered after images in the markup."
+        }
+      ]
+    }
+  ]
+}

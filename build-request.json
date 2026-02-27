@@ -1,0 +1,81 @@
+{
+  "kind": "build_request",
+  "title": "Icon-only drag, centered text labels, and drawing layer ordering",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "When dragging an icon on the canvas, only the icon image should move. The text label must remain fixed in its original position and must not follow the icon image during the drag operation.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-3"
+        ],
+        "quotes": [
+          "I should be able to drag the icon image in the canvas only and not include the text",
+          "should only the icon image move while the text label stays in place"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking and dragging an icon image on the canvas moves only the image element.",
+        "The text label associated with the icon remains at its original canvas position while the icon image is being dragged.",
+        "Releasing the drag leaves the icon image at the new position while the text label stays where it was."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Text labels on the canvas must be centered vertically relative to the icon's position.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-3"
+        ],
+        "quotes": [
+          "I should be able to modify the text label into center",
+          "centered vertically"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each text label is rendered so that it is vertically centered relative to the icon image it belongs to.",
+        "Vertical centering is maintained regardless of the icon's position on the canvas."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "All drawings (freehand, shapes, lines, arrows) and icons placed on the canvas must always render on top of any uploaded background image. The uploaded image must remain the bottom-most layer.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-3"
+        ],
+        "quotes": [
+          "when I upload an Image in canvas I should be able to draw and overwrite icons",
+          "appear on top of the uploaded image"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Uploaded background images are always rendered below all other canvas elements (icons, drawings, text labels, connections).",
+        "Freehand drawings drawn after uploading an image appear visually on top of the uploaded image.",
+        "Icons added to the canvas are always displayed above any uploaded background image.",
+        "The draw and erase tools operate on elements layered above the uploaded image."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change the backend schema or Motoko actor.",
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+  ],
+  "nonGoals": [
+    "Moving text labels when the icon is dragged.",
+    "Allowing uploaded images to be layered above drawings or icons.",
+    "Horizontal centering of text labels.",
+    "Any changes to connection labels or attack path coloring."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
